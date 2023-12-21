@@ -34,6 +34,7 @@
 		{@const is_sp_notation = token.startsWith('_')}
 		{@const is_word = !is_punctuation && !is_sp_notation}
 
+		<!-- TODO: tooltip is really not the right solution for this since there could me multiple messages, see https://github.com/saadeghi/daisyui/discussions/2655 -->
 		<div class:tooltip={has_errors} class:tooltip-error={has_errors} data-tip={messages.join(' ⎯ ')}>
 			<span class:badge-error={has_errors} class:badge-outline={is_word}  class:font-mono={is_sp_notation} class="badge badge-lg p-4 text-lg tracking-widest">
 				{#if has_errors}
