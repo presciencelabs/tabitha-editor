@@ -1,11 +1,11 @@
 <script>
 	import Icon from '@iconify/svelte'
-	import {check} from '$lib/checks'
+	import {parse} from '$lib/parser'
 
 	let entered_text = ''
 
-	$: checked_tokens = check(entered_text)
-	$: has_error = checked_tokens.some(token => !!token.messages.length)
+	$: checked_tokens = parse(entered_text)
+	$: has_error = checked_tokens.some(({message}) => !!message)
 	$: success = checked_tokens.length && !has_error
 </script>
 
@@ -15,6 +15,7 @@
 </form>
 
 <div class="divider my-12" class:divider-success={success} class:divider-error={has_error}>
+	<!-- prettier-ignore -->
 	<span class:text-success={success} class:text-error={has_error} class="prose text-2xl">
 		Phase 1 encoding
 	</span>
@@ -26,19 +27,18 @@
 	{/if}
 </div>
 
-<section class="prose max-w-none flex flex-wrap gap-x-4 gap-y-8">
+<section class="prose flex max-w-none flex-wrap gap-x-4 gap-y-8">
 	{#each checked_tokens as checked_token}
-		{@const {messages, token} = checked_token}
-		{@const has_errors = !!messages.length}
+		{@const {message, token} = checked_token}
+		{@const has_error = !!message}
 		{@const is_punctuation = ['[', ']', '.', ','].includes(token)}
 		{@const is_sp_notation = token.startsWith('_')}
 		{@const is_word = !is_punctuation && !is_sp_notation}
 
-		<!-- TODO: tooltip is really not the right solution for this since there could me multiple messages, see https://github.com/saadeghi/daisyui/discussions/2655 -->
-		<div class:tooltip={has_errors} class:tooltip-error={has_errors} data-tip={messages.join(' ⎯ ')}>
-			<span class:badge-error={has_errors} class:badge-outline={is_word}  class:font-mono={is_sp_notation} class="badge badge-lg p-4 text-lg tracking-widest">
-				{#if has_errors}
-					<Icon icon="mdi:close-circle" class="h-6 w-6 me-2" />
+		<div class:tooltip={has_error} class:tooltip-error={has_error} data-tip={message}>
+			<span class:badge-error={has_error} class:badge-outline={is_word} class:font-mono={is_sp_notation} class="badge badge-lg p-4 text-lg tracking-widest">
+				{#if has_error}
+					<Icon icon="mdi:close-circle" class="me-2 h-6 w-6" />
 
 					{token}
 				{:else}
