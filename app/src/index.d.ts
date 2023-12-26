@@ -5,6 +5,13 @@ type CheckedToken = {
 	message: string
 }
 
+type DbRowConcept = {
+	id: string
+	part_of_speech: string
+	stem: string
+	level: string
+}
+
 interface LookupResultsToken extends CheckedToken {
 	levels: string[]
 }
