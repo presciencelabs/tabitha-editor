@@ -12,19 +12,13 @@ type DbRowConcept = {
 	level: string
 }
 
-interface LookupResultsToken extends CheckedToken {
-	levels: string[]
-}
-
 type LookupTerm = string
 
 type LookupResult<T> = {
+	term: LookupTerm
 	matches: T[]
 }
 
-type OntologyResult = {
-	id: string
-	stem: string
+interface OntologyResult extends DbRowConcept {
 	sense: string
-	level: string
 }
