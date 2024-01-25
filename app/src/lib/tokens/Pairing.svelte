@@ -11,7 +11,7 @@
 
 	// scenarios:
 	//		good: follower follower/disciple
-	//		bad: disciple /disciple follower/ disciple/disciple
+	//		bad: disciple /disciple follower/ disciple/disciple /
 	/**
 	 * @param {string} token
 	 * @returns {CheckedToken[]}

@@ -315,6 +315,7 @@ describe('syntax: pairings', () => {
 		test.each([
 			[['follower/']],
 			[['/disciple']],
+			[['/']],
 		])('%s', test_tokens => {
 			/** @type {CheckedToken[]} */
 			const checked_tokens = check_syntax(test_tokens)
