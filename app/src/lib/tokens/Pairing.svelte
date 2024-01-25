@@ -4,15 +4,16 @@
 	import Result from './Result.svelte'
 	import NotFound from './NotFound.svelte'
 	import {check_ontology} from '$lib/lookups'
+	import { REGEXES } from '$lib/regexes'
 
 	/** @type {CheckedToken} */
 	export let checked_token
 
-	$: [simple, complex] = split_pair(checked_token.token)
+	$: [left, right] = split_pair(checked_token.token)
 
 	// scenarios:
 	//		good: follower follower/disciple
-	//		bad: disciple /disciple follower/ disciple/disciple disciple/follower /
+	//		bad: /disciple follower/ disciple/disciple disciple/follower /
 	/**
 	 * @param {string} token
 	 * @returns {CheckedToken[]}
@@ -22,44 +23,30 @@
 	}
 
 	/**
-	 * @param {CheckedToken} simple
-	 * @param {CheckedToken} complex
+	 * @param {CheckedToken} word1
+	 * @param {CheckedToken} word2
 	 */
-	async function lookup(simple, complex) {
+	async function lookup(word1, word2) {
 		return Promise.all([
-			check_ontology(simple),
-			check_ontology(complex),
+			check_ontology(word1),
+			check_ontology(word2),
 		])
-	}
-
-	/**
-	 * @param {OntologyResult} token
-	 */
-	function is_simple(token) {
-		return ['0','1'].includes(token.level)
-	}
-
-	/**
-	 * @param {OntologyResult} token
-	 */
-	function is_complex(token) {
-		return ['2','3'].includes(token.level)
 	}
 </script>
 
-{#await lookup(simple, complex)}
+{#await lookup(left, right)}
 	<Loading {checked_token} />
-{:then [simple_result, complex_result]}
+{:then [left_result, right_result]}
 	<!-- TODO: consider multiple matches where the levels are different, e.g., son -->
-	{@const simple_match = simple_result.matches?.[0]}
-	{@const complex_match = complex_result.matches?.[0]}
+	{@const left_match = left_result.matches?.[0]}
+	{@const right_match = right_result.matches?.[0]}
 
 	<div class="join">
-		{#if simple_match}
-			{#if is_simple(simple_match) }
-				<Result result={simple_result} classes='join-item' />
+		{#if left_match}
+			{#if REGEXES.IS_LEVEL_SIMPLE.test(left_match.level) }
+				<Result result={left_result} classes='join-item' />
 			{:else}
-				{@const error = {token: simple.token, message: 'Word must be a level 0 or 1'}}
+				{@const error = {token: left.token, message: 'Word must be a level 0 or 1'}}
 
 				<Error checked_token={error} classes='join-item' />
 			{/if}
@@ -71,11 +58,11 @@
 			/
 		</span>
 
-		{#if complex_match}
-			{#if is_complex(complex_match) }
-				<Result result={complex_result} classes='join-item' />
+		{#if right_match}
+			{#if REGEXES.IS_LEVEL_COMPLEX.test(right_match.level) }
+				<Result result={right_result} classes='join-item' />
 			{:else}
-				{@const error = {token: complex.token, message: 'Word must be a level 2 or 3'}}
+				{@const error = {token: right.token, message: 'Word must be a level 2 or 3'}}
 
 				<Error checked_token={error} classes='join-item' />
 			{/if}
