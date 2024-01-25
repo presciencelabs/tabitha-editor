@@ -3,6 +3,7 @@
 	import Loading from './Loading.svelte'
 	import LookupResult from './LookupResult.svelte'
 	import Note from './Note.svelte'
+	import NotFound from './NotFound.svelte'
 	import Pairing from './Pairing.svelte'
 	import Punctuation from './Punctuation.svelte'
 	import {check_ontology} from '$lib/lookups'
@@ -32,8 +33,8 @@
 			<Loading {checked_token} />
 		{:then result}
 			<LookupResult {result} />
-		{:catch error}
-			<pre>Unknown error {error}</pre>
+		{:catch}
+			<NotFound {checked_token} />
 		{/await}
 	{/if}
 {/each}

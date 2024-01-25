@@ -2,12 +2,14 @@
 	/** @type {LookupResult<OntologyResult>} */
 	export let result
 
+	export let classes = ''
+
 	// TODO: more work needed to handle multiple matches with possibly different levels, e.g., son
 	const match = result.matches[0]
-	const level_color = match ? `L${match.level}` : ''
+	const level_color = `L${match?.level}`
 </script>
 
-<span class="badge badge-lg badge-outline px-4 py-5 text-lg tracking-widest {level_color}">
+<span class="badge badge-lg badge-outline px-4 py-5 text-lg tracking-widest {level_color} {classes}">
 	{result.term}
 </span>
 
