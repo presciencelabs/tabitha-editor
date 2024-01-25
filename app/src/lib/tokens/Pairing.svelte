@@ -1,7 +1,7 @@
 <script>
 	import Error from './Error.svelte'
 	import Loading from './Loading.svelte'
-	import LookupResult from './LookupResult.svelte' //TODO: this will cause a name conflict with the existing type
+	import Result from './Result.svelte'
 	import NotFound from './NotFound.svelte'
 	import {check_ontology} from '$lib/lookups'
 
@@ -32,12 +32,18 @@
 		])
 	}
 
+	/**
+	 * @param {OntologyResult} token
+	 */
 	function is_simple(token) {
-		return [0,1].includes(token.level)
+		return ['0','1'].includes(token.level)
 	}
 
+	/**
+	 * @param {OntologyResult} token
+	 */
 	function is_complex(token) {
-		return [2,3].includes(token.level)
+		return ['2','3'].includes(token.level)
 	}
 </script>
 
@@ -51,7 +57,7 @@
 	<div class="join">
 		{#if simple_match}
 			{#if is_simple(simple_match) }
-				<LookupResult result={simple_result} classes='join-item' />
+				<Result result={simple_result} classes='join-item' />
 			{:else}
 				{@const error = {token: simple.token, message: 'Word must be a level 0 or 1'}}
 
@@ -67,7 +73,7 @@
 
 		{#if complex_match}
 			{#if is_complex(complex_match) }
-				<LookupResult result={complex_result} classes='join-item' />
+				<Result result={complex_result} classes='join-item' />
 			{:else}
 				{@const error = {token: complex.token, message: 'Word must be a level 2 or 3'}}
 

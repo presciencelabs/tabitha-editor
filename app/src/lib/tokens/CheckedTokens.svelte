@@ -1,7 +1,7 @@
 <script>
 	import Error from './Error.svelte'
 	import Loading from './Loading.svelte'
-	import LookupResult from './LookupResult.svelte'
+	import Result from './Result.svelte'
 	import Note from './Note.svelte'
 	import NotFound from './NotFound.svelte'
 	import Pairing from './Pairing.svelte'
@@ -32,7 +32,7 @@
 		{#await check_ontology(checked_token)}
 			<Loading {checked_token} />
 		{:then result}
-			<LookupResult {result} />
+			<Result {result} />
 		{:catch}
 			<NotFound {checked_token} />
 		{/await}
