@@ -1,4 +1,5 @@
 <script>
+	import Error from './Error.svelte'
 	import Loading from './Loading.svelte'
 	import LookupResult from './LookupResult.svelte' //TODO: this will cause a name conflict with the existing type
 	import NotFound from './NotFound.svelte'
@@ -11,7 +12,7 @@
 
 	// scenarios:
 	//		good: follower follower/disciple
-	//		bad: disciple /disciple follower/ disciple/disciple /
+	//		bad: disciple /disciple follower/ disciple/disciple disciple/follower /
 	/**
 	 * @param {string} token
 	 * @returns {CheckedToken[]}
@@ -30,19 +31,51 @@
 			check_ontology(complex),
 		])
 	}
+
+	function is_simple(token) {
+		return [0,1].includes(token.level)
+	}
+
+	function is_complex(token) {
+		return [2,3].includes(token.level)
+	}
 </script>
 
 {#await lookup(simple, complex)}
 	<Loading {checked_token} />
 {:then [simple_result, complex_result]}
+	<!-- TODO: consider multiple matches where the levels are different, e.g., son -->
+	{@const simple_match = simple_result.matches?.[0]}
+	{@const complex_match = complex_result.matches?.[0]}
+
 	<div class="join">
-		<LookupResult result={simple_result} classes='join-item' />
+		{#if simple_match}
+			{#if is_simple(simple_match) }
+				<LookupResult result={simple_result} classes='join-item' />
+			{:else}
+				{@const error = {token: simple.token, message: 'Word must be a level 0 or 1'}}
+
+				<Error checked_token={error} classes='join-item' />
+			{/if}
+		{:else}
+			<NotFound {checked_token} classes='join-item' />
+		{/if}
 
 		<span class="badge badge-lg badge-outline px-1.5 py-5 text-2xl join-item">
 			/
 		</span>
 
-		<LookupResult result={complex_result} classes='join-item' />
+		{#if complex_match}
+			{#if is_complex(complex_match) }
+				<LookupResult result={complex_result} classes='join-item' />
+			{:else}
+				{@const error = {token: complex.token, message: 'Word must be a level 2 or 3'}}
+
+				<Error checked_token={error} classes='join-item' />
+			{/if}
+		{:else}
+			<NotFound {checked_token} classes='join-item' />
+		{/if}
 	</div>
 {:catch}
 	<NotFound {checked_token} />
