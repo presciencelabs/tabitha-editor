@@ -1,5 +1,5 @@
 // prettier-ignore
-export const function_words = [
+export const FUNCTION_WORDS = new Set([
 	'a',
 	'an',
 	'certainly',
@@ -27,5 +27,5 @@ export const function_words = [
 	'very',
 	'will',
 	'would',
-]
+])
 

@@ -1,5 +1,39 @@
 import {parse} from '.'
 import {describe, expect, test} from 'vitest'
+import { DEFAULT_TOKEN_VALUES, TOKEN_TYPE } from '$lib/token'
+
+/**
+ * 
+ * @param {string} token 
+ * @param {string?} lookup_term 
+ * @returns 
+ */
+export function word_token(token, lookup_term=null) {
+	return {
+		...DEFAULT_TOKEN_VALUES,
+		token,
+		type: TOKEN_TYPE.WORD,
+		lookup_term: lookup_term || token,
+	}
+}
+
+/**
+ * 
+ * @param {string} token 
+ * @param {string?} lookup_left
+ * @param {string?} lookup_right
+ * @returns 
+ */
+export function pairing_token(token, lookup_left=null, lookup_right=null) {
+	let [left, right] = token.split('/')
+	return {
+		...DEFAULT_TOKEN_VALUES,
+		token,
+		type: TOKEN_TYPE.PAIRING,
+		pairing_left: word_token(left, lookup_left),
+		pairing_right: word_token(right, lookup_right),
+	}
+}
 
 describe('parse', () => {
 	describe('no problems', () => {
@@ -13,23 +47,14 @@ describe('parse', () => {
 
 		test('token', () => {
 			expect(parse('token')).toEqual([
-				{
-					token: 'token',
-					message: '',
-				},
+				word_token('token')
 			])
 		})
 
 		test('token1 token2', () => {
 			expect(parse('token1 token2')).toEqual([
-				{
-					token: 'token1',
-					message: '',
-				},
-				{
-					token: 'token2',
-					message: '',
-				},
+				word_token('token1'),
+				word_token('token2')
 			])
 		})
 
@@ -38,16 +63,22 @@ describe('parse', () => {
 
 			expect(results).length(6)
 			expect(results[0].token).toBe('ok')
+			expect(results[0].type).toBe(TOKEN_TYPE.WORD)
 			expect(results[0].message).toBe('')
 			expect(results[1].token).toBe('_notesNotation')
+			expect(results[1].type).toBe(TOKEN_TYPE.NOTE)
 			expect(results[1].message).toBe('')
 			expect(results[2].token).toBe('[')
+			expect(results[2].type).toBe(TOKEN_TYPE.PUNCTUATION)
 			expect(results[2].message).toBe('')
 			expect(results[3].token).toBe('fixedbracket')
+			expect(results[3].type).toBe(TOKEN_TYPE.WORD)
 			expect(results[3].message).toBe('')
 			expect(results[4].token).toBe('you(Paul)')
+			expect(results[4].type).toBe(TOKEN_TYPE.WORD)
 			expect(results[4].message).toBe('')
 			expect(results[5].token).toBe(']')
+			expect(results[5].type).toBe(TOKEN_TYPE.PUNCTUATION)
 			expect(results[5].message).toBe('')
 		})
 
@@ -84,6 +115,30 @@ describe('parse', () => {
 			expect(results[13].token).toBe('.')
 			expect(results[13].message).toBe('')
 		})
+
+		test('you(people) are being stupid/foolish."', () => {
+			const results = parse('you(people) are being stupid/foolish."')
+
+			expect(results).length(6)
+			expect(results[0].token).toBe('you(people)')
+			expect(results[0].type).toBe(TOKEN_TYPE.WORD)
+			expect(results[0].message).toBe('')
+			expect(results[1].token).toBe('are')
+			expect(results[1].type).toBe(TOKEN_TYPE.WORD)
+			expect(results[1].message).toBe('')
+			expect(results[2].token).toBe('being')
+			expect(results[2].type).toBe(TOKEN_TYPE.WORD)
+			expect(results[2].message).toBe('')
+			expect(results[3].token).toBe('stupid/foolish')
+			expect(results[3].type).toBe(TOKEN_TYPE.PAIRING)
+			expect(results[3].message).toBe('')
+			expect(results[4].token).toBe('.')
+			expect(results[4].type).toBe(TOKEN_TYPE.PUNCTUATION)
+			expect(results[4].message).toBe('')
+			expect(results[5].token).toBe('"')
+			expect(results[5].type).toBe(TOKEN_TYPE.PUNCTUATION)
+			expect(results[5].message).toBe('')
+		})
 	})
 
 	describe('problems detected', () => {
@@ -99,18 +154,22 @@ describe('parse', () => {
 			expect(results[2].message).toMatch(/^Missing a closing bracket/)
 		})
 
-		test('ok _notesNotation[badbracket you', () => {
-			const results = parse('ok _notesNotation[badbracket you')
+		test('ok _notesNotation text[badbracket you', () => {
+			const results = parse('ok _notesNotation text[badbracket you')
 
-			expect(results).length(4)
+			expect(results).length(6)
 			expect(results[0].token).toBe('ok')
 			expect(results[0].message).toBe('')
-			expect(results[1].token).toBe('_notesNotation[badbracket')
-			expect(results[1].message).toMatch(/^Subordinate clauses/)
-			expect(results[2].token).toBe('you')
-			expect(results[2].message).toMatch(/^Second person pronouns/)
-			expect(results[3].token).toBe(']')
-			expect(results[3].message).toMatch(/^Missing a closing bracket/)
+			expect(results[1].token).toBe('_notesNotation')
+			expect(results[1].message).toBe('')
+			expect(results[2].token).toBe('text[')
+			expect(results[2].message).toMatch(/^Must have a space/)
+			expect(results[3].token).toBe('badbracket')
+			expect(results[3].message).toBe('')
+			expect(results[4].token).toBe('you')
+			expect(results[4].message).toMatch(/^Second person pronouns/)
+			expect(results[5].token).toBe(']')
+			expect(results[5].message).toMatch(/^Missing a closing bracket/)
 		})
 
 		test('ok _notesNotation [fixedbracket you', () => {

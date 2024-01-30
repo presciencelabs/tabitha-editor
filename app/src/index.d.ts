@@ -1,8 +1,12 @@
-type Token = string
+type TokenType = string
 
-type CheckedToken = {
-	token: Token
-	message: string
+type Token = {
+	token: string;
+	type: TokenType;
+	message: string;
+	lookup_term: string;
+	pairing_left: Token?;
+	pairing_right: Token?;
 }
 
 type DbRowConcept = {
