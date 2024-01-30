@@ -96,10 +96,11 @@ describe('tokenize_input', () => {
 	})
 
 	test('valid words', () => {
-		const INPUT = "token token's token-A token's-A in-order-to Holy-Spirit's token123 123"
+		const INPUT = "token tokens token's token-A token's-A in-order-to Holy-Spirit's token123 123"
 		
 		const EXPECTED_OUTPUT = [
 			word_token("token", "token"),
+			word_token("tokens", "tokens"),
 			word_token("token's", "token"),
 			word_token("token-A", "token-A"),
 			word_token("token's-A", "token-A"),

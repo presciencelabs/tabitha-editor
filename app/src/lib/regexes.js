@@ -15,7 +15,7 @@ const EXTRACT_PRONOUN_REFERENT = /^\w+\(([\w'-]+)\)$/
 
 // Could be son son's sons' son-C son's-C sons'-C
 // This pulls out the stem and sense, which will then need to be put back together
-const EXTRACT_WORD_REFERENT = /^(.+?)'?s?(-[A-Z])?$/
+const EXTRACT_WORD_REFERENT = /^(.+?)(?:'s|')?(-[A-Z])?$/
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Character_class
 const OPENING_OR_CLOSING_BRACKET = /[[\]]/
