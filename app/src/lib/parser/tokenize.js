@@ -9,6 +9,16 @@ import {ERRORS} from './error_messages'
  * @returns {Token[]}
  */
 export function tokenize_input(text = '') {
+	/** @type {Array<[() => boolean, () => Token]>} */
+	const parsers = [
+		[() => match(REGEXES.WORD_START_CHAR), word],
+		[() => match(REGEXES.OPENING_PAREN), clause_notation],
+		[() => match(/_/), underscore_notation],
+		[() => match_two(/\.\d/), decimal_number],
+		[() => match(/[["]/), opening_punctuation],
+		[() => match(/[.,?!:\]]/), closing_punctuation],
+	]
+
 	const tokens = []
 	let token_start = 0
 
@@ -18,38 +28,11 @@ export function tokenize_input(text = '') {
 		if (match(REGEXES.ANY_WHITESPACE)) {
 			continue
 		}
-		tokens.push(parse_token())
+		const parser = parsers.find(([check]) => check())?.[1] ?? invalid_opening_char
+		tokens.push(parser())
 	}
 
 	return tokens
-
-	/**
-	 * @returns {Token}
-	 */
-	function parse_token() {
-		if (match(REGEXES.WORD_START_CHAR)) {
-			return word()
-
-		} else if (match(REGEXES.OPENING_PAREN)) {
-			return clause_notation()
-
-		} else if (match(/_/)) {
-			return underscore_notation()
-
-		} else if (match_two(/\.\d/)) {
-			// decimal number like .1
-			return decimal_number()
-
-		} else if (match(/[.,?!:\]]/)) {
-			return closing_punctuation()
-
-		} else if (match(/[["]/)) {
-			return opening_punctuation()
-
-		} else {
-			return invalid_opening_char()
-		}
-	}
 
 	function word() {
 		eat(REGEXES.WORD_CHAR)
