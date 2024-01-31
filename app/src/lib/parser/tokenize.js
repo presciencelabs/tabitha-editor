@@ -9,7 +9,7 @@ import {ERRORS} from './error_messages'
  * @returns {Token[]}
  */
 export function tokenize_input(text = '') {
-	let tokens = []
+	const tokens = []
 	let token_start = 0
 
 	let i = 0
@@ -99,7 +99,7 @@ export function tokenize_input(text = '') {
 		eat_until(REGEXES.OR(REGEXES.TOKEN_END_BOUNDARY, REGEXES.CLOSING_PAREN))
 		if (!match(REGEXES.CLOSING_PAREN)) {
 			// (imp
-			return create_error_token(collect_text(), ERRORS.MISSING_CLOSING_PAREN)
+			return error_token(ERRORS.MISSING_CLOSING_PAREN)
 
 		} else if (!is_at_end() && !peek_match(REGEXES.ANY_WHITESPACE)) {
 			// (imp)[ (imp)token
@@ -133,6 +133,27 @@ export function tokenize_input(text = '') {
 		return simple_token(TOKEN_TYPE.PUNCTUATION)
 	}
 
+	/**
+	 * @param {TokenType} token_type
+	 * @returns {Token}
+	 */
+	function check_boundary_for_token(token_type) {
+		if (!is_at_end() && !peek_match(REGEXES.TOKEN_END_BOUNDARY)) {
+			return invalid_closing_char()
+		}
+
+		if (token_type == TOKEN_TYPE.LOOKUP_WORD) {
+			// token token. token,
+			return word_token()
+		} else if (token_type == TOKEN_TYPE.PAIRING) {
+			// simple/complex simple/complex. simple/complex,
+			return pairing_token()
+		} else {
+			// punctuation
+			return simple_token(token_type)
+		}
+	}
+
 	function invalid_opening_char() {
 		const char = peek()
 		eat_until(REGEXES.TOKEN_END_BOUNDARY)
@@ -145,24 +166,8 @@ export function tokenize_input(text = '') {
 		return error_token(messages.get(char) || ERRORS.UNRECOGNIZED_CHAR)
 	}
 
-	/**
-	 * @param {TokenType} token_type
-	 * @returns {Token}
-	 */
-	function check_boundary_for_token(token_type) {
-		if (is_at_end() || peek_match(REGEXES.TOKEN_END_BOUNDARY)) {
-			if (token_type == TOKEN_TYPE.LOOKUP_WORD) {
-				// token token. token,
-				return word_token(collect_text())
-			} else if (token_type == TOKEN_TYPE.PAIRING) {
-				// simple/complex simple/complex. simple/complex,
-				return pairing_token(collect_text())
-			} else {
-				// punctuation
-				return simple_token(token_type)
-			}
-			
-		} else if (match(REGEXES.OPENING_BRACKET)) {
+	function invalid_closing_char() {
+		if (match(REGEXES.OPENING_BRACKET)) {
 			// token[ .[ ][ etc
 			return error_token(ERRORS.NO_SPACE_BEFORE_OPENING_BRACKET)
 
@@ -178,7 +183,7 @@ export function tokenize_input(text = '') {
 
 		} else {
 			// .token token_ ?token
-			let text = collect_text()
+			const text = collect_text()
 			eat_until(REGEXES.TOKEN_END_BOUNDARY)
 			return error_token(ERRORS.INVALID_TOKEN_END(text))
 		}
@@ -187,13 +192,12 @@ export function tokenize_input(text = '') {
 	function collect_text() {
 		return text.substring(token_start, i)
 	}
-	
 
 	/**
-	 * @param {string} token
 	 * @returns {Token}
 	 */
-	function word_token(token) {
+	function word_token() {
+		const token = collect_text()
 		if (FUNCTION_WORDS.has(token.toLowerCase())) {
 			return create_token(token, TOKEN_TYPE.FUNCTION_WORD)
 		}
@@ -205,25 +209,22 @@ export function tokenize_input(text = '') {
 	 * @returns {Token}
 	 */
 	function lookup_token(text) {
-		let lookup_term = text
-		if (text.includes('(')) {
-			// you(Paul)
-			// @ts-ignore there will always be a match here
-			lookup_term = text.match(REGEXES.EXTRACT_PRONOUN_REFERENT)?.[1]
-		}
-		const match = lookup_term.match(REGEXES.EXTRACT_WORD_REFERENT)
+		// The lookup term could be in a pronoun referent
+		const lookup_term = text.match(REGEXES.EXTRACT_PRONOUN_REFERENT)?.[1] ?? text
+		const lookup_match = lookup_term.match(REGEXES.EXTRACT_WORD_REFERENT)
+
 		// combine stem and sense
 		// @ts-ignore the stem will always be there
-		const stem = match?.[1]
-		const sense = match?.[2] ?? ''
+		const stem = lookup_match?.[1]
+		const sense = lookup_match?.[2] ?? ''
 		return create_token(text, TOKEN_TYPE.LOOKUP_WORD, { lookup_term: `${stem}${sense}` })
 	}
 
 	/**
-	 * @param {string} token 
 	 * @returns {Token}
 	 */
-	function pairing_token(token) {
+	function pairing_token() {
+		const token = collect_text()
 		const [left, right] = token.split('/')
 		const left_token = lookup_token(left)
 		const right_token = lookup_token(right)

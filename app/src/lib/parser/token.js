@@ -1,26 +1,19 @@
-/**
- * @type {TokenType}
- */
+/** @type {TokenType} */
 const ERROR = 'Error'
-/**
- * @type {TokenType}
- */
+
+/** @type {TokenType} */
 const PUNCTUATION = 'Punctuation'
-/**
- * @type {TokenType}
- */
+
+/** @type {TokenType} */
 const NOTE = 'Note'
-/**
- * @type {TokenType}
- */
+
+/** @type {TokenType} */
 const FUNCTION_WORD = 'FunctionWord'
-/**
- * @type {TokenType}
- */
+
+/** @type {TokenType} */
 const LOOKUP_WORD = 'Word'
-/**
- * @type {TokenType}
- */
+
+/** @type {TokenType} */
 const PAIRING = 'Pairing'
 
 export const TOKEN_TYPE = {
