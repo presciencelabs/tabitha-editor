@@ -3,7 +3,7 @@
 	import {parse} from '$lib/parser'
 	import {backtranslate} from '$lib/backtranslator'
 	import {Tokens} from '$lib/tokens'
-	import {TOKEN_TYPE} from '$lib/token'
+	import {TOKEN_TYPE} from '$lib/parser/token'
 
 	let entered_text = ''
 

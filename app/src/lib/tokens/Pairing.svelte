@@ -6,14 +6,14 @@
 	import TokenDisplay from './TokenDisplay.svelte'
 	import {check_ontology} from '$lib/lookups'
 	import {REGEXES} from '$lib/regexes'
-	import {error_token} from '$lib/token'
+	import {create_error_token} from '$lib/parser/token'
 
 	/** @type {Token} */
 	export let token
 
 	// At this point the pairing tokens will never be null. This satisfies the compiler
-	$: left_token = token.pairing_left || error_token('', 'Unreachable')
-	$: right_token = token.pairing_right || error_token('', 'Unreachable')
+	$: left_token = token.pairing_left || create_error_token('', 'Unreachable')
+	$: right_token = token.pairing_right || create_error_token('', 'Unreachable')
 
 	/**
 	 * 

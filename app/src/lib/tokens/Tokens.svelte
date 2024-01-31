@@ -5,18 +5,18 @@
 	import Pairing from './Pairing.svelte'
 	import Punctuation from './Punctuation.svelte'
 	import Word from './Word.svelte'
-	import {TOKEN_TYPE} from '$lib/token'
+	import {TOKEN_TYPE} from '$lib/parser/token'
 
 	/** @type {Token[]} */
 	export let tokens
 
-	let component_map = new Map([
+	const component_map = new Map([
 		[TOKEN_TYPE.ERROR, Error],
 		[TOKEN_TYPE.FUNCTION_WORD, FunctionWord],
 		[TOKEN_TYPE.NOTE, Note],
 		[TOKEN_TYPE.PAIRING, Pairing],
 		[TOKEN_TYPE.PUNCTUATION, Punctuation],
-		[TOKEN_TYPE.WORD, Word],
+		[TOKEN_TYPE.LOOKUP_WORD, Word],
 	])
 </script>
 

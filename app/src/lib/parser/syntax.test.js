@@ -1,6 +1,6 @@
-import { DEFAULT_TOKEN_VALUES, TOKEN_TYPE } from '$lib/token'
-import {CLAUSE_NOTATIONS} from './clause_notations'
+import {TOKEN_TYPE, create_token} from './token'
 import {check_for_unbalanced_brackets, check_syntax} from './syntax'
+import {ERRORS} from './error_messages'
 import {describe, expect, test} from 'vitest'
 
 /**
@@ -9,7 +9,7 @@ import {describe, expect, test} from 'vitest'
  * @returns {Token[]}
  */
 function create_tokens(tokens) {
-	return tokens.map(token => {return {...DEFAULT_TOKEN_VALUES, token, type: TOKEN_TYPE.WORD}})
+	return tokens.map(token => {return create_token(token, TOKEN_TYPE.LOOKUP_WORD)})
 }
 
 describe('syntax: pronouns', () => {
@@ -184,7 +184,7 @@ describe('balancing: brackets', () => {
 			expect(checked_tokens[1]).toEqual(test_tokens[1])
 
 			expect(checked_tokens[2].token).toBe(']')
-			expect(checked_tokens[2].message).toMatch(/^Missing a closing/)
+			expect(checked_tokens[2].message).toEqual(ERRORS.MISSING_CLOSING_BRACKET)
 		})
 
 		test('[token [token] => should result in an extra "]" token at the end with the appropriate message', () => {
@@ -200,7 +200,7 @@ describe('balancing: brackets', () => {
 			expect(checked_tokens[4]).toEqual(test_tokens[4])
 
 			expect(checked_tokens[5].token).toBe(']')
-			expect(checked_tokens[5].message).toMatch(/^Missing a closing/)
+			expect(checked_tokens[5].message).toEqual(ERRORS.MISSING_CLOSING_BRACKET)
 		})
 
 		test('token] => should result in an extra "[" token at the beginning with the appropriate message', () => {
@@ -210,7 +210,7 @@ describe('balancing: brackets', () => {
 
 			expect(checked_tokens.length).toEqual(3)
 			expect(checked_tokens[0].token).toBe('[')
-			expect(checked_tokens[0].message).toMatch(/^Missing an opening/)
+			expect(checked_tokens[0].message).toEqual(ERRORS.MISSING_OPENING_BRACKET)
 
 			expect(checked_tokens[1]).toEqual(test_tokens[0])
 			expect(checked_tokens[2]).toEqual(test_tokens[1])
@@ -223,7 +223,7 @@ describe('balancing: brackets', () => {
 
 			expect(checked_tokens.length).toEqual(6)
 			expect(checked_tokens[0].token).toBe('[')
-			expect(checked_tokens[0].message).toMatch(/^Missing an opening/)
+			expect(checked_tokens[0].message).toEqual(ERRORS.MISSING_OPENING_BRACKET)
 
 			expect(checked_tokens[1]).toEqual(test_tokens[0])
 			expect(checked_tokens[2]).toEqual(test_tokens[1])
@@ -245,9 +245,9 @@ describe('balancing: brackets', () => {
 			expect(checked_tokens[4]).toEqual(test_tokens[4])
 
 			expect(checked_tokens[5].token).toBe(']')
-			expect(checked_tokens[5].message).toMatch(/^Missing a closing/)
+			expect(checked_tokens[5].message).toEqual(ERRORS.MISSING_CLOSING_BRACKET)
 			expect(checked_tokens[6].token).toBe(']')
-			expect(checked_tokens[6].message).toMatch(/^Missing a closing/)
+			expect(checked_tokens[6].message).toEqual(ERRORS.MISSING_CLOSING_BRACKET)
 		})
 
 		test('[token]]] => should result in extra "[" tokens at the begining with the appropriate message', () => {
@@ -257,9 +257,9 @@ describe('balancing: brackets', () => {
 
 			expect(checked_tokens.length).toEqual(7)
 			expect(checked_tokens[0].token).toBe('[')
-			expect(checked_tokens[0].message).toMatch(/^Missing an opening/)
+			expect(checked_tokens[0].message).toEqual(ERRORS.MISSING_OPENING_BRACKET)
 			expect(checked_tokens[1].token).toBe('[')
-			expect(checked_tokens[1].message).toMatch(/^Missing an opening/)
+			expect(checked_tokens[1].message).toEqual(ERRORS.MISSING_OPENING_BRACKET)
 
 			expect(checked_tokens[2]).toEqual(test_tokens[0])
 			expect(checked_tokens[3]).toEqual(test_tokens[1])

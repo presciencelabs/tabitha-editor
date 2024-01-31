@@ -1,4 +1,4 @@
-type TokenType = string
+type TokenType = 'Error' | 'Punctuation' | 'Note' | 'FunctionWord' | 'Word' | 'Pairing'
 
 type Token = {
 	token: string;

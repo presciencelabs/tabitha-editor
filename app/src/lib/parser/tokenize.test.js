@@ -1,37 +1,9 @@
-import { DEFAULT_TOKEN_VALUES, TOKEN_TYPE } from '$lib/token'
-import { CLAUSE_NOTATIONS } from './clause_notations'
-import { FUNCTION_WORDS } from './function_words'
+import {TOKEN_TYPE, create_error_token, create_token} from './token'
+import {ERRORS} from './error_messages'
+import {CLAUSE_NOTATIONS} from './clause_notations'
+import {FUNCTION_WORDS} from './function_words'
 import {tokenize_input} from './tokenize'
 import {describe, expect, test} from 'vitest'
-
-/**
- * 
- * @param {string} token 
- * @param {TokenType} type 
- * @returns 
- */
-function simple_token(token, type) {
-	return {
-		...DEFAULT_TOKEN_VALUES,
-		token,
-		type,
-	}
-}
-
-/**
- * 
- * @param {string} token 
- * @param {string} message 
- * @returns 
- */
-function error_token(token, message) {
-	return {
-		...DEFAULT_TOKEN_VALUES,
-		token,
-		type: TOKEN_TYPE.ERROR,
-		message,
-	}
-}
 
 /**
  * 
@@ -39,13 +11,8 @@ function error_token(token, message) {
  * @param {string?} lookup_term 
  * @returns 
  */
-function word_token(token, lookup_term=null) {
-	return {
-		...DEFAULT_TOKEN_VALUES,
-		token,
-		type: TOKEN_TYPE.WORD,
-		lookup_term: lookup_term || token,
-	}
+function create_word_token(token, lookup_term=null) {
+	return create_token(token, TOKEN_TYPE.LOOKUP_WORD, {lookup_term: lookup_term || token})
 }
 
 /**
@@ -55,15 +22,11 @@ function word_token(token, lookup_term=null) {
  * @param {string?} lookup_right
  * @returns 
  */
-function pairing_token(token, lookup_left=null, lookup_right=null) {
-	let [left, right] = token.split('/')
-	return {
-		...DEFAULT_TOKEN_VALUES,
-		token,
-		type: TOKEN_TYPE.PAIRING,
-		pairing_left: word_token(left, lookup_left),
-		pairing_right: word_token(right, lookup_right),
-	}
+function create_pairing_token(token, lookup_left=null, lookup_right=null) {
+	const [left, right] = token.split('/')
+	const left_token = create_word_token(left, lookup_left)
+	const right_token = create_word_token(right, lookup_right)
+	return create_token(token, TOKEN_TYPE.PAIRING, {pairing_left: left_token, pairing_right: right_token})
 }
 
 describe('tokenize_input', () => {
@@ -83,13 +46,13 @@ describe('tokenize_input', () => {
 		g`
 
 		const EXPECTED_OUTPUT = [
-			simple_token('a', TOKEN_TYPE.FUNCTION_WORD),
-			word_token('b'),
-			word_token('c'),
-			word_token('d'),
-			word_token('e'),
-			word_token('f'),
-			word_token('g'),
+			create_token('a', TOKEN_TYPE.FUNCTION_WORD),
+			create_word_token('b'),
+			create_word_token('c'),
+			create_word_token('d'),
+			create_word_token('e'),
+			create_word_token('f'),
+			create_word_token('g'),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -99,15 +62,15 @@ describe('tokenize_input', () => {
 		const INPUT = "token tokens token's token-A token's-A in-order-to Holy-Spirit's token123 123"
 		
 		const EXPECTED_OUTPUT = [
-			word_token("token", "token"),
-			word_token("tokens", "tokens"),
-			word_token("token's", "token"),
-			word_token("token-A", "token-A"),
-			word_token("token's-A", "token-A"),
-			word_token("in-order-to", "in-order-to"),
-			word_token("Holy-Spirit's", "Holy-Spirit"),
-			word_token("token123", "token123"),
-			word_token("123", "123"),
+			create_word_token("token", "token"),
+			create_word_token("tokens", "tokens"),
+			create_word_token("token's", "token"),
+			create_word_token("token-A", "token-A"),
+			create_word_token("token's-A", "token-A"),
+			create_word_token("in-order-to", "in-order-to"),
+			create_word_token("Holy-Spirit's", "Holy-Spirit"),
+			create_word_token("token123", "token123"),
+			create_word_token("123", "123"),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -117,12 +80,12 @@ describe('tokenize_input', () => {
 		const INPUT = "2.5 .5 .1. 3.88]"
 		
 		const EXPECTED_OUTPUT = [
-			word_token('2.5', '2.5'),
-			word_token('.5', '.5'),
-			word_token('.1', '.1'),
-			simple_token('.', TOKEN_TYPE.PUNCTUATION),
-			word_token('3.88', '3.88'),
-			simple_token(']', TOKEN_TYPE.PUNCTUATION),
+			create_word_token('2.5', '2.5'),
+			create_word_token('.5', '.5'),
+			create_word_token('.1', '.1'),
+			create_token('.', TOKEN_TYPE.PUNCTUATION),
+			create_word_token('3.88', '3.88'),
+			create_token(']', TOKEN_TYPE.PUNCTUATION),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -132,9 +95,9 @@ describe('tokenize_input', () => {
 		const INPUT = ".token ,token token["
 		
 		const EXPECTED_OUTPUT = [
-			error_token('.token', '. must be followed by a space or punctuation'),
-			error_token(',token', ', must be followed by a space or punctuation'),
-			error_token('token[', 'Must have a space between token and ['),
+			create_error_token('.token', ERRORS.INVALID_TOKEN_END('.')),
+			create_error_token(',token', ERRORS.INVALID_TOKEN_END(',')),
+			create_error_token('token[', ERRORS.NO_SPACE_BEFORE_OPENING_BRACKET),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -144,15 +107,15 @@ describe('tokenize_input', () => {
 		const INPUT = "you(Paul) abc(test) your(Paul's) your(son-C) your(son's-C) your(sons'-C)] you(Paul)."
 		
 		const EXPECTED_OUTPUT = [
-			word_token("you(Paul)", "Paul"),
-			word_token("abc(test)", "test"),
-			word_token("your(Paul's)", "Paul"),
-			word_token("your(son-C)", "son-C"),
-			word_token("your(son's-C)", "son-C"),
-			word_token("your(sons'-C)", "sons-C"),
-			simple_token(']', TOKEN_TYPE.PUNCTUATION),
-			word_token("you(Paul)", "Paul"),
-			simple_token('.', TOKEN_TYPE.PUNCTUATION),
+			create_word_token("you(Paul)", "Paul"),
+			create_word_token("abc(test)", "test"),
+			create_word_token("your(Paul's)", "Paul"),
+			create_word_token("your(son-C)", "son-C"),
+			create_word_token("your(son's-C)", "son-C"),
+			create_word_token("your(sons'-C)", "sons-C"),
+			create_token(']', TOKEN_TYPE.PUNCTUATION),
+			create_word_token("you(Paul)", "Paul"),
+			create_token('.', TOKEN_TYPE.PUNCTUATION),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -162,11 +125,11 @@ describe('tokenize_input', () => {
 		const INPUT = "you(Paul youPaul) you(Paul)[ you(Paul)_."
 		
 		const EXPECTED_OUTPUT = [
-			error_token("you(Paul", 'Missing a closing parenthesis'),
-			error_token("youPaul)", 'Missing an opening parenthesis'),
-			error_token("you(Paul)[", 'Must have a space between you(Paul) and ['),
-			error_token("you(Paul)_", 'you(Paul) must be followed by a space or punctuation'),
-			simple_token('.', TOKEN_TYPE.PUNCTUATION),
+			create_error_token("you(Paul", ERRORS.MISSING_CLOSING_PAREN),
+			create_error_token("youPaul)", ERRORS.MISSING_OPENING_PAREN),
+			create_error_token("you(Paul)[", ERRORS.NO_SPACE_BEFORE_OPENING_BRACKET),
+			create_error_token("you(Paul)_", ERRORS.INVALID_TOKEN_END('you(Paul)')),
+			create_token('.', TOKEN_TYPE.PUNCTUATION),
 		]
 		
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -176,16 +139,16 @@ describe('tokenize_input', () => {
 		const INPUT = "_note _note. _note] [_note _note[ __implicit"
 		
 		const EXPECTED_OUTPUT = [
-			simple_token('_note', TOKEN_TYPE.NOTE),
-			simple_token('_note', TOKEN_TYPE.NOTE),
-			simple_token('.', TOKEN_TYPE.PUNCTUATION),
-			simple_token('_note', TOKEN_TYPE.NOTE),
-			simple_token(']', TOKEN_TYPE.PUNCTUATION),
-			simple_token('[', TOKEN_TYPE.PUNCTUATION),
-			simple_token('_note', TOKEN_TYPE.NOTE),
-			simple_token('_note', TOKEN_TYPE.NOTE),
-			simple_token('[', TOKEN_TYPE.PUNCTUATION),
-			simple_token('__implicit', TOKEN_TYPE.NOTE), 	// double underscore is fine
+			create_token('_note', TOKEN_TYPE.NOTE),
+			create_token('_note', TOKEN_TYPE.NOTE),
+			create_token('.', TOKEN_TYPE.PUNCTUATION),
+			create_token('_note', TOKEN_TYPE.NOTE),
+			create_token(']', TOKEN_TYPE.PUNCTUATION),
+			create_token('[', TOKEN_TYPE.PUNCTUATION),
+			create_token('_note', TOKEN_TYPE.NOTE),
+			create_token('_note', TOKEN_TYPE.NOTE),
+			create_token('[', TOKEN_TYPE.PUNCTUATION),
+			create_token('__implicit', TOKEN_TYPE.NOTE), 	// double underscore is fine
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -195,10 +158,10 @@ describe('tokenize_input', () => {
 		const INPUT = "token_note token_ ._note ]_note"
 		
 		const EXPECTED_OUTPUT = [
-			error_token('token_note', 'Notes notation should have a space before the underscore, e.g., ⎕_implicit'),
-			error_token('token_', 'token must be followed by a space or punctuation'),
-			error_token('._note', 'Notes notation should have a space before the underscore, e.g., ⎕_implicit'),
-			error_token(']_note', 'Notes notation should have a space before the underscore, e.g., ⎕_implicit'),
+			create_error_token('token_note', ERRORS.NO_SPACE_BEFORE_UNDERSCORE),
+			create_error_token('token_', ERRORS.INVALID_TOKEN_END('token')),
+			create_error_token('._note', ERRORS.NO_SPACE_BEFORE_UNDERSCORE),
+			create_error_token(']_note', ERRORS.NO_SPACE_BEFORE_UNDERSCORE),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -208,10 +171,10 @@ describe('tokenize_input', () => {
 		const INPUT = "(imp) (implicit-situational) [(imp)"
 		
 		const EXPECTED_OUTPUT = [
-			simple_token('(imp)', TOKEN_TYPE.NOTE),
-			simple_token('(implicit-situational)', TOKEN_TYPE.NOTE),
-			simple_token('[', TOKEN_TYPE.PUNCTUATION),
-			simple_token('(imp)', TOKEN_TYPE.NOTE),
+			create_token('(imp)', TOKEN_TYPE.NOTE),
+			create_token('(implicit-situational)', TOKEN_TYPE.NOTE),
+			create_token('[', TOKEN_TYPE.PUNCTUATION),
+			create_token('(imp)', TOKEN_TYPE.NOTE),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -222,7 +185,7 @@ describe('tokenize_input', () => {
 		test.each(CLAUSE_NOTATIONS.map(notation => ([[notation]])))
 			('%s', test_text => {
 			const EXPECTED_OUTPUT = [
-				simple_token(test_text[0], TOKEN_TYPE.NOTE)
+				create_token(test_text[0], TOKEN_TYPE.NOTE)
 			]
 
 			expect(tokenize_input(test_text[0])).toEqual(EXPECTED_OUTPUT)
@@ -233,15 +196,15 @@ describe('tokenize_input', () => {
 		const INPUT = "(imp imp) token(imp) (imp)token (implicit_situational) (imperative) (Paul's) (test )"
 		
 		const EXPECTED_OUTPUT = [
-			error_token('(imp', 'Missing a closing parenthesis'),
-			error_token('imp)', 'Missing an opening parenthesis'),
-			word_token('token(imp)', 'imp'),		// tokenizing at this time does not differentiate from a pronoun referent
-			error_token('(imp)token', 'Must include a space after a clause notation'),
-			error_token('(implicit_situational)', 'This clause notation is not recognized'),
-			error_token('(imperative)', 'This clause notation is not recognized'),
-			error_token("(Paul's)", 'This clause notation is not recognized'),
-			error_token('(test', 'Missing a closing parenthesis'),
-			error_token(')', 'Missing an opening parenthesis'),
+			create_error_token('(imp', ERRORS.MISSING_CLOSING_PAREN),
+			create_error_token('imp)', ERRORS.MISSING_OPENING_PAREN),
+			create_word_token('token(imp)', 'imp'),		// tokenizing at this time does not differentiate from a pronoun referent
+			create_error_token('(imp)token', ERRORS.NO_SPACE_AFTER_CLAUSE_NOTATION),
+			create_error_token('(implicit_situational)', ERRORS.UNRECOGNIZED_CLAUSE_NOTATION),
+			create_error_token('(imperative)', ERRORS.UNRECOGNIZED_CLAUSE_NOTATION),
+			create_error_token("(Paul's)", ERRORS.UNRECOGNIZED_CLAUSE_NOTATION),
+			create_error_token('(test', ERRORS.MISSING_CLOSING_PAREN),
+			create_error_token(')', ERRORS.MISSING_OPENING_PAREN),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -252,7 +215,7 @@ describe('tokenize_input', () => {
 		test.each(Array.from(FUNCTION_WORDS).map(word => ([[word]])))
 			('%s', test_text => {
 			const EXPECTED_OUTPUT = [
-				simple_token(test_text[0], TOKEN_TYPE.FUNCTION_WORD)
+				create_token(test_text[0], TOKEN_TYPE.FUNCTION_WORD)
 			]
 
 			expect(tokenize_input(test_text[0])).toEqual(EXPECTED_OUTPUT)
@@ -264,7 +227,7 @@ describe('tokenize_input', () => {
 		test.each(Array.from(FUNCTION_WORDS).map(word => ([[word.toUpperCase()]])))
 			('%s', test_text => {
 			const EXPECTED_OUTPUT = [
-				simple_token(test_text[0], TOKEN_TYPE.FUNCTION_WORD)
+				create_token(test_text[0], TOKEN_TYPE.FUNCTION_WORD)
 			]
 
 			expect(tokenize_input(test_text[0])).toEqual(EXPECTED_OUTPUT)
@@ -275,25 +238,25 @@ describe('tokenize_input', () => {
 		const INPUT = '[[ [" "[ [token [. [? [] [[token]]'
 		
 		const EXPECTED_OUTPUT = [
-			simple_token('[', TOKEN_TYPE.PUNCTUATION),
-			simple_token('[', TOKEN_TYPE.PUNCTUATION),
-			simple_token('[', TOKEN_TYPE.PUNCTUATION),
-			simple_token('"', TOKEN_TYPE.PUNCTUATION),
-			simple_token('"', TOKEN_TYPE.PUNCTUATION),
-			simple_token('[', TOKEN_TYPE.PUNCTUATION),
-			simple_token('[', TOKEN_TYPE.PUNCTUATION),
-			word_token('token'),
-			simple_token('[', TOKEN_TYPE.PUNCTUATION),
-			simple_token('.', TOKEN_TYPE.PUNCTUATION),
-			simple_token('[', TOKEN_TYPE.PUNCTUATION),
-			simple_token('?', TOKEN_TYPE.PUNCTUATION),
-			simple_token('[', TOKEN_TYPE.PUNCTUATION),
-			simple_token(']', TOKEN_TYPE.PUNCTUATION),
-			simple_token('[', TOKEN_TYPE.PUNCTUATION),
-			simple_token('[', TOKEN_TYPE.PUNCTUATION),
-			word_token('token'),
-			simple_token(']', TOKEN_TYPE.PUNCTUATION),
-			simple_token(']', TOKEN_TYPE.PUNCTUATION),
+			create_token('[', TOKEN_TYPE.PUNCTUATION),
+			create_token('[', TOKEN_TYPE.PUNCTUATION),
+			create_token('[', TOKEN_TYPE.PUNCTUATION),
+			create_token('"', TOKEN_TYPE.PUNCTUATION),
+			create_token('"', TOKEN_TYPE.PUNCTUATION),
+			create_token('[', TOKEN_TYPE.PUNCTUATION),
+			create_token('[', TOKEN_TYPE.PUNCTUATION),
+			create_word_token('token'),
+			create_token('[', TOKEN_TYPE.PUNCTUATION),
+			create_token('.', TOKEN_TYPE.PUNCTUATION),
+			create_token('[', TOKEN_TYPE.PUNCTUATION),
+			create_token('?', TOKEN_TYPE.PUNCTUATION),
+			create_token('[', TOKEN_TYPE.PUNCTUATION),
+			create_token(']', TOKEN_TYPE.PUNCTUATION),
+			create_token('[', TOKEN_TYPE.PUNCTUATION),
+			create_token('[', TOKEN_TYPE.PUNCTUATION),
+			create_word_token('token'),
+			create_token(']', TOKEN_TYPE.PUNCTUATION),
+			create_token(']', TOKEN_TYPE.PUNCTUATION),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -303,11 +266,11 @@ describe('tokenize_input', () => {
 		const INPUT = ".[ ,[ ?[ ][ token["
 		
 		const EXPECTED_OUTPUT = [
-			error_token('.[', 'Must have a space between . and ['),
-			error_token(',[', 'Must have a space between , and ['),
-			error_token('?[', 'Must have a space between ? and ['),
-			error_token('][', 'Must have a space between ] and ['),
-			error_token('token[', 'Must have a space between token and ['),
+			create_error_token('.[', ERRORS.NO_SPACE_BEFORE_OPENING_BRACKET),
+			create_error_token(',[', ERRORS.NO_SPACE_BEFORE_OPENING_BRACKET),
+			create_error_token('?[', ERRORS.NO_SPACE_BEFORE_OPENING_BRACKET),
+			create_error_token('][', ERRORS.NO_SPACE_BEFORE_OPENING_BRACKET),
+			create_error_token('token[', ERRORS.NO_SPACE_BEFORE_OPENING_BRACKET),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -317,25 +280,25 @@ describe('tokenize_input', () => {
 		const INPUT = '." ". ?"] token]". "], token]] token,'
 		
 		const EXPECTED_OUTPUT = [
-			simple_token('.', TOKEN_TYPE.PUNCTUATION),
-			simple_token('"', TOKEN_TYPE.PUNCTUATION),
-			simple_token('"', TOKEN_TYPE.PUNCTUATION),
-			simple_token('.', TOKEN_TYPE.PUNCTUATION),
-			simple_token('?', TOKEN_TYPE.PUNCTUATION),
-			simple_token('"', TOKEN_TYPE.PUNCTUATION),
-			simple_token(']', TOKEN_TYPE.PUNCTUATION),
-			word_token('token'),
-			simple_token(']', TOKEN_TYPE.PUNCTUATION),
-			simple_token('"', TOKEN_TYPE.PUNCTUATION),
-			simple_token('.', TOKEN_TYPE.PUNCTUATION),
-			simple_token('"', TOKEN_TYPE.PUNCTUATION),
-			simple_token(']', TOKEN_TYPE.PUNCTUATION),
-			simple_token(',', TOKEN_TYPE.PUNCTUATION),
-			word_token('token'),
-			simple_token(']', TOKEN_TYPE.PUNCTUATION),
-			simple_token(']', TOKEN_TYPE.PUNCTUATION),
-			word_token('token'),
-			simple_token(',', TOKEN_TYPE.PUNCTUATION),
+			create_token('.', TOKEN_TYPE.PUNCTUATION),
+			create_token('"', TOKEN_TYPE.PUNCTUATION),
+			create_token('"', TOKEN_TYPE.PUNCTUATION),
+			create_token('.', TOKEN_TYPE.PUNCTUATION),
+			create_token('?', TOKEN_TYPE.PUNCTUATION),
+			create_token('"', TOKEN_TYPE.PUNCTUATION),
+			create_token(']', TOKEN_TYPE.PUNCTUATION),
+			create_word_token('token'),
+			create_token(']', TOKEN_TYPE.PUNCTUATION),
+			create_token('"', TOKEN_TYPE.PUNCTUATION),
+			create_token('.', TOKEN_TYPE.PUNCTUATION),
+			create_token('"', TOKEN_TYPE.PUNCTUATION),
+			create_token(']', TOKEN_TYPE.PUNCTUATION),
+			create_token(',', TOKEN_TYPE.PUNCTUATION),
+			create_word_token('token'),
+			create_token(']', TOKEN_TYPE.PUNCTUATION),
+			create_token(']', TOKEN_TYPE.PUNCTUATION),
+			create_word_token('token'),
+			create_token(',', TOKEN_TYPE.PUNCTUATION),
 		]
 		
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -345,12 +308,12 @@ describe('tokenize_input', () => {
 		const INPUT = "( ) / * + ;"
 		
 		const EXPECTED_OUTPUT = [
-			error_token('(', 'Missing a closing parenthesis'),
-			error_token(')', 'Missing an opening parenthesis'),
-			error_token('/', 'Pairings should have the form simple/complex, e.g., follower/disciple.'),
-			error_token('*', 'Unrecognized character'),
-			error_token('+', 'Unrecognized character'),
-			error_token(';', 'Unrecognized character'),
+			create_error_token('(', ERRORS.MISSING_CLOSING_PAREN),
+			create_error_token(')', ERRORS.MISSING_OPENING_PAREN),
+			create_error_token('/', ERRORS.INVALID_PAIRING_SYNTAX),
+			create_error_token('*', ERRORS.UNRECOGNIZED_CHAR),
+			create_error_token('+', ERRORS.UNRECOGNIZED_CHAR),
+			create_error_token(';', ERRORS.UNRECOGNIZED_CHAR),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -360,15 +323,15 @@ describe('tokenize_input', () => {
 		const INPUT = "simple/complex simple's/complex's simples'/complexs' simples'-A/complexs' simple-A/complex-B. [simple/complex]"
 		
 		const EXPECTED_OUTPUT = [
-			pairing_token("simple/complex"),
-			pairing_token("simple's/complex's", "simple", "complex"),
-			pairing_token("simples'/complexs'", "simples", "complexs"),
-			pairing_token("simples'-A/complexs'", "simples-A", "complexs"),
-			pairing_token("simple-A/complex-B", "simple-A", "complex-B"),
-			simple_token('.', TOKEN_TYPE.PUNCTUATION),
-			simple_token('[', TOKEN_TYPE.PUNCTUATION),
-			pairing_token("simple/complex", "simple", "complex"),
-			simple_token(']', TOKEN_TYPE.PUNCTUATION),
+			create_pairing_token("simple/complex"),
+			create_pairing_token("simple's/complex's", "simple", "complex"),
+			create_pairing_token("simples'/complexs'", "simples", "complexs"),
+			create_pairing_token("simples'-A/complexs'", "simples-A", "complexs"),
+			create_pairing_token("simple-A/complex-B", "simple-A", "complex-B"),
+			create_token('.', TOKEN_TYPE.PUNCTUATION),
+			create_token('[', TOKEN_TYPE.PUNCTUATION),
+			create_pairing_token("simple/complex", "simple", "complex"),
+			create_token(']', TOKEN_TYPE.PUNCTUATION),
 		]
 		
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
@@ -378,14 +341,14 @@ describe('tokenize_input', () => {
 		const INPUT = "/complex simple/ / simple//complex simple/.complex simple./complex"
 		
 		const EXPECTED_OUTPUT = [
-			error_token('/complex', 'Pairings should have the form simple/complex, e.g., follower/disciple.'),
-			error_token('simple/', 'Pairings should have the form simple/complex, e.g., follower/disciple.'),
-			error_token('/', 'Pairings should have the form simple/complex, e.g., follower/disciple.'),
-			error_token('simple//complex', 'Pairings should have the form simple/complex, e.g., follower/disciple.'),
-			error_token('simple/', 'Pairings should have the form simple/complex, e.g., follower/disciple.'),
-			error_token('.complex', '. must be followed by a space or punctuation'),
-			word_token('simple'),
-			error_token('./complex', '. must be followed by a space or punctuation'),
+			create_error_token('/complex', ERRORS.INVALID_PAIRING_SYNTAX),
+			create_error_token('simple/', ERRORS.INVALID_PAIRING_SYNTAX),
+			create_error_token('/', ERRORS.INVALID_PAIRING_SYNTAX),
+			create_error_token('simple//complex', ERRORS.INVALID_PAIRING_SYNTAX),
+			create_error_token('simple/', ERRORS.INVALID_PAIRING_SYNTAX),
+			create_error_token('.complex', ERRORS.INVALID_TOKEN_END('.')),
+			create_word_token('simple'),
+			create_error_token('./complex', ERRORS.INVALID_TOKEN_END('.')),
 		]
 		
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)

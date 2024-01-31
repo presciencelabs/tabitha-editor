@@ -1,7 +1,8 @@
 import {pipe} from '$lib/pipeline'
 import {REGEXES} from '$lib/regexes'
-import {TOKEN_TYPE, error_token} from '$lib/token'
+import {TOKEN_TYPE, create_error_token} from './token'
 import {PRONOUN_RULES} from './pronoun_rules'
+import {ERRORS} from './error_messages'
 
 /**
  * @param {Token[]} tokens
@@ -73,7 +74,7 @@ export function check_for_unbalanced_brackets(tokens) {
 			tracker.push(bracket)
 		} else {
 			if (tracker.length === 0) {
-				tokens = [error_token('[', 'Missing an opening bracket'), ...tokens]
+				tokens = [create_error_token('[', ERRORS.MISSING_OPENING_BRACKET), ...tokens]
 			} else {
 				tracker.pop()
 			}
@@ -81,7 +82,7 @@ export function check_for_unbalanced_brackets(tokens) {
 	}
 
 	while (tracker.length > 0) {
-		tokens.push(error_token(']', 'Missing a closing bracket'))
+		tokens.push(create_error_token(']', ERRORS.MISSING_CLOSING_BRACKET))
 
 		tracker.pop()
 	}
