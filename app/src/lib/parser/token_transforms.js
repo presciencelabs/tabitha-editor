@@ -1,4 +1,4 @@
-import {TOKEN_TYPE} from "./token";
+import {TOKEN_TYPE} from './token'
 
 /**
  * @typedef {[token: string, context: string[], transform: (token: Token) => Token]} TokenTransform
@@ -14,8 +14,8 @@ import {TOKEN_TYPE} from "./token";
  * @type {TokenTransform[]}
  */
 const TOKEN_TRANSFORMS = [
-    ['do', ['not'], set_token_type(TOKEN_TYPE.FUNCTION_WORD)],
-    ['because', ['of'], set_token_lookup('because-B')],
+	['do', ['not'], set_token_type(TOKEN_TYPE.FUNCTION_WORD)],
+	['because', ['of'], set_token_lookup('because-B')],
 ]
 
 /**
@@ -23,7 +23,7 @@ const TOKEN_TRANSFORMS = [
  * @returns {(token: Token) => Token}
  */
 function set_token_type(type) {
-	return (token) => {return {...token, type}}
+	return (token) => ({...token, type})
 }
 
 /**
@@ -31,7 +31,7 @@ function set_token_type(type) {
  * @returns {(token: Token) => Token}
  */
 function set_token_lookup(lookup_term) {
-	return (token) => {return {...token, lookup_term}}
+	return (token) => ({...token, lookup_term})
 }
 
 /**
@@ -40,41 +40,41 @@ function set_token_lookup(lookup_term) {
  * @returns {Token[]}
  */
 export function transform_tokens(tokens) {
-    const new_tokens = []
+	const new_tokens = []
 
-    let current = 0
-    while (current < tokens.length) {
-        new_tokens.push(create_next_token())
-    }
+	let current = 0
+	while (current < tokens.length) {
+		new_tokens.push(create_next_token())
+	}
 
-    return new_tokens
+	return new_tokens
 
-    /**
-     * 
-     * @returns {Token}
-     */
-    function create_next_token() {
+	/**
+	 * 
+	 * @returns {Token}
+	 */
+	function create_next_token() {
 		if (tokens[current].type != TOKEN_TYPE.LOOKUP_WORD) {
 			return tokens[current++]
 		}
 
-        const transform = TOKEN_TRANSFORMS.find(matches_transform)?.[2] ?? ((token) => token)
-        return transform(tokens[current++])
-    }
+		const transform = TOKEN_TRANSFORMS.find(matches_transform)?.[2] ?? (token => token)
+		return transform(tokens[current++])
+	}
 
-    /**
-     * @param {TokenTransform} transform
-     */
-    function matches_transform([token, context]) {
-        return peek_match(token) && context.every((value, i) => peek_match(value, i+1))
-    }
+	/**
+	 * @param {TokenTransform} transform
+	 */
+	function matches_transform([token, context]) {
+		return peek_match(token) && context.every((value, i) => peek_match(value, i+1))
+	}
 
-    /**
-     * @param {string} value 
-     * @param {number} offset 
-     */
-    function peek_match(value, offset=0) {
-        return (current + offset) < tokens.length
-            && value == tokens[current+offset].token.toLowerCase()
-    }
+	/**
+	 * @param {string} value 
+	 * @param {number} offset 
+	 */
+	function peek_match(value, offset=0) {
+		return (current + offset) < tokens.length
+			&& value == tokens[current+offset].token.toLowerCase()
+	}
 }
