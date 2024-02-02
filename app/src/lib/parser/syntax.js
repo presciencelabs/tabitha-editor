@@ -88,7 +88,7 @@ export function check_sentence_syntax(tokens) {
 
 		// Check beginning of quotes ([")
 		for (let i = 1; i < sentence_tokens.length; i++) {
-			if (sentence_tokens[i-1].token == '[' && sentence_tokens[i].token == '"') {
+			if (sentence_tokens[i-1].token === '[' && sentence_tokens[i].token === '"') {
 				find_and_check_first_word(sentence_tokens.slice(i))
 			}
 		}
@@ -171,7 +171,7 @@ function find_and_check_sentences(tokens) {
 		}
 	}
 
-	if (start != current) {
+	if (start !== current) {
 		// add a 'missing period' error
 		tokens.push(create_error_token('.', ERRORS.MISSING_PERIOD))
 		sentences.push(collect_sentence())
@@ -183,7 +183,7 @@ function find_and_check_sentences(tokens) {
 	 * @param {Token} token 
 	 */
 	function is_sentence_end_token(token) {
-		return (token.type == TOKEN_TYPE.PUNCTUATION || token.type == TOKEN_TYPE.ERROR)
+		return (token.type === TOKEN_TYPE.PUNCTUATION || token.type === TOKEN_TYPE.ERROR)
 			&& REGEXES.SENTENCE_ENDING_PUNCTUATION.test(token.token)
 	}
 
@@ -191,7 +191,7 @@ function find_and_check_sentences(tokens) {
 	 * @param {Token} token 
 	 */
 	function is_clause_end_token(token) {
-		return token.type == TOKEN_TYPE.PUNCTUATION && REGEXES.CLAUSE_ENDING_PUNCTUATION.test(token.token)
+		return token.type === TOKEN_TYPE.PUNCTUATION && REGEXES.CLAUSE_ENDING_PUNCTUATION.test(token.token)
 	}
 
 	function collect_sentence() {
