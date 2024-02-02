@@ -638,5 +638,22 @@ describe('sentence syntax: capitalization', () => {
 			expect(checked_tokens).length(test_tokens.length)
 			expect_error_at(1, ERRORS.FIRST_WORD_NOT_CAPITALIZED, checked_tokens)
 		})
+		test('Token, ["hello"]. beginning of quote is checked', () => {
+			const test_tokens = [
+				create_word_token('Token'),
+				create_token(',', TOKEN_TYPE.PUNCTUATION),
+				create_token('[', TOKEN_TYPE.PUNCTUATION),
+				create_token('"', TOKEN_TYPE.PUNCTUATION),
+				create_word_token('hello'),
+				create_token('"', TOKEN_TYPE.PUNCTUATION),
+				create_token(']', TOKEN_TYPE.PUNCTUATION),
+				create_token('.', TOKEN_TYPE.PUNCTUATION),
+			]
+
+			const checked_tokens = check_sentence_syntax(test_tokens)
+
+			expect(checked_tokens).length(test_tokens.length)
+			expect_error_at(4, ERRORS.FIRST_WORD_NOT_CAPITALIZED, checked_tokens)
+		})
 	})
 })
