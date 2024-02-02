@@ -62,9 +62,9 @@ function check_inflections(db) {
 	 */
 	async function lookup(possible_inflection) {
 		// strip sense from word
-		let sense_match = possible_inflection.match(/^(.+)(-[A-Z])$/)
-		let word = sense_match?.[1] ?? possible_inflection
-		let sense = sense_match?.[2] ?? ''
+		const sense_match = possible_inflection.match(/^(.+)(-[A-Z])$/)
+		const word = sense_match?.[1] ?? possible_inflection
+		const sense = sense_match?.[2] ?? ''
 
 		// not aware of a need to grab multiple rows if the stems are all the same, e.g., love (has both noun and verb), but the stem is the same.
 		const sql = `
@@ -74,7 +74,7 @@ function check_inflections(db) {
 		`
 
 		// prettier-ignore
-		let stem = await db.prepare(sql).bind(`%|${word}|%`).first('stem') ?? ''
+		const stem = await db.prepare(sql).bind(`%|${word}|%`).first('stem') ?? ''
 		return stem ? `${stem}${sense}` : ''
 	}
 }
