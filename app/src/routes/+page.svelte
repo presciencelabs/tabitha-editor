@@ -29,7 +29,7 @@
 </form>
 
 {#await tokens_promise}
-	<div><span class="loading loading-ring loading-lg absolute" />Checking Ontology...</div>
+	<div class="divider my-12 divider-warning">Checking Ontology...</div>
 {:then tokens} 
 	{@const has_error = tokens.some(token_has_error)}
 	{@const success = tokens.length > 0 && !has_error}
