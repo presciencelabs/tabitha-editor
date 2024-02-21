@@ -1,8 +1,8 @@
 <script>
-    import {TOKEN_TYPE, token_has_concept} from '$lib/parser/token';
+    import {TOKEN_TYPE, token_has_concept} from '$lib/parser/token'
 	import Error from './Error.svelte'
-	import NotFound from "./NotFound.svelte"
-	import Result from "./Result.svelte"
+	import NotFound from './NotFound.svelte'
+	import Result from './Result.svelte'
 
 	/** @type {Token} */
 	export let token

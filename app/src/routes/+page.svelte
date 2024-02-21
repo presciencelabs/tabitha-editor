@@ -6,7 +6,6 @@
 	import {token_has_error} from '$lib/parser/token'
 
 	let entered_text = ''
-	$: tokens_promise = parse(entered_text)
 	$: english_back_translation = backtranslate(entered_text)
 	$: english_back_translation && reset_copied()
 
@@ -28,7 +27,7 @@
 	<textarea bind:value={entered_text} rows="5" autofocus class="textarea textarea-bordered textarea-lg w-4/5" />
 </form>
 
-{#await tokens_promise}
+{#await parse(entered_text)}
 	<div class="divider my-12 divider-warning">Checking Ontology...</div>
 {:then tokens} 
 	{@const has_error = tokens.some(token_has_error)}
