@@ -2,17 +2,17 @@ import {parse_checker_rule} from './rules_parser'
 
 // TODO store these in the database
 const checker_rules_json = [
-	// {
-	// 	'name': 'Expect a [ before a relative clause',
-	// 	'trigger': { 'token': 'that|who|whom|which' },
-	// 	'context': {
-	// 		'precededby': { 'category': 'Noun' },
-	// 	},
-	// 	'require': {
-	// 		'precededby': '[',
-	// 		'message': 'Missing bracket before relative clause.',
-	// 	}
-	// },
+	{
+		'name': 'Expect a [ before a relative clause',
+		'trigger': { 'token': 'that|who|whom|which' },
+		'context': {
+			'precededby': { 'category': 'Noun' },
+		},
+		'require': {
+			'precededby': '[',
+			'message': 'Missing bracket before relative clause.',
+		}
+	},
 	{
 		'name': 'Expect a [ before a quote',
 		'trigger': { 'token': ',' },
@@ -23,6 +23,16 @@ const checker_rules_json = [
 			'followedby': '[',
 			'message': 'Missing bracket before an opening quote',
 		},
+	},
+	{
+		'name': 'Speak does not use quotes',
+		'trigger': { 'stem': 'speak' },
+		'context': {
+			'followedby': { 'token': '"', 'skip': 'all' }
+		},
+		'require': {
+			'message': '\'Speak\' cannot be used with a direct quote',
+		}
 	},
 ]
 

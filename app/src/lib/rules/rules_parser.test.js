@@ -92,21 +92,25 @@ describe('context filters', () => {
 		expect(results[2]).toBe(false)
 	})
 	test('followed by with skip', () => {
-		const context_json = { 'followedby': { 'token': 'other', 'skip': { 'token': 'token' } } }
+		const context_json = { 'followedby': { 'token': 'other', 'skip': { 'token': 'skip' } } }
 		const filter = create_token_context(context_json)
 
 		const tokens = [
 			create_token('text', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'text'}),
-			create_token('token', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'token'}),
+			create_token('.', TOKEN_TYPE.PUNCTUATION),
+			create_token('text', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'text'}),
+			create_token('skip', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'skip'}),
 			create_token('other', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'other'}),
 			create_token('last', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'last'}),
 		]
 		const results = tokens.map((_, i) => filter(tokens, i))
 
-		expect(results[0]).toBe(true)
-		expect(results[1]).toBe(true)
-		expect(results[2]).toBe(false)
-		expect(results[3]).toBe(false)
+		expect(results[0]).toBe(false)
+		expect(results[1]).toBe(false)
+		expect(results[2]).toBe(true)
+		expect(results[3]).toBe(true)
+		expect(results[4]).toBe(false)
+		expect(results[5]).toBe(false)
 	})
 	test('preceded by', () => {
 		const context_json = { 'precededby': { 'token': 'token' } }
@@ -131,6 +135,8 @@ describe('context filters', () => {
 
 		const tokens = [
 			create_token('token', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'token'}),
+			create_token('.', TOKEN_TYPE.PUNCTUATION),
+			create_token('token', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'token'}),
 			create_token('token', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'token'}),
 			create_token('skip', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'skip'}),
 			create_token('other', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'other'}),
@@ -140,9 +146,11 @@ describe('context filters', () => {
 
 		expect(results[0]).toBe(false)
 		expect(results[1]).toBe(true)
-		expect(results[2]).toBe(true)
+		expect(results[2]).toBe(false)
 		expect(results[3]).toBe(true)
-		expect(results[4]).toBe(false)
+		expect(results[4]).toBe(true)
+		expect(results[5]).toBe(true)
+		expect(results[6]).toBe(false)
 	})
 	test('preceded by and followed by', () => {
 		const context_json = { 'precededby': { 'token': 'token' }, 'followedby': { 'token': 'token' } }

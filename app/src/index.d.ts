@@ -5,10 +5,9 @@ type Token = {
 	type: TokenType;
 	message: string;
 	lookup_term: string;
-	pairing_left: Token?;
-	pairing_right: Token?;
 	concept: OntologyResult?;
-	lookup_results: OntologyResult[]
+	lookup_results: OntologyResult[];
+	sub_tokens: Token[];
 }
 
 type LookupTerm = string

@@ -1,3 +1,6 @@
+import {REGEXES} from '$lib/regexes'
+import {TOKEN_TYPE, check_token_lookup} from '$lib/parser/token'
+
 /**
  *
  * @param {any} rule_json
@@ -49,34 +52,55 @@ export function create_token_filter(filter_json) {
 	/** @type {TokenFilter[]} */
 	const filters = []
 
-	const token_filter = filter_json['token']
-	if (token_filter !== undefined) {
-		filters.push(create_token_token_filter(token_filter))
-	}
+	add_value_filter('token', token => token.token)
+	add_value_filter('type', token => token.type)
 
-	const type_filter = filter_json['type']
-	if (type_filter !== undefined) {
-		filters.push(token => token.type === type_filter)
-	}
-	// TODO support filtering by lookup values such as category/stem/etc
+	add_lookup_filter('stem', concept => concept.stem)
+	add_lookup_filter('category', concept => concept.part_of_speech)
 
 	if (filters.length === 0) {
 		return () => false
 	}
 	return token => filters.every(filter => filter(token))
-}
 
-/**
- *
- * @param {string} token_value
- * @return {TokenFilter}
- */
-function create_token_token_filter(token_value) {
-	const token_values = token_value.split('|')
-	if (token_values.length > 1) {
-		return token => token_values.includes(token.token)
+	/**
+	 * 
+	 * @param {string} property_name 
+	 * @param {(token: Token) => string?} value_getter
+	 */
+	function add_value_filter(property_name, value_getter) {
+		const property_json = filter_json[property_name]
+		if (property_json !== undefined) {
+			const value_checker = get_value_checker(property_json)
+			filters.push(token => value_checker(value_getter(token)))
+		}
 	}
-	return token => token.token === token_value
+
+	/**
+	 * 
+	 * @param {string} property_name 
+	 * @param {(concept: OntologyResult) => string} value_getter
+	 */
+	function add_lookup_filter(property_name, value_getter) {
+		const property_json = filter_json[property_name]
+		if (property_json !== undefined) {
+			const value_checker = get_value_checker(property_json)
+			filters.push(check_token_lookup(concept => value_checker(value_getter(concept))))
+		}
+	}
+
+	/**
+	 * 
+	 * @param {string} filter_value 
+	 * @returns {(value: string?) => boolean}
+	 */
+	function get_value_checker(filter_value) {
+		const filter_values = filter_value.split('|')
+		if (filter_values.length > 1) {
+			return value => value !== null && filter_values.includes(value)
+		}
+		return value => value === filter_value
+	}
 }
 
 /**
@@ -127,10 +151,8 @@ function create_context_filter(context_json, offset) {
 	return (tokens, trigger_index) => end_check(tokens, trigger_index + offset) && filter(tokens[trigger_index + offset])
 
 	/**
-	 * TODO only go until a clause boundary?
-	 *
-	 * @param {Token[]} tokens
-	 * @param {number} trigger_index
+	 * @param {Token[]} tokens 
+	 * @param {number} trigger_index 
 	 * @returns {boolean}
 	 */
 	function check_context_with_skip(tokens, trigger_index) {
@@ -139,11 +161,20 @@ function create_context_filter(context_json, offset) {
 				return true
 			}
 			// @ts-ignore
-			if (!skip_filter(tokens[i])) {
+			if (is_sentence_end_token(tokens[i]) || !skip_filter(tokens[i])) {
 				return false
 			}
 		}
 		return false
+	}
+
+	/**
+	 * TODO remove this. apply rules per sentence instead
+	 * 
+	 * @param {Token} token 
+	 */
+	function is_sentence_end_token(token) {
+		return token.type === TOKEN_TYPE.PUNCTUATION && REGEXES.SENTENCE_ENDING_PUNCTUATION.test(token.token)
 	}
 }
 
@@ -174,9 +205,9 @@ export function create_token_transform(transform_json) {
 		transforms.push(token => ({...token, type}))
 	}
 
-	const lookup_term = transform_json['lookup']
-	if (lookup_term !== undefined) {
-		transforms.push(token => ({...token, lookup_term}))
+	const concept = transform_json['concept']
+	if (concept !== undefined) {
+		transforms.push(set_token_concept(concept))
 	}
 
 	if (transforms.length === 0) {
@@ -185,5 +216,42 @@ export function create_token_transform(transform_json) {
 		return transforms[0]
 	} else {
 		return token => transforms.reduce((new_token, transform) => transform(new_token), token)
+	}
+}
+
+/**
+ * 
+ * @param {string} concept must include the sense
+ * @returns {TokenTransform}
+ */
+function set_token_concept(concept) {
+	const [stem, sense] = split_concept()
+
+	return token => {
+		const matched_result = token.lookup_results.find(result => result.stem === stem && result.sense === sense)
+
+		if (matched_result) {
+			token.concept = matched_result
+		} else {
+			// TODO lookup in the ontology
+			token.lookup_term = concept
+			token.concept = {
+				id: '0',
+				stem,
+				sense,
+				part_of_speech: '',
+				level: 1,
+				gloss: '',
+			}
+		}
+
+		return token
+	}
+
+	function split_concept() {
+		const dash = concept.lastIndexOf('-')
+		const stem = concept.substring(0, dash)
+		const sense = concept.substring(dash+1)
+		return [stem, sense]
 	}
 }

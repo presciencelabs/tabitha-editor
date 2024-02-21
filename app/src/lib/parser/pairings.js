@@ -16,13 +16,14 @@ export function check_pairings(tokens) {
 	 * @param {Token} token
 	 */
 	function check_pairing(token) {
-		if (token.pairing_left &&
-			check_token_lookup(concept => REGEXES.IS_LEVEL_COMPLEX.test(`${concept.level}`))(token.pairing_left)) {
-			token.pairing_left = create_error_token(token.pairing_left.token, 'Word must be a level 0 or 1')
+		if (token.type !== TOKEN_TYPE.PAIRING) return
+
+		const [left, right] = token.sub_tokens
+		if (check_token_lookup(concept => REGEXES.IS_LEVEL_COMPLEX.test(`${concept.level}`))(left)) {
+			token.sub_tokens[0] = create_error_token(left.token, 'Word must be a level 0 or 1')
 		}
-		if (token.pairing_right &&
-			check_token_lookup(concept => REGEXES.IS_LEVEL_SIMPLE.test(`${concept.level}`))(token.pairing_right)) {
-			token.pairing_right = create_error_token(token.pairing_right.token, 'Word must be a level 2 or 3')
+		if (check_token_lookup(concept => REGEXES.IS_LEVEL_SIMPLE.test(`${concept.level}`))(right)) {
+			token.sub_tokens[1] = create_error_token(right.token, 'Word must be a level 2 or 3')
 		}
 	}
 }
