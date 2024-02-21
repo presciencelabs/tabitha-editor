@@ -7,10 +7,7 @@ import {TOKEN_TYPE} from "./parser/token"
 export async function perform_ontology_lookups(tokens) {
 	const lookup_tokens = tokens.flatMap(get_lookup_tokens)
 
-	const lookup_promises = lookup_tokens.map(check_ontology)
-
-	// TODO handle errors
-	await Promise.all(lookup_promises)
+	await Promise.all(lookup_tokens.map(check_ontology))
 
 	return tokens
 
@@ -20,9 +17,9 @@ export async function perform_ontology_lookups(tokens) {
 	 * @returns {Token[]}
 	 */
 	function get_lookup_tokens(token) {
-		if (token.type == TOKEN_TYPE.LOOKUP_WORD) {
+		if (token.type === TOKEN_TYPE.LOOKUP_WORD) {
 			return [token]
-		} else if (token.type == TOKEN_TYPE.PAIRING) {
+		} else if (token.type === TOKEN_TYPE.PAIRING) {
 			// @ts-ignore
 			return [token.pairing_left, token.pairing_right]
 		} else {

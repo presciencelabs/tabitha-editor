@@ -27,6 +27,8 @@ export async function parse(text) {
 }
 
 /**
+ * TODO: temporary... need to build e2e testing infrastructure
+ * 
  * @param {string} text
  * @returns {Token[]}
  */

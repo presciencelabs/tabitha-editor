@@ -62,10 +62,10 @@ export function create_error_token(token, message) {
 /**
  * 
  * @param {Token} token 
- * @returns 
+ * @returns {boolean}
  */
 export function token_has_concept(token) {
-	return token.concept || token.lookup_results.length > 0
+	return token.concept !== null || token.lookup_results.length > 0
 }
 
 /**
@@ -74,7 +74,7 @@ export function token_has_concept(token) {
  * @returns {TokenFilter}
  */
 export function check_token_lookup(lookup_check) {
-	return (token) => {
+	return token => {
 		if (token.concept) {
 			return lookup_check(token.concept)
 		} else if (token.lookup_results.length > 0) {

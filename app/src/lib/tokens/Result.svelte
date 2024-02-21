@@ -6,7 +6,7 @@
 	export let classes = ''
 
 	// TODO: more work needed to handle multiple matches with possibly different levels, e.g., son
-	let concept = token.concept || token.lookup_results[0]
+	const concept = token.concept || token.lookup_results[0]
 </script>
 
 <TokenDisplay classes="{classes} L{concept.level}">
