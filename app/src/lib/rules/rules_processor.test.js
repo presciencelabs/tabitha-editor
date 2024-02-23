@@ -82,6 +82,29 @@ describe('transform rules', () => {
 		expect(results[4].lookup_term).toBe('concept-A')
 	})
 
+	test('triggered within a subordinate clauses', () => {
+		const transform_rules = [
+			{
+				'trigger': { 'token': 'token' },
+				'context': { 'followedby': { 'token': 'context' } },
+				'transform': { 'concept': 'concept-A' },
+			},
+		].map(parse_transform_rule)
+
+		const input_tokens = [
+			create_sentence([
+				create_clause_token([
+					create_token('token', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'token'}),
+					create_token('context', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'context'}),
+				]),
+			]),
+		]
+
+		const results = apply_transform_rules(input_tokens, transform_rules).flatMap(flatten_sentence)
+
+		expect(results[0].lookup_term).toBe('concept-A')
+	})
+
 	test('multiple transforms for one token', () => {
 		const transform_rules = [
 			{
@@ -110,6 +133,7 @@ describe('transform rules', () => {
 
 		expect(results[2].lookup_term).toBe('the-B')
 	})
+
 	test('not triggered across sentences', () => {
 		const transform_rules = [
 			{
@@ -132,11 +156,12 @@ describe('transform rules', () => {
 
 		expect(results).toEqual(input_tokens)
 	})
-	test('not triggered from within subordinate clauses', () => {
+
+	test('not triggered when context is in subordinate clauses', () => {
 		const transform_rules = [
 			{
 				'trigger': { 'token': 'token' },
-				'context': { 'followedby': { 'token': 'other', 'skip': 'all' } },
+				'context': { 'followedby': { 'token': 'context', 'skip': 'all' } },
 				'transform': { 'concept': 'concept-A' },
 			},
 		].map(parse_transform_rule)
@@ -255,6 +280,43 @@ describe('checker rules', () => {
 		expect(output_tokens[1].message).toBe('')
 		expect(output_tokens[2].message).toBe('')
 	})
+	test('triggered with multiple precededby', () => {
+		const rules = [
+			{
+				'trigger': { 'token': 'token' },
+				'context': { 'followedby': { 'token': 'context' }},
+				'require': {
+					'precededby': 'add1',
+					'message': 'message1',
+				},
+			},
+			{
+				'trigger': { 'token': 'token' },
+				'context': { 'followedby': { 'token': 'context' }},
+				'require': {
+					'precededby': 'add2',
+					'message': 'message2',
+				},
+			},
+		].map(parse_checker_rule)
+
+		const input_tokens = [
+			create_sentence([
+				create_token('token', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'token'}),
+				create_token('context', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'context'}),
+			]),
+		]
+
+		const output_tokens = apply_checker_rules(input_tokens, rules).flatMap(flatten_sentence)
+
+		expect(output_tokens.length).toBe(4)
+		expect(output_tokens[0].token).toBe('add1')
+		expect(output_tokens[0].message).toBe('message1')
+		expect(output_tokens[1].token).toBe('add2')
+		expect(output_tokens[1].message).toBe('message2')
+		expect(output_tokens[2].message).toBe('')
+		expect(output_tokens[3].message).toBe('')
+	})
 	test('triggered with message on trigger', () => {
 		const rules = [
 			{
@@ -303,7 +365,7 @@ describe('checker rules', () => {
 
 		expect(output_tokens).toEqual(input_tokens)
 	})
-	test('not triggered from within subordinate clauses', () => {
+	test('context not triggered from within subordinate clauses', () => {
 		const rules = [
 			{
 				'trigger': { 'token': 'token' },
@@ -327,5 +389,33 @@ describe('checker rules', () => {
 		const output_tokens = apply_checker_rules(input_tokens, rules)
 
 		expect(output_tokens).toEqual(input_tokens)
+	})
+
+	test('triggered within a subordinate clauses', () => {
+		const rules = [
+			{
+				'trigger': { 'token': 'token' },
+				'context': { 'followedby': { 'token': 'context' } },
+				'require': {
+					'followedby': 'add',
+					'message': 'message',
+				},
+			},
+		].map(parse_checker_rule)
+
+		const input_tokens = [
+			create_sentence([
+				create_clause_token([
+					create_token('token', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'token'}),
+					create_token('context', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'context'}),
+				]),
+			]),
+		]
+
+		const results = apply_checker_rules(input_tokens, rules).flatMap(flatten_sentence)
+
+		expect(results.length).toBe(3)
+		expect(results[1].token).toBe('add')
+		expect(results[1].message).toBe('message')
 	})
 })

@@ -15,37 +15,54 @@ function get_triggered_rules(rules, tokens, index) {
 
 /**
  * 
- * @param {Sentence[]} sentences 
- * @returns {Sentence[]}
+ * @param {Token[]} sub_tokens 
+ * @returns {Sentence}
  */
-export function apply_transform_rules(sentences, transforms=TRANSFORM_RULES) {
-	return sentences.map(sentence => apply_transform_rules_by_sentence(sentence, transforms))
+function create_sentence(sub_tokens) {
+	return { clause: create_clause_token(sub_tokens) }
 }
 
 /**
  * 
- * @param {Sentence} sentence 
+ * @param {Sentence[]} sentences 
  * @param {TransformRule[]} transforms
- * @returns {Sentence}
+ * @returns {Sentence[]}
  */
-function apply_transform_rules_by_sentence(sentence, transforms) {
-	const tokens = sentence.clause.sub_tokens
-	const new_tokens = []
+export function apply_transform_rules(sentences, transforms=TRANSFORM_RULES) {
+	return sentences.map(sentence => create_sentence(apply_transforms_to_tokens(sentence.clause.sub_tokens, transforms)))
+	
+	/**
+	 * 
+	 * @param {Token[]} tokens 
+	 * @param {TransformRule[]} transforms
+	 * @returns {Token[]}
+	 */
+	function apply_transforms_to_tokens(tokens, transforms) {
+		if (tokens.length === 0) {
+			return tokens
+		}
 
-	for (let i = 0; i < tokens.length; i++) {
-		const triggered_rules = get_triggered_rules(transforms, tokens, i)
-		
-		new_tokens.push(apply_transforms(triggered_rules, tokens[i]))
+		const new_tokens = []
+
+		for (let i = 0; i < tokens.length; i++) {
+			const triggered_rules = get_triggered_rules(transforms, tokens, i)
+
+			const new_token = transform_token(triggered_rules, tokens[i])
+			new_token.sub_tokens = apply_transforms_to_tokens(tokens[i].sub_tokens, transforms)
+			
+			new_tokens.push(new_token)
+		}
+	
+		return new_tokens
 	}
-
-	return { clause: create_clause_token(new_tokens) }
 
 	/**
 	 * 
 	 * @param {TransformRule[]} rules 
 	 * @param {Token} token 
+	 * @returns {Token}
 	 */
-	function apply_transforms(rules, token) {
+	function transform_token(rules, token) {
 		if (rules.length === 0) {
 			return token
 		} else if (rules.length === 1) {
@@ -59,38 +76,42 @@ function apply_transform_rules_by_sentence(sentence, transforms) {
 /**
  * 
  * @param {Sentence[]} sentences 
+ * @param {CheckerRule[]} rules
  * @returns {Sentence[]}
  */
 export function apply_checker_rules(sentences, rules=CHECKER_RULES) {
-	return sentences.map(sentence => apply_checker_rules_by_sentence(sentence, rules))
+	return sentences.map(sentence => create_sentence(apply_rules_to_tokens(sentence.clause.sub_tokens, rules)))
 }
 
 /**
  * 
- * @param {Sentence} sentence 
+ * @param {Token[]} tokens 
  * @param {CheckerRule[]} rules
- * @return {Sentence}
+ * @return {Token[]}
  */
-function apply_checker_rules_by_sentence(sentence, rules) {
-	const tokens = sentence.clause.sub_tokens
+function apply_rules_to_tokens(tokens, rules) {
 	const new_tokens = []
 
 	for (let i = 0; i < tokens.length; i++) {
 		const triggered_rules = get_triggered_rules(rules, tokens, i)
 		
-		if (triggered_rules.length === 0) {
+		if (triggered_rules.length > 0) {
+			new_tokens.push(...create_context_tokens(triggered_rules, action => action.preceded_by))
+
+			const new_token = create_trigger_token(triggered_rules, tokens[i])
+			new_token.sub_tokens = apply_rules_to_tokens(tokens[i].sub_tokens, rules)
+			new_tokens.push(new_token)
+			
+			new_tokens.push(...create_context_tokens(triggered_rules, action => action.followed_by))
+
+		} else {
+			tokens[i].sub_tokens = apply_rules_to_tokens(tokens[i].sub_tokens, rules)
 			new_tokens.push(tokens[i])
-			continue
 		}
 
-		new_tokens.push(...create_context_tokens(triggered_rules, action => action.preceded_by))
-
-		new_tokens.push(create_trigger_token(triggered_rules, tokens[i]))
-
-		new_tokens.push(...create_context_tokens(triggered_rules, action => action.followed_by))
 	}
 
-	return { clause: create_clause_token(new_tokens) }
+	return new_tokens
 
 	/**
 	 * 
