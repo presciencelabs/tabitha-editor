@@ -1,5 +1,4 @@
-import {REGEXES} from '$lib/regexes'
-import {TOKEN_TYPE, check_token_lookup} from '$lib/parser/token'
+import {check_token_lookup, set_token_concept} from '$lib/parser/token'
 
 /**
  *
@@ -161,20 +160,11 @@ function create_context_filter(context_json, offset) {
 				return true
 			}
 			// @ts-ignore
-			if (is_sentence_end_token(tokens[i]) || !skip_filter(tokens[i])) {
+			if (!skip_filter(tokens[i])) {
 				return false
 			}
 		}
 		return false
-	}
-
-	/**
-	 * TODO remove this. apply rules per sentence instead
-	 * 
-	 * @param {Token} token 
-	 */
-	function is_sentence_end_token(token) {
-		return token.type === TOKEN_TYPE.PUNCTUATION && REGEXES.SENTENCE_ENDING_PUNCTUATION.test(token.token)
 	}
 }
 
@@ -207,7 +197,7 @@ export function create_token_transform(transform_json) {
 
 	const concept = transform_json['concept']
 	if (concept !== undefined) {
-		transforms.push(set_token_concept(concept))
+		transforms.push(token => set_token_concept(token, concept))
 	}
 
 	if (transforms.length === 0) {
@@ -216,42 +206,5 @@ export function create_token_transform(transform_json) {
 		return transforms[0]
 	} else {
 		return token => transforms.reduce((new_token, transform) => transform(new_token), token)
-	}
-}
-
-/**
- * 
- * @param {string} concept must include the sense
- * @returns {TokenTransform}
- */
-function set_token_concept(concept) {
-	const [stem, sense] = split_concept()
-
-	return token => {
-		const matched_result = token.lookup_results.find(result => result.stem === stem && result.sense === sense)
-
-		if (matched_result) {
-			token.concept = matched_result
-		} else {
-			// TODO lookup in the ontology
-			token.lookup_term = concept
-			token.concept = {
-				id: '0',
-				stem,
-				sense,
-				part_of_speech: '',
-				level: 1,
-				gloss: '',
-			}
-		}
-
-		return token
-	}
-
-	function split_concept() {
-		const dash = concept.lastIndexOf('-')
-		const stem = concept.substring(0, dash)
-		const sense = concept.substring(dash+1)
-		return [stem, sense]
 	}
 }

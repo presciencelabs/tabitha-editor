@@ -13,6 +13,9 @@ const UNRECOGNIZED_CHAR = 'Unrecognized character.'
 const MISSING_PERIOD = 'Each verse must end in a period (or ? and !).'
 const FIRST_WORD_NOT_CAPITALIZED = 'The first word of each sentence should be capitalized.'
 
+const WORD_LEVEL_TOO_HIGH = 'Word must be a level 0 or 1'
+const WORD_LEVEL_TOO_LOW = 'Word must be a level 2 or 3'
+
 /**
  * 
  * @param {string} text 
@@ -29,9 +32,11 @@ export const ERRORS = {
 	NO_SPACE_BEFORE_OPENING_BRACKET,
 	MISSING_PERIOD,
 	FIRST_WORD_NOT_CAPITALIZED,
-	UNRECOGNIZED_CLAUSE_NOTATION,
-	NO_SPACE_BEFORE_UNDERSCORE,
-	INVALID_PAIRING_SYNTAX,
-	UNRECOGNIZED_CHAR,
-	INVALID_TOKEN_END,
+    UNRECOGNIZED_CLAUSE_NOTATION,
+    NO_SPACE_BEFORE_UNDERSCORE,
+    INVALID_PAIRING_SYNTAX,
+    UNRECOGNIZED_CHAR,
+    INVALID_TOKEN_END,
+    WORD_LEVEL_TOO_HIGH,
+    WORD_LEVEL_TOO_LOW,
 }

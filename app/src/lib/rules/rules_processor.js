@@ -1,4 +1,4 @@
-import {create_error_token} from '$lib/parser/token'
+import {TOKEN_TYPE, create_clause_token, create_error_token} from '$lib/parser/token'
 import {CHECKER_RULES} from './checker_rules'
 import {TRANSFORM_RULES} from './transform_rules'
 
@@ -15,11 +15,21 @@ function get_triggered_rules(rules, tokens, index) {
 
 /**
  * 
- * @param {Token[]} tokens 
- * @param {TransformRule[]} transforms
- * @returns {Token[]}
+ * @param {Sentence[]} sentences 
+ * @returns {Sentence[]}
  */
-export function apply_transform_rules(tokens, transforms=TRANSFORM_RULES) {
+export function apply_transform_rules(sentences, transforms=TRANSFORM_RULES) {
+	return sentences.map(sentence => apply_transform_rules_by_sentence(sentence, transforms))
+}
+
+/**
+ * 
+ * @param {Sentence} sentence 
+ * @param {TransformRule[]} transforms
+ * @returns {Sentence}
+ */
+function apply_transform_rules_by_sentence(sentence, transforms) {
+	const tokens = sentence.clause.sub_tokens
 	const new_tokens = []
 
 	for (let i = 0; i < tokens.length; i++) {
@@ -28,7 +38,7 @@ export function apply_transform_rules(tokens, transforms=TRANSFORM_RULES) {
 		new_tokens.push(apply_transforms(triggered_rules, tokens[i]))
 	}
 
-	return new_tokens
+	return { clause: create_clause_token(new_tokens) }
 
 	/**
 	 * 
@@ -48,11 +58,21 @@ export function apply_transform_rules(tokens, transforms=TRANSFORM_RULES) {
 
 /**
  * 
- * @param {Token[]} tokens 
- * @param {CheckerRule[]} rules
- * @return {Token[]}
+ * @param {Sentence[]} sentences 
+ * @returns {Sentence[]}
  */
-export function apply_checker_rules(tokens, rules=CHECKER_RULES) {
+export function apply_checker_rules(sentences, rules=CHECKER_RULES) {
+	return sentences.map(sentence => apply_checker_rules_by_sentence(sentence, rules))
+}
+
+/**
+ * 
+ * @param {Sentence} sentence 
+ * @param {CheckerRule[]} rules
+ * @return {Sentence}
+ */
+function apply_checker_rules_by_sentence(sentence, rules) {
+	const tokens = sentence.clause.sub_tokens
 	const new_tokens = []
 
 	for (let i = 0; i < tokens.length; i++) {
@@ -70,12 +90,12 @@ export function apply_checker_rules(tokens, rules=CHECKER_RULES) {
 		new_tokens.push(...create_context_tokens(triggered_rules, action => action.followed_by))
 	}
 
-	return new_tokens
+	return { clause: create_clause_token(new_tokens) }
 
 	/**
 	 * 
-	 * @param {CheckerRule[]} rules 
-	 * @param {(action: CheckerAction) => string?} token_getter 
+	 * @param {CheckerRule[]} rules
+	 * @param {(action: CheckerAction) => string?} token_getter
 	 */
 	function create_context_tokens(rules, token_getter) {
 		return rules
@@ -88,12 +108,17 @@ export function apply_checker_rules(tokens, rules=CHECKER_RULES) {
 	 * 
 	 * @param {CheckerRule[]} rules 
 	 * @param {Token} token 
+	 * @returns {Token}
 	 */
 	function create_trigger_token(rules, token) {
 		const trigger_rules = rules.filter(rule => rule.require.preceded_by === undefined && rule.require.followed_by === undefined)
 		if (trigger_rules.length > 0) {
 			// only use the first message for now
-			return create_error_token(token.token, trigger_rules[0].require.message)
+			return {
+				...token,
+				type: TOKEN_TYPE.ERROR,
+				message: trigger_rules[0].require.message,
+			}
 		}
 		return token
 	}
