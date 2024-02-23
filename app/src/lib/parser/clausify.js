@@ -1,6 +1,6 @@
 import {REGEXES} from '$lib/regexes'
 import {ERRORS} from './error_messages'
-import {TOKEN_TYPE, create_clause_token, create_error_token, create_token, flatten_sentence} from './token'
+import {TOKEN_TYPE, create_clause_token, create_error_token, flatten_sentence} from './token'
 
 /**
  * @param {Token[]} tokens

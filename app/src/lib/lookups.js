@@ -1,4 +1,4 @@
-import {TOKEN_TYPE, flatten_sentence} from "./parser/token"
+import {TOKEN_TYPE, flatten_sentence} from './parser/token'
 
 /**
  * 

@@ -77,7 +77,7 @@ export function check_capitalization(sentences) {
 		const word_types = [TOKEN_TYPE.LOOKUP_WORD, TOKEN_TYPE.PAIRING, TOKEN_TYPE.FUNCTION_WORD]
 
 		return word_types.includes(token.type)
-			|| (token.token.length > 0 && REGEXES.WORD_START_CHAR.test(token.token[0]))
+			|| token.token.length > 0 && REGEXES.WORD_START_CHAR.test(token.token[0])
 	}
 
 	/**

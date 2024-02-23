@@ -18,7 +18,7 @@ describe('transform rules', () => {
 			{
 				'trigger': { 'token': 'token' },
 				'context': { 'followedby': 'all' },
-				'transform': { 'concept': 'concept-A' }
+				'transform': { 'concept': 'concept-A' },
 			},
 		].map(parse_transform_rule)
 
@@ -39,7 +39,7 @@ describe('transform rules', () => {
 			{
 				'trigger': { 'token': 'token' },
 				'context': { 'followedby': { 'token': 'other' } },
-				'transform': { 'concept': 'concept-A' }
+				'transform': { 'concept': 'concept-A' },
 			},
 		].map(parse_transform_rule)
 
@@ -60,7 +60,7 @@ describe('transform rules', () => {
 			{
 				'trigger': { 'token': 'peanut' },
 				'context': { 'precededby': { 'token': 'a' } },
-				'transform': { 'concept': 'concept-A' }
+				'transform': { 'concept': 'concept-A' },
 			},
 		].map(parse_transform_rule)
 
@@ -87,12 +87,12 @@ describe('transform rules', () => {
 			{
 				'trigger': { 'token': 'the' },
 				'context': { 'followedby': 'all' },
-				'transform': { 'concept': 'the-A' }
+				'transform': { 'concept': 'the-A' },
 			},
 			{
 				'trigger': { 'type': TOKEN_TYPE.FUNCTION_WORD },
 				'context': { 'followedby': 'all' },
-				'transform': { 'concept': 'the-B' }
+				'transform': { 'concept': 'the-B' },
 			},
 		].map(parse_transform_rule)
 
@@ -115,7 +115,7 @@ describe('transform rules', () => {
 			{
 				'trigger': { 'token': 'token' },
 				'context': { 'followedby': { 'token': 'other', 'skip': 'all'  } },
-				'transform': { 'concept': 'concept-A' }
+				'transform': { 'concept': 'concept-A' },
 			},
 		].map(parse_transform_rule)
 
@@ -137,7 +137,7 @@ describe('transform rules', () => {
 			{
 				'trigger': { 'token': 'token' },
 				'context': { 'followedby': { 'token': 'other', 'skip': 'all' } },
-				'transform': { 'concept': 'concept-A' }
+				'transform': { 'concept': 'concept-A' },
 			},
 		].map(parse_transform_rule)
 
@@ -145,8 +145,8 @@ describe('transform rules', () => {
 			create_sentence([
 				create_token('token', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'token'}),
 				create_clause_token([
-					create_token('context', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'context'})
-				])
+					create_token('context', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'context'}),
+				]),
 			]),
 		]
 
@@ -286,7 +286,7 @@ describe('checker rules', () => {
 				'require': {
 					'followedby': 'add',
 					'message': 'message',
-				}
+				},
 			},
 		].map(parse_checker_rule)
 
@@ -311,7 +311,7 @@ describe('checker rules', () => {
 				'require': {
 					'followedby': 'add',
 					'message': 'message',
-				}
+				},
 			},
 		].map(parse_checker_rule)
 
@@ -319,8 +319,8 @@ describe('checker rules', () => {
 			create_sentence([
 				create_token('token', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'token'}),
 				create_clause_token([
-					create_token('context', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'context'})
-				])
+					create_token('context', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'context'}),
+				]),
 			]),
 		]
 

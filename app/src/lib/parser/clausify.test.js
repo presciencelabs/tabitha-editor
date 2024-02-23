@@ -37,8 +37,8 @@ describe('clausify: brackets', () => {
 			const expected = [
 				create_sentence([
 					create_clause_token(test_tokens.slice(0, 3)),
-					test_tokens[3]
-				])
+					test_tokens[3],
+				]),
 			]
 
 			expect(clausify(test_tokens)).toEqual(expected)
@@ -50,8 +50,8 @@ describe('clausify: brackets', () => {
 				create_sentence([
 					create_clause_token(test_tokens.slice(0, 3)),
 					create_clause_token(test_tokens.slice(3, 6)),
-					test_tokens[6]
-				])
+					test_tokens[6],
+				]),
 			]
 
 			expect(clausify(test_tokens)).toEqual(expected)
@@ -67,8 +67,8 @@ describe('clausify: brackets', () => {
 						create_clause_token(test_tokens.slice(2, 5)),
 						test_tokens[5],
 					]),
-					test_tokens[6]
-				])
+					test_tokens[6],
+				]),
 			]
 
 			expect(clausify(test_tokens)).toEqual(expected)
@@ -83,8 +83,8 @@ describe('clausify: brackets', () => {
 						create_clause_token(test_tokens.slice(1, 4)),
 						test_tokens[4],
 					]),
-					test_tokens[5]
-				])
+					test_tokens[5],
+				]),
 			]
 
 			expect(clausify(test_tokens)).toEqual(expected)
@@ -106,8 +106,8 @@ describe('clausify: brackets', () => {
 						]),
 						test_tokens[11],
 					]),
-					test_tokens[12]
-				])
+					test_tokens[12],
+				]),
 			]
 
 			expect(clausify(test_tokens)).toEqual(expected)
@@ -122,7 +122,7 @@ describe('clausify: brackets', () => {
 				create_sentence([
 					create_clause_token([
 						...test_tokens.slice(0, 3),
-						create_error_token(']', ERRORS.MISSING_CLOSING_BRACKET)
+						create_error_token(']', ERRORS.MISSING_CLOSING_BRACKET),
 					]),
 				]),
 			]
@@ -139,7 +139,7 @@ describe('clausify: brackets', () => {
 						...test_tokens.slice(0, 2),
 						create_clause_token(test_tokens.slice(2, 5)),
 						test_tokens[5],
-						create_error_token(']', ERRORS.MISSING_CLOSING_BRACKET)
+						create_error_token(']', ERRORS.MISSING_CLOSING_BRACKET),
 					]),
 				]),
 			]
@@ -153,7 +153,7 @@ describe('clausify: brackets', () => {
 			const expected = [
 				create_sentence([
 					create_error_token('[', ERRORS.MISSING_OPENING_BRACKET),
-					...test_tokens
+					...test_tokens,
 				]),
 			]
 
@@ -185,9 +185,9 @@ describe('clausify: brackets', () => {
 							test_tokens[1],
 							create_clause_token(test_tokens.slice(2, 5)),
 							test_tokens[5],
-							create_error_token(']', ERRORS.MISSING_CLOSING_BRACKET)
+							create_error_token(']', ERRORS.MISSING_CLOSING_BRACKET),
 						]),
-						create_error_token(']', ERRORS.MISSING_CLOSING_BRACKET)
+						create_error_token(']', ERRORS.MISSING_CLOSING_BRACKET),
 					]),
 				]),
 			]
@@ -219,10 +219,10 @@ describe('clausify: brackets', () => {
 				create_sentence([
 					create_clause_token([
 						...test_tokens.slice(0, 5),
-						create_error_token(']', ERRORS.MISSING_CLOSING_BRACKET)
+						create_error_token(']', ERRORS.MISSING_CLOSING_BRACKET),
 					]),
 				]),
-				create_sentence(test_tokens.slice(5, 7))
+				create_sentence(test_tokens.slice(5, 7)),
 			]
 
 			expect(clausify(test_tokens)).toEqual(expected)
@@ -234,7 +234,7 @@ describe('clausify: brackets', () => {
 				create_sentence(test_tokens.slice(0, 2)),
 				create_sentence([
 					create_error_token('[', ERRORS.MISSING_OPENING_BRACKET),
-					...test_tokens.slice(2, 5)
+					...test_tokens.slice(2, 5),
 				]),
 			]
 
@@ -247,12 +247,12 @@ describe('clausify: brackets', () => {
 				create_sentence([
 					create_clause_token([
 						...test_tokens.slice(0, 3),
-						create_error_token(']', ERRORS.MISSING_CLOSING_BRACKET)
+						create_error_token(']', ERRORS.MISSING_CLOSING_BRACKET),
 					]),
 				]),
 				create_sentence([
 					create_error_token('[', ERRORS.MISSING_OPENING_BRACKET),
-					...test_tokens.slice(3, 6)
+					...test_tokens.slice(3, 6),
 				]),
 			]
 
@@ -282,8 +282,8 @@ describe('clausify: period check', () => {
 
 			const expected_tokens = [
 				create_sentence([
-					create_clause_token(test_tokens)
-				])
+					create_clause_token(test_tokens),
+				]),
 			]
 
 			expect(clausify(test_tokens)).toEqual(expected_tokens)
@@ -302,7 +302,7 @@ describe('clausify: period check', () => {
 				create_sentence([
 					create_clause_token(test_tokens.slice(0, 4)),
 					test_tokens[4],
-				])
+				]),
 			]
 
 			expect(clausify(test_tokens)).toEqual(expected_tokens)
@@ -327,8 +327,8 @@ describe('clausify: period check', () => {
 			const expected_tokens = [
 				create_sentence([
 					...test_tokens,
-					create_error_token('.', ERRORS.MISSING_PERIOD)
-				])
+					create_error_token('.', ERRORS.MISSING_PERIOD),
+				]),
 			]
 
 			expect(clausify(test_tokens)).toEqual(expected_tokens)
@@ -353,7 +353,7 @@ describe('clausify: period check', () => {
 				create_sentence([
 					create_clause_token(test_tokens.slice(0, 3)),
 					create_error_token('.', ERRORS.MISSING_PERIOD),
-				])
+				]),
 			]
 
 			expect(clausify(test_tokens)).toEqual(expected_tokens)
@@ -364,8 +364,8 @@ describe('clausify: period check', () => {
 			const expected_tokens = [
 				create_sentence([
 					...test_tokens,
-					create_error_token('.', ERRORS.MISSING_PERIOD)
-				])
+					create_error_token('.', ERRORS.MISSING_PERIOD),
+				]),
 			]
 
 			expect(clausify(test_tokens)).toEqual(expected_tokens)

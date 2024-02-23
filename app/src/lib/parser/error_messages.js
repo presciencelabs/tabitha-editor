@@ -17,8 +17,8 @@ const WORD_LEVEL_TOO_HIGH = 'Word must be a level 0 or 1'
 const WORD_LEVEL_TOO_LOW = 'Word must be a level 2 or 3'
 
 /**
- * 
- * @param {string} text 
+ *
+ * @param {string} text
  */
 const INVALID_TOKEN_END = function(text) {
 	return `${text} must be followed by a space or punctuation.`
@@ -32,11 +32,11 @@ export const ERRORS = {
 	NO_SPACE_BEFORE_OPENING_BRACKET,
 	MISSING_PERIOD,
 	FIRST_WORD_NOT_CAPITALIZED,
-    UNRECOGNIZED_CLAUSE_NOTATION,
-    NO_SPACE_BEFORE_UNDERSCORE,
-    INVALID_PAIRING_SYNTAX,
-    UNRECOGNIZED_CHAR,
-    INVALID_TOKEN_END,
-    WORD_LEVEL_TOO_HIGH,
-    WORD_LEVEL_TOO_LOW,
+	UNRECOGNIZED_CLAUSE_NOTATION,
+	NO_SPACE_BEFORE_UNDERSCORE,
+	INVALID_PAIRING_SYNTAX,
+	UNRECOGNIZED_CHAR,
+	INVALID_TOKEN_END,
+	WORD_LEVEL_TOO_HIGH,
+	WORD_LEVEL_TOO_LOW,
 }
