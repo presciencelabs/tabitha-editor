@@ -1,11 +1,13 @@
 import {pipe} from '$lib/pipeline'
 import {tokenize_input} from './tokenize'
 import {check_capitalization, check_for_pronouns} from './syntax'
-import {use_alternate_lookups} from './alternate_lookups'
-import {apply_checker_rules, apply_transform_rules} from '../rules/rules_processor'
 import {perform_ontology_lookups} from '$lib/lookups'
 import {check_pairings} from './pairings'
 import {clausify, flatten_sentences} from './clausify'
+import {rules_applier} from '../rules/rules_processor'
+import {LOOKUP_RULES} from '../rules/lookup_rules'
+import {TRANSFORM_RULES} from '../rules/transform_rules'
+import {CHECKER_RULES} from '../rules/checker_rules'
 
 /**
  * @param {string} text
@@ -14,17 +16,17 @@ import {clausify, flatten_sentences} from './clausify'
 export async function parse(text) {
 	const pre_lookups = pipe(
 		tokenize_input,
-		use_alternate_lookups,
 		check_for_pronouns,
 		clausify,
 		check_capitalization,
+		rules_applier(LOOKUP_RULES),
 	)(text)
 
 	const with_lookups = await perform_ontology_lookups(pre_lookups)
 
 	return pipe(
-		apply_transform_rules,
-		apply_checker_rules,
+		rules_applier(TRANSFORM_RULES),
+		rules_applier(CHECKER_RULES),
 		flatten_sentences,
 		check_pairings,
 	)(with_lookups)
@@ -39,12 +41,12 @@ export async function parse(text) {
 export function parse_for_test(text) {
 	return pipe(
 		tokenize_input,
-		use_alternate_lookups,
 		check_for_pronouns,
 		clausify,
 		check_capitalization,
-		apply_transform_rules,
-		apply_checker_rules,
+		rules_applier(LOOKUP_RULES),
+		rules_applier(TRANSFORM_RULES),
+		rules_applier(CHECKER_RULES),
 		flatten_sentences,
 		check_pairings,
 	)(text)

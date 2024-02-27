@@ -6,15 +6,8 @@
 	export let classes = ''
 
 	// TODO: more work needed to handle multiple matches with possibly different levels, e.g., son
-	const concept = token.concept || token.lookup_results[0]
-	const tooltip = token.concept ? display_concept(token.concept) : token.lookup_results.map(display_concept).join('; ')
-
-	/**
-	 * @param {OntologyResult} concept
-	 */
-	function display_concept(concept) {
-		return `${concept.stem}-${concept.sense}`
-	}
+	const concept = token.lookup_results[0]
+	const tooltip = token.lookup_results.map(result => `${result.stem}-${result.sense}`).join('; ')
 </script>
 
 <div class='tooltip' data-tip={tooltip}>

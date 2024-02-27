@@ -18,25 +18,6 @@ const transform_rules_json = [
 		'transform': { 'type': TOKEN_TYPE.FUNCTION_WORD },
 	},
 	{
-		'name': 'because of becomes because-B',
-		'trigger': { 'token': 'because' },
-		'context': {
-			'followedby': { 'token': 'of' },
-		},
-		'transform': { 'concept': 'because-B' },
-	},
-	{
-		'name': 'take-away',
-		'trigger': { 'stem': 'take' },
-		'context': {
-			'followedby': {
-				'token': 'away',
-				'skip': 'all',
-			},
-		},
-		'transform': { 'concept': 'take-away-A' },
-	},
-	{
 		'name': 'start before a verb becomes a function word',
 		'trigger': { 'stem': 'start' },
 		'context': {
