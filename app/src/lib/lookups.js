@@ -1,4 +1,4 @@
-import {TOKEN_TYPE, flatten_sentence} from './parser/token'
+import {TOKEN_TYPE} from './parser/token'
 
 // TODO move whole token pipeline to the server
 
@@ -8,7 +8,7 @@ import {TOKEN_TYPE, flatten_sentence} from './parser/token'
  * @returns {Promise<Sentence[]>}
  */
 export async function perform_form_lookups(sentences) {
-	const lookup_tokens = sentences.flatMap(flatten_sentence).filter(is_lookup_token)
+	const lookup_tokens = sentences.flatMap(flatten_for_lookup).filter(is_lookup_token)
 
 	await Promise.all(lookup_tokens.map(check_forms))
 
@@ -21,11 +21,32 @@ export async function perform_form_lookups(sentences) {
  * @returns {Promise<Sentence[]>}
  */
 export async function perform_ontology_lookups(sentences) {
-	const lookup_tokens = sentences.flatMap(flatten_sentence).filter(is_lookup_token)
+	const lookup_tokens = sentences.flatMap(flatten_for_lookup).filter(is_lookup_token)
 
 	await Promise.all(lookup_tokens.map(check_ontology))
 
 	return sentences
+}
+
+/**
+ * 
+ * @param {Sentence} sentence 
+ * @returns {Token[]}
+ */
+function flatten_for_lookup(sentence) {
+	return flatten_tokens(sentence.clause)
+
+	/**
+	 * 
+	 * @param {Token} token 
+	 * @returns {Token[]}
+	 */
+	function flatten_tokens(token) {
+		if (token.type === TOKEN_TYPE.CLAUSE || token.type === TOKEN_TYPE.PAIRING) {
+			return token.sub_tokens.flatMap(flatten_tokens)
+		}
+		return [token]
+	}
 }
 
 /**
