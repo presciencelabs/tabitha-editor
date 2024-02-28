@@ -2,7 +2,7 @@ import {TOKEN_TYPE, create_clause_token, create_token, flatten_sentence} from '$
 import {describe, expect, test} from 'vitest'
 import {parse_checker_rule, parse_transform_rule} from './rules_parser'
 import {apply_rules} from './rules_processor'
-import { LOOKUP_RULES } from './lookup_rules'
+import {LOOKUP_RULES} from './lookup_rules'
 
 /**
  * 

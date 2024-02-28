@@ -4,10 +4,7 @@ import {check_capitalization, check_for_pronouns} from './syntax'
 import {perform_form_lookups, perform_ontology_lookups} from '$lib/lookups'
 import {check_pairings} from './pairings'
 import {clausify, flatten_sentences} from './clausify'
-import {rules_applier} from '../rules/rules_processor'
-import {LOOKUP_RULES} from '../rules/lookup_rules'
-import {TRANSFORM_RULES} from '../rules/transform_rules'
-import {CHECKER_RULES} from '../rules/checker_rules'
+import {CHECKER_RULES, LOOKUP_RULES, TRANSFORM_RULES, rules_applier} from '$lib/rules/rules.index'
 
 /**
  * @param {string} text

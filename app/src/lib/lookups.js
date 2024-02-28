@@ -75,8 +75,8 @@ async function check_ontology(lookup_token) {
 	if (!all_elements_the_same(lookup_token.form_results, result => result.stem.toLowerCase())) {
 		const unique_lookups = [...new Set(lookup_token.form_results.map(form => form.stem))]
 
-		await Promise.all(unique_lookups.map(check_word_in_ontology))
-			.then(results => lookup_token.lookup_results = results.flat())
+		const results = await Promise.all(unique_lookups.map(check_word_in_ontology))
+		lookup_token.lookup_results = results.flat()
 
 	} else {
 		lookup_token.lookup_results = await check_word_in_ontology(lookup_token.lookup_term)
