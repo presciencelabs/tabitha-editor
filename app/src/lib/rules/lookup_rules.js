@@ -76,35 +76,34 @@ const lookup_rules_json = [
 		'lookup': 'because-B',
 		'combine': 1,
 	},
-	// TODO change the trigger to use the stem once the form is resolved
 	{
 		'name': 'take away',
-		'trigger': { 'token': 'take' },
+		'trigger': { 'stem': 'take' },
 		'context': { 'followedby': {'token': 'away', 'skip': 'all'} },
 		'lookup': 'take-away',
-		'context_transform': { 'type': TOKEN_TYPE.FUNCTION_WORD }
+		'context_transform': { 'type': TOKEN_TYPE.FUNCTION_WORD },
 	},
 	{
 		'name': 'come out',
-		'trigger': { 'token': 'come' },
+		'trigger': { 'stem': 'come' },
 		'context': { 'followedby': {'token': 'out'} },
 		'lookup': 'come-out',
 		'combine': 1,
 	},
 	{
 		'name': 'give birth',
-		'trigger': { 'token': 'give' },
+		'trigger': { 'stem': 'give' },
 		'context': { 'followedby': {'token': 'birth'} },
 		'lookup': 'birth',
 		'combine': 1,
 	},
 	{
 		'name': 'put on (clothes)',
-		'trigger': { 'token': 'put' },
-		'context': { 'followedby': [{'token': 'on'}, {'token': 'clothes|glove|sandal|shirt|shoe'}] },
+		'trigger': { 'stem': 'put' },
+		'context': { 'followedby': [{'token': 'on'}, {'stem': 'clothes|glove|sandal|shirt|shoe'}] },
 		'lookup': 'put-on',
 		'combine': 1,
-		'comment': 'The clothing-related nouns must be present because we don\'t want this rule applying to \'put on\' in general'
+		'comment': 'The clothing-related nouns must be present because we don\'t want this rule applying to \'put on\' in general',
 	},
 ]
 

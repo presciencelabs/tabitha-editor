@@ -1,4 +1,4 @@
-import {TOKEN_TYPE, check_token_lookup, create_error_token, create_token, set_token_concept} from '$lib/parser/token'
+import {TOKEN_TYPE, check_token_lookup, create_error_token, set_token_concept} from '$lib/parser/token'
 
 /**
  *
@@ -177,7 +177,32 @@ export function create_token_filter(filter_json) {
 		})
 	}
 
-	add_lookup_filter('stem', concept => concept.stem)
+	// a token form can have | separated values
+	const form_json = filter_json['form']
+	if (form_json !== undefined) {
+		filters.push(token => {
+			return token.form_results.length
+				? token.form_results.every(form => get_value_checker(form.form)(form_json))
+				: false
+		})
+	}
+
+	const stem_json = filter_json['stem']
+	if (stem_json !== undefined) {
+		const value_checker = get_value_checker(stem_json)
+		filters.push(token => {
+			if (token.lookup_results.length) {
+				return token.lookup_results.every(lookup => value_checker(lookup.stem))
+
+			} else if (token.form_results.length) {
+				return token.form_results.every(form => value_checker(form.stem))
+
+			} else {
+				return value_checker(token.token)
+			}
+		})
+	}
+
 	add_lookup_filter('category', concept => concept.part_of_speech)
 
 	if (filters.length === 0) {
@@ -243,9 +268,19 @@ export function create_context_filter(context_json) {
 		filters.push(create_directional_context_filter(preceded_by, -1))
 	}
 
+	const not_preceded_by = context_json['notprecededby']
+	if (not_preceded_by !== undefined) {
+		filters.push(negate(create_directional_context_filter(not_preceded_by, -1)))
+	}
+
 	const followed_by = context_json['followedby']
 	if (followed_by !== undefined) {
 		filters.push(create_directional_context_filter(followed_by, +1))
+	}
+
+	const not_followed_by = context_json['notfollowedby']
+	if (not_followed_by !== undefined) {
+		filters.push(negate(create_directional_context_filter(not_followed_by, +1)))
 	}
 
 	if (filters.length === 0) {
@@ -253,6 +288,24 @@ export function create_context_filter(context_json) {
 	} else if (filters.length === 1) {
 		return (tokens, start_index) => filters[0](tokens, start_index)
 	} else {
+		return combine(filters)
+	}
+
+	/**
+	 * 
+	 * @param {TokenContextFilter} filter 
+	 * @returns {TokenContextFilter}
+	 */
+	function negate(filter) {
+		return (tokens, start_index) => filter(tokens, start_index).success ? context_result(false) : context_result(true)
+	}
+
+	/**
+	 * 
+	 * @param {TokenContextFilter[]} filters
+	 * @returns {TokenContextFilter}
+	 */
+	function combine(filters) {
 		return (tokens, start_index) => {
 			const results = filters.map(filter => filter(tokens, start_index))
 			if (results.every(result => result.success)) {
@@ -384,6 +437,11 @@ export function create_token_transform(transform_json) {
 	const tag = transform_json['tag']
 	if (tag !== undefined) {
 		transforms.push(token => ({...token, tag}))
+	}
+
+	const function_tag = transform_json['function']
+	if (function_tag !== undefined) {
+		transforms.push(token => ({...token, type: TOKEN_TYPE.FUNCTION_WORD, tag: function_tag}))
 	}
 
 	const concept = transform_json['concept']

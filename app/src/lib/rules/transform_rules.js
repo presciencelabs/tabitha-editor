@@ -55,6 +55,29 @@ const transform_rules_json = [
 		},
 		'transform': { 'concept': 'be-D' },
 	},
+	{
+		'name': 'be before a past participle Verb indicates passive',
+		'trigger': { 'stem': 'be' },
+		'context': {
+			'followedby': {
+				'category': 'Verb',
+				'form': 'past participle',
+				'skip': { 'category': 'Adverb' },
+			},
+		},
+		'transform': { 'function': 'passive' },
+	},
+	{
+		'name': 'by preceded by a passive be indicates the agent',
+		'trigger': { 'stem': 'by' },
+		'context': {
+			'precededby': {
+				'tag': 'passive',
+				'skip': 'all',
+			},
+		},
+		'transform': { 'function': 'agent_of_passive' },
+	},
 ]
 
 export const TRANSFORM_RULES = transform_rules_json.map(parse_transform_rule)

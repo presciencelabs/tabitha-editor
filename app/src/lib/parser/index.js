@@ -1,7 +1,7 @@
 import {pipe} from '$lib/pipeline'
 import {tokenize_input} from './tokenize'
 import {check_capitalization, check_for_pronouns} from './syntax'
-import {perform_ontology_lookups} from '$lib/lookups'
+import {perform_form_lookups, perform_ontology_lookups} from '$lib/lookups'
 import {check_pairings} from './pairings'
 import {clausify, flatten_sentences} from './clausify'
 import {rules_applier} from '../rules/rules_processor'
@@ -19,10 +19,11 @@ export async function parse(text) {
 		check_for_pronouns,
 		clausify,
 		check_capitalization,
-		rules_applier(LOOKUP_RULES),
 	)(text)
 
-	const with_lookups = await perform_ontology_lookups(pre_lookups)
+	const with_forms = await perform_form_lookups(pre_lookups)
+	const with_transformed_lookups = rules_applier(LOOKUP_RULES)(with_forms)
+	const with_lookups = await perform_ontology_lookups(with_transformed_lookups)
 
 	return pipe(
 		rules_applier(TRANSFORM_RULES),

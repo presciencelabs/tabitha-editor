@@ -1,13 +1,14 @@
 type TokenType = 'Error' | 'Punctuation' | 'Note' | 'FunctionWord' | 'Word' | 'Pairing' | 'Clause'
 
 type Token = {
-	token: string;
-	type: TokenType;
-	message: string;
-	tag: string;
-	lookup_term: string;
-	lookup_results: OntologyResult[];
-	sub_tokens: Token[];
+	token: string
+	type: TokenType
+	message: string
+	tag: string
+	lookup_term: string
+	form_results: FormResult[]
+	lookup_results: OntologyResult[]
+	sub_tokens: Token[]
 }
 
 type Clause = Token
@@ -32,11 +33,16 @@ type OntologyResult = {
 	gloss: string
 }
 
-type Stem = string
+type FormResult = {
+	stem: string
+	part_of_speech: string
+	form: string
+}
 
 type DbRowInflection = {
-	stem: Stem
+	stem: string
 	part_of_speech: string
+	inflections: string
 }
 
 type TokenFilter = (token: Token) => boolean

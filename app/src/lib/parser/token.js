@@ -47,6 +47,7 @@ export function create_token(token, type, {message='', tag='', lookup_term='', s
 		message,
 		tag,
 		lookup_term,
+		form_results: [],
 		lookup_results: [],
 		sub_tokens,
 	}

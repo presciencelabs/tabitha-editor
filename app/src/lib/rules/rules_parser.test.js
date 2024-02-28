@@ -92,6 +92,23 @@ describe('context filters', () => {
 		expect(results[1].indexes[0]).toBe(2)
 		expect(results[2].success).toBe(false)
 	})
+	test('not followed by', () => {
+		const context_json = { 'notfollowedby': { 'token': 'token' } }
+		const filter = create_context_filter(context_json)
+
+		const tokens = [
+			create_token('token', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'token'}),
+			create_token('text', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'text'}),
+			create_token('token', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'token'}),
+			create_token('other', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'other'}),
+		]
+		const results = tokens.map((_, i) => filter(tokens, i))
+
+		expect(results[0].success).toBe(true)
+		expect(results[1].success).toBe(false)
+		expect(results[2].success).toBe(true)
+		expect(results[3].success).toBe(true)
+	})
 	test('followed by with skip', () => {
 		const context_json = { 'followedby': { 'token': 'other', 'skip': { 'token': 'skip' } } }
 		const filter = create_context_filter(context_json)
@@ -129,6 +146,23 @@ describe('context filters', () => {
 		expect(results[2].success).toBe(false)
 		expect(results[3].success).toBe(true)
 		expect(results[3].indexes[0]).toBe(2)
+	})
+	test('not preceded by', () => {
+		const context_json = { 'notprecededby': { 'token': 'token' } }
+		const filter = create_context_filter(context_json)
+
+		const tokens = [
+			create_token('token', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'token'}),
+			create_token('text', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'text'}),
+			create_token('token', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'token'}),
+			create_token('other', TOKEN_TYPE.LOOKUP_WORD, {lookup_term: 'other'}),
+		]
+		const results = tokens.map((_, i) => filter(tokens, i))
+
+		expect(results[0].success).toBe(true)
+		expect(results[1].success).toBe(false)
+		expect(results[2].success).toBe(true)
+		expect(results[3].success).toBe(false)
 	})
 	test('preceded by with skip', () => {
 		const context_json = { 'precededby': { 'token': 'token', 'skip': { 'token': 'skip' } } }
