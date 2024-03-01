@@ -70,7 +70,7 @@ export function tokenize_input(text = '') {
 		}
 		// simple/complex
 		eat(REGEXES.WORD_CHAR)
-		return check_boundary_for_token(TOKEN_TYPE.PAIRING)
+		return check_boundary_for_token(TOKEN_TYPE.LOOKUP_WORD)
 	}
 
 	function decimal_number() {
@@ -127,11 +127,8 @@ export function tokenize_input(text = '') {
 		}
 
 		if (token_type === TOKEN_TYPE.LOOKUP_WORD) {
-			// token token. token,
+			// token token. token, simple/complex
 			return word_token()
-		} else if (token_type === TOKEN_TYPE.PAIRING) {
-			// simple/complex simple/complex. simple/complex,
-			return pairing_token()
 		} else {
 			// punctuation
 			return simple_token(token_type)
@@ -182,6 +179,9 @@ export function tokenize_input(text = '') {
 	 */
 	function word_token() {
 		const token = collect_text()
+		if (token.includes('/')) {
+			return pairing_token(token)
+		}
 		return get_function_word(token) || lookup_token(token)
 	}
 
@@ -212,12 +212,13 @@ export function tokenize_input(text = '') {
 	}
 
 	/**
+	 * @param {string} token 
 	 * @returns {Token}
 	 */
-	function pairing_token() {
-		const token = collect_text()
-		const sub_tokens = token.split('/').map(lookup_token)
-		return create_token(token, TOKEN_TYPE.PAIRING, { sub_tokens })
+	function pairing_token(token) {
+		const [left, right] = token.split('/').map(lookup_token)
+		left.complex_pairing = right
+		return left
 	}
 
 	/**
