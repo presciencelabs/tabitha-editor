@@ -85,8 +85,9 @@ export function parse_part_of_speech_rule(rule_json) {
 	function create_remove_action(remove_json) {
 		return (tokens, trigger_index) => {
 			const token = tokens[trigger_index]
-			const new_results = token.lookup_results.filter(result => result.part_of_speech !== remove_json)
-			tokens[trigger_index] = {...token, lookup_results: new_results}
+			const form_results = token.form_results.filter(result => result.part_of_speech !== remove_json)
+			const lookup_results = token.lookup_results.filter(result => result.part_of_speech !== remove_json)
+			tokens[trigger_index] = {...token, form_results, lookup_results}
 			return trigger_index + 1
 		}
 	}

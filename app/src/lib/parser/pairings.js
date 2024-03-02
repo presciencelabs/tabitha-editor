@@ -44,7 +44,10 @@ export function check_pairings(sentences) {
 		const overlapping_categories = new Set([...left_categories].filter(x => right_categories.has(x)))
 
 		if (overlapping_categories.size > 0) {
+			left.form_results = left.form_results.filter(result => overlapping_categories.has(result.part_of_speech))
 			left.lookup_results = left.lookup_results.filter(result => overlapping_categories.has(result.part_of_speech))
+
+			right.form_results = right.form_results.filter(result => overlapping_categories.has(result.part_of_speech))
 			right.lookup_results = right.lookup_results.filter(result => overlapping_categories.has(result.part_of_speech))
 		} else {
 			left.message = 'Cannot pair words of different parts of speech'
