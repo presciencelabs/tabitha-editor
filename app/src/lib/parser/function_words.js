@@ -7,7 +7,7 @@ export const FUNCTION_WORDS = new Map([
 	['definitely', 'definite_mood'],
 	['extremely', 'extremely_intensified_degree'],
 	['from', 'source_role'],
-	['it', 'agent_proposition'],
+	['it', 'agent_proposition_subject'],
 	['least', 'least_degree'],
 	['might', 'might_mood'],
 	['must', 'must_mood'],

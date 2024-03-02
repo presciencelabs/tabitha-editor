@@ -364,14 +364,17 @@ describe('sentence syntax: tag setting', () => {
 		expect(clause_tokens[5].tag).not.toBe('relative_clause')
 	})
 	test('"that" clause tag', () => {
-		const test_tokens = clausify(tokenize_input('That person [that].'))
+		const test_tokens = clausify(tokenize_input('That person [that]. John saw [that].'))
 		test_tokens[0].clause.sub_tokens[1].lookup_results.push(create_lookup_result('person', {part_of_speech: 'Noun'}))
+		test_tokens[1].clause.sub_tokens[1].lookup_results.push(create_lookup_result('see', {part_of_speech: 'Verb'}))
 
 		const checked_tokens = apply_rules(test_tokens, SYNTAX_RULES)
-		const clause_tokens = checked_tokens[0].clause.sub_tokens
 		
-		expect(clause_tokens[2].tag).toBe('patient_clause|relative_clause')
-		expect(clause_tokens[2].sub_tokens[1].tag).toBe('relativizer|complementizer')
+		expect(checked_tokens[0].clause.sub_tokens[2].tag).toBe('relative_clause|patient_clause')
+		expect(checked_tokens[0].clause.sub_tokens[2].sub_tokens[1].tag).toBe('relativizer|complementizer')
+		
+		expect(checked_tokens[1].clause.sub_tokens[2].tag).toBe('patient_clause')
+		expect(checked_tokens[1].clause.sub_tokens[2].sub_tokens[1].tag).toBe('complementizer')
 	})
 	test('Adverbial clause tag', () => {
 		const test_tokens = clausify(tokenize_input('[Because].'))
@@ -381,20 +384,5 @@ describe('sentence syntax: tag setting', () => {
 		const clause_tokens = checked_tokens[0].clause.sub_tokens
 		
 		expect(clause_tokens[0].tag).toBe('adverbial_clause')
-	})
-	test('Agent propositions clause tag', () => {
-		const test_tokens = clausify(tokenize_input('It pleases God [that people obey God]. [You(person) obey God] is good. The book [that is on the table] is good.'))
-		test_tokens[0].clause.sub_tokens[1].lookup_results.push(create_lookup_result('please', {part_of_speech: 'Verb'}))
-		test_tokens[1].clause.sub_tokens[1].lookup_results.push(create_lookup_result('be', {part_of_speech: 'Verb'}))
-		test_tokens[2].clause.sub_tokens[3].lookup_results.push(create_lookup_result('be', {part_of_speech: 'Verb'}))
-
-		const checked_tokens = apply_rules(test_tokens, SYNTAX_RULES)
-		
-		expect(checked_tokens[0].clause.sub_tokens[3].type).toBe(TOKEN_TYPE.CLAUSE)
-		expect(checked_tokens[0].clause.sub_tokens[3].tag).toBe('agent_clause')
-		expect(checked_tokens[1].clause.sub_tokens[0].type).toBe(TOKEN_TYPE.CLAUSE)
-		expect(checked_tokens[1].clause.sub_tokens[0].tag).toBe('agent_clause')
-		expect(checked_tokens[2].clause.sub_tokens[2].type).toBe(TOKEN_TYPE.CLAUSE)
-		expect(checked_tokens[2].clause.sub_tokens[2].tag).not.toBe('agent_clause')
 	})
 })

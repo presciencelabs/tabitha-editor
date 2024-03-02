@@ -36,27 +36,35 @@ const syntax_rule_info = [
 		},
 	},
 	{
-		name: 'Set tag for relative clauses',
+		name: 'Set tag for relative clauses based on relativizer',
 		comment: 'removes extra tags for words like "who" and "which". "that" is handled again in the next rule',
 		rule: {
 			trigger: subordinate_clause_starts_with(create_token_filter({'tag': 'relativizer'})),
 			context: create_context_filter({ 'precededby': { 'category': 'Noun'} }),
 			action: (tokens, trigger_index) => {
-				tokens[trigger_index].tag = 'relative_clause'
-				tokens[trigger_index].sub_tokens[1].tag = 'relativizer'
+				const relativizer = tokens[trigger_index].sub_tokens[1]
+				if (relativizer.token === 'that') {
+					// 'that' could also be a complementizer here
+					tokens[trigger_index].tag = 'relative_clause|patient_clause'
+					relativizer.tag = 'relativizer|complementizer'
+				} else {
+					tokens[trigger_index].tag = 'relative_clause'
+					relativizer.tag = 'relativizer'
+				}
+
 				return trigger_index + 1
 			},
 		},
 	},
 	{
-		name: 'Set tag for "that" when preceded by a Noun',
-		comment: '"that" could still be a relativizer OR complementizer at the start of a subordinate clause (but never a demonstrative)',
+		name: 'Set tag for "that" when not preceded by a Noun',
+		comment: '"that" can only be a complementizer in this case',
 		rule: {
 			trigger: subordinate_clause_starts_with(create_token_filter({'token': 'that'})),
-			context: create_context_filter({}),
+			context: create_context_filter({ 'notprecededby': { 'category': 'Noun' }}),
 			action: (tokens, trigger_index) => {
-				tokens[trigger_index].tag = 'patient_clause|relative_clause'
-				tokens[trigger_index].sub_tokens[1].tag = 'relativizer|complementizer'
+				tokens[trigger_index].tag = 'patient_clause'
+				tokens[trigger_index].sub_tokens[1].tag = 'complementizer'
 				return trigger_index + 1
 			},
 		},
@@ -69,30 +77,6 @@ const syntax_rule_info = [
 			context: create_context_filter({}),
 			action: (tokens, trigger_index) => {
 				tokens[trigger_index].tag = 'adverbial_clause'
-				return trigger_index + 1
-			},
-		},
-	},
-	{
-		name: 'Set tag for agent propositions of the form "[] Verb"',
-		comment: 'eg. [You(person) obey God] is good. Add filter for relative clause in case of a sentence like: The book [that is on the table] is good.',
-		rule: {
-			trigger: token => token_is_subordinate_clause(token) && !token.tag.includes('relative_clause'),
-			context: create_context_filter({ 'followedby': { 'category': 'Verb' }}),
-			action: (tokens, trigger_index) => {
-				tokens[trigger_index].tag = 'agent_clause'
-				return trigger_index + 1
-			},
-		},
-	},
-	{
-		name: 'Set tag for agent propositions of the form "It... [that..."',
-		comment: 'eg. It pleases God [that people obey God].',
-		rule: {
-			trigger: token_is_subordinate_clause,
-			context: create_context_filter({ 'precededby': { 'tag': 'agent_proposition', 'skip': 'all' }}),
-			action: (tokens, trigger_index) => {
-				tokens[trigger_index].tag = 'agent_clause'
 				return trigger_index + 1
 			},
 		},
@@ -144,10 +128,7 @@ export const SYNTAX_RULES = syntax_rule_info.map(rule => rule.rule)
  * @param {Token} token 
  */
 function token_is_subordinate_clause(token) {
-	return token.type === TOKEN_TYPE.CLAUSE
-		&& token.sub_tokens.length > 0
-		&& token.sub_tokens[0].token === '['
-		&& token.sub_tokens[0].type !== TOKEN_TYPE.ERROR
+	return token.type === TOKEN_TYPE.CLAUSE && !token.tag.includes('main_clause')
 }
 
 /**
@@ -157,9 +138,9 @@ function token_is_subordinate_clause(token) {
  */
 function subordinate_clause_starts_with(first_token_filter) {
 	return clause => clause.type === TOKEN_TYPE.CLAUSE
+		&& !clause.tag.includes('main_clause')
 		&& clause.sub_tokens.length > 1
-		&& clause.sub_tokens[0].token === '['
-		&& first_token_filter(clause.sub_tokens[1])
+		&& first_token_filter(clause.sub_tokens[1])		// skip the '['
 }
 
 /**
