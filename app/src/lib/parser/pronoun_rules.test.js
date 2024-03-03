@@ -26,15 +26,26 @@ function create_tokens(tokens) {
 	}
 }
 
+/**
+ * @param {string} pronoun
+ * @param {string} referent
+ * @param {string?} referent_lookup
+ * @returns {Token}
+ */
+function create_pronoun_token(pronoun, referent, referent_lookup=null) {
+	const pronoun_token = create_token(pronoun, TOKEN_TYPE.FUNCTION_WORD)
+	return create_token(referent, TOKEN_TYPE.LOOKUP_WORD, { lookup_term: referent_lookup ?? referent, pronoun: pronoun_token })
+}
+
 describe('invalid tokens: pronouns', () => {
 	describe('valid', () => {
 		test.each([
-			[create_tokens(['I(Paul)']), PRONOUN_TAGS.get('i')],
-			[create_tokens(['myself(Paul)']), PRONOUN_TAGS.get('myself')],
-			[create_tokens(['You(Paul)']), PRONOUN_TAGS.get('you')],
-			[create_tokens(['you(Paul)']), PRONOUN_TAGS.get('you')],
-			[create_tokens(['we(people)']), PRONOUN_TAGS.get('we')],
-			[create_tokens(['each-other(people)']), PRONOUN_TAGS.get('each-other')],
+			[[create_pronoun_token('I', 'Paul')], PRONOUN_TAGS.get('i')],
+			[[create_pronoun_token('myself', 'Paul')], PRONOUN_TAGS.get('myself')],
+			[[create_pronoun_token('You', 'Paul')], PRONOUN_TAGS.get('you')],
+			[[create_pronoun_token('you', 'Paul')], PRONOUN_TAGS.get('you')],
+			[[create_pronoun_token('we', 'people')], PRONOUN_TAGS.get('we')],
+			[[create_pronoun_token('each-other', 'people')], PRONOUN_TAGS.get('each-other')],
 		])('%s', (test_tokens, exptected_tag) => {
 			const EXPECTED_OUTPUT = test_tokens.map(token => ({...token, tag: exptected_tag}))
 
@@ -140,13 +151,16 @@ describe('invalid tokens: pronouns', () => {
 	})
 
 	test('invalid: invalid pronoun used with referent', () => {
-		const test_tokens = create_tokens(['her(Mary)', 'token(Mary)'])
+		const test_tokens = [
+			create_pronoun_token('her', 'Mary'),
+			create_pronoun_token('token', 'Mary'),
+		]
 		const checked_tokens = check_for_pronouns(test_tokens)
 
 		expect(checked_tokens[0].token).toEqual(test_tokens[0].token)
-		expect(checked_tokens[0].message).toMatch(/^Third person pronouns/)
+		expect(checked_tokens[0].pronoun?.message).toMatch(/^Third person pronouns/)
 		expect(checked_tokens[1].token).toEqual(test_tokens[1].token)
-		expect(checked_tokens[1].message).toMatch(/^Unrecognized pronoun/)
+		expect(checked_tokens[1].pronoun?.message).toMatch(/^Unrecognized pronoun/)
 	})
 
 	test('invalid: catches mine, yours, ours, and each-other', () => {

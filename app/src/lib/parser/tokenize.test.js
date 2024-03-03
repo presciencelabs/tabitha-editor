@@ -28,6 +28,19 @@ function create_pairing_token(token, lookup_left=null, lookup_right=null) {
 	return left_token
 }
 
+/**
+ * @param {string} pronoun
+ * @param {string} referent
+ * @param {string?} referent_lookup
+ * @returns {Token}
+ */
+function create_pronoun_token(pronoun, referent, referent_lookup=null) {
+	const referent_token = create_word_token(referent, referent_lookup)
+	const pronoun_token = create_token(pronoun, TOKEN_TYPE.FUNCTION_WORD)
+	referent_token.pronoun = pronoun_token
+	return referent_token
+}
+
 describe('tokenize_input', () => {
 	test("'' should return an empty array", () => {
 		const INPUT = ''
@@ -107,14 +120,14 @@ describe('tokenize_input', () => {
 		const INPUT = "you(Paul) abc(test) your(Paul's) your(son-C) your(son's-C) your(sons'-C)] you(Paul)."
 
 		const EXPECTED_OUTPUT = [
-			create_word_token('you(Paul)', 'Paul'),
-			create_word_token('abc(test)', 'test'),
-			create_word_token("your(Paul's)", 'Paul'),
-			create_word_token('your(son-C)', 'son-C'),
-			create_word_token("your(son's-C)", 'son-C'),
-			create_word_token("your(sons'-C)", 'sons-C'),
+			create_pronoun_token('you', 'Paul'),
+			create_pronoun_token('abc', 'test'),
+			create_pronoun_token('your', 'Paul\'s', 'Paul'),
+			create_pronoun_token('your', 'son-C'),
+			create_pronoun_token('your', 'son\'s-C', 'son-C'),
+			create_pronoun_token('your', 'sons\'-C', 'sons-C'),
 			create_token(']', TOKEN_TYPE.PUNCTUATION),
-			create_word_token('you(Paul)', 'Paul'),
+			create_pronoun_token('you', 'Paul'),
 			create_token('.', TOKEN_TYPE.PUNCTUATION),
 		]
 
@@ -200,7 +213,7 @@ describe('tokenize_input', () => {
 		const EXPECTED_OUTPUT = [
 			create_error_token('(imp', ERRORS.MISSING_CLOSING_PAREN),
 			create_error_token('imp)', ERRORS.MISSING_OPENING_PAREN),
-			create_word_token('token(imp)', 'imp'),		// tokenizing at this time does not differentiate from a pronoun referent
+			create_pronoun_token('token', 'imp'),		// tokenizing at this time does not differentiate from a pronoun referent
 			create_error_token('(imp)token', ERRORS.INVALID_TOKEN_END('(imp)')),
 			create_error_token('(implicit_situational)', ERRORS.UNRECOGNIZED_CLAUSE_NOTATION),
 			create_error_token('(imperative)', ERRORS.UNRECOGNIZED_CLAUSE_NOTATION),
@@ -317,7 +330,7 @@ describe('tokenize_input', () => {
 			create_word_token('Jesus’', 'Jesus'),
 			create_word_token("Jesus'", 'Jesus'),
 			create_word_token('sons’-C', 'sons-C'),
-			create_word_token('you(Paul’s)', 'Paul'),
+			create_pronoun_token('you', 'Paul’s', 'Paul'),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)

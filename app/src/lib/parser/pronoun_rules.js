@@ -55,29 +55,30 @@ export function check_for_pronouns(tokens) {
 			return create_error_token(token.token, PRONOUN_MESSAGES.get(normalized_token))
 		}
 
-		const referent_match = normalized_token.match(REGEXES.EXTRACT_PRONOUN_REFERENT)
-		if (referent_match) {
-			return check_referent(token, referent_match[1])
-		}
-
-		return token
+		return check_pronoun(token)
 	}
 
 	/**
 	 * 
 	 * @param {Token} token 
-	 * @param {string} pronoun 
 	 * @returns {Token}
 	 */
-	function check_referent(token, pronoun) {
-		if (PRONOUN_TAGS.has(pronoun)) {
-			// @ts-ignore
-			return {...token, tag: PRONOUN_TAGS.get(pronoun)}
-		} else if (PRONOUN_MESSAGES.has(pronoun)) {
-			// @ts-ignore
-			return create_error_token(token.token, PRONOUN_MESSAGES.get(pronoun))
-		} else {
-			return create_error_token(token.token, `Unrecognized pronoun "${pronoun}"`)
+	function check_pronoun(token) {
+		if (!token.pronoun) {
+			return token
 		}
+
+		const pronoun = token.pronoun.token
+		const normalized_pronoun = pronoun.toLowerCase()
+		if (PRONOUN_TAGS.has(normalized_pronoun)) {
+			// @ts-ignore
+			return {...token, tag: PRONOUN_TAGS.get(normalized_pronoun)}
+		} else if (PRONOUN_MESSAGES.has(normalized_pronoun)) {
+			// @ts-ignore
+			token.pronoun = create_error_token(pronoun, PRONOUN_MESSAGES.get(normalized_pronoun))
+		} else {
+			token.pronoun = create_error_token(pronoun, `Unrecognized pronoun "${pronoun}"`)
+		}
+		return token
 	}
 }

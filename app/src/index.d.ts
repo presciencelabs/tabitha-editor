@@ -9,6 +9,7 @@ type Token = {
 	form_results: FormResult[]
 	lookup_results: OntologyResult[]
 	complex_pairing: Token?;
+	pronoun: Token?;
 	sub_tokens: Token[]
 }
 

@@ -95,11 +95,19 @@ const syntax_rule_info = [
 				}
 
 				word_token.tag = word_token.tag ? `${word_token.tag}|first_word` : 'first_word'
-				if (starts_lowercase(word_token.token)) {
-					word_token.type = TOKEN_TYPE.ERROR
-					word_token.message = word_token.message || ERRORS.FIRST_WORD_NOT_CAPITALIZED
-				}
+				test_token(word_token.pronoun ? word_token.pronoun : word_token)
 				return trigger_index + 1
+
+				/**
+				 * 
+				 * @param {Token} token 
+				 */
+				function test_token(token) {
+					if (starts_lowercase(token.token)) {
+						token.type = TOKEN_TYPE.ERROR
+						token.message = token.message || ERRORS.FIRST_WORD_NOT_CAPITALIZED
+					}
+				}
 			},
 		},
 	},

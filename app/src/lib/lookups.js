@@ -104,7 +104,7 @@ async function check_ontology(lookup_token) {
 	if (lookup_token.form_results.length) {
 		const forms = lookup_token.form_results
 		lookup_token.lookup_results = lookup_token.lookup_results
-			.filter(lookup => forms.some(form => form.form === 'stem' || form.part_of_speech === lookup.part_of_speech))
+			.filter(lookup => forms.some(({form, part_of_speech}) => form === 'stem' || part_of_speech === lookup.part_of_speech))
 	}
 	
 

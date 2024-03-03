@@ -35,9 +35,10 @@ export const TOKEN_TYPE = {
  * @param {string} [other_data.lookup_term=''] 
  * @param {Token[]} [other_data.sub_tokens=[]] 
  * @param {Token?} [other_data.pairing=null] 
+ * @param {Token?} [other_data.pronoun=null] 
  * @return {Token}
  */
-export function create_token(token, type, {message='', tag='', lookup_term='', sub_tokens=[], pairing=null}={}) {
+export function create_token(token, type, {message='', tag='', lookup_term='', sub_tokens=[], pairing=null, pronoun=null}={}) {
 	return {
 		token,
 		type,
@@ -48,6 +49,7 @@ export function create_token(token, type, {message='', tag='', lookup_term='', s
 		lookup_results: [],
 		sub_tokens,
 		complex_pairing: pairing,
+		pronoun,
 	}
 }
 
@@ -123,6 +125,7 @@ export function token_has_error(token) {
 		|| token.message.length > 0
 		|| token.sub_tokens.some(token_has_error)
 		|| token.complex_pairing !== null && token_has_error(token.complex_pairing)
+		|| token.pronoun !== null && token_has_error(token.pronoun)
 }
 
 /**

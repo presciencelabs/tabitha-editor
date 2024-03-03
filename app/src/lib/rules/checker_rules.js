@@ -1,6 +1,5 @@
 import {parse_checker_rule} from './rules_parser'
 
-// TODO store these in the database
 const checker_rules_json = [
 	{
 		'name': 'Expect a [ before a relative clause',

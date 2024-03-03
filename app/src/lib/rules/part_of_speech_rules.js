@@ -1,7 +1,6 @@
 import {parse_part_of_speech_rule} from './rules_parser'
 
 /**
- * TODO store these in the database
  * These rules are designed to disambiguate words that could be multiple parts of speech.
  * E.g. guard(N/V), command(N/V), pleased(V/Adj), well(N/Adj/Adv)
  * The Analyzer has many of these, but this is just a few for now.
