@@ -1,4 +1,3 @@
-import {REGEXES} from '$lib/regexes'
 import {TOKEN_TYPE, create_error_token} from './token'
 
 const FIRST_PERSON = ['i', 'me', 'my', 'myself', 'we', 'us', 'our', 'ourselves']

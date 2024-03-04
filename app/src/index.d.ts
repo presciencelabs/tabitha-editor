@@ -4,6 +4,7 @@ type Token = {
 	token: string
 	type: TokenType
 	message: string
+	suggest: string
 	tag: string
 	lookup_term: string
 	form_results: FormResult[]

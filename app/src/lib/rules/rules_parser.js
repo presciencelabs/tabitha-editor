@@ -135,37 +135,59 @@ export function parse_transform_rule(rule_json) {
 export function parse_checker_rule(rule_json) {
 	const trigger = create_token_filter(rule_json['trigger'])
 	const context = create_context_filter(rule_json['context'])
-	const require = create_checker_action(rule_json['require'])
+
+	// one of these has to be present, but not both
+	const require_json = rule_json['require']
+	const suggest_json = rule_json['suggest']
+	const action = require_json ? checker_require_action(require_json) : checker_suggest_action(suggest_json)
 
 	return {
 		trigger,
 		context,
-		action: checker_rule_action,
+		action,
 	}
 
 	/**
 	 * 
-	 * @param {Token[]} tokens
-	 * @param {number} trigger_index
-	 * @returns {number}
+	 * @param {any} action_json
+	 * @returns {RuleAction}
 	 */
-	function checker_rule_action(tokens, trigger_index) {
-		// The action will have a precededby, followedby, or neither. Never both.
-		if (require.preceded_by) {
-			tokens.splice(trigger_index, 0, create_error_token(require.preceded_by, require.message))
-			return trigger_index + 2
-		}
-		if (require.followed_by) {
-			tokens.splice(trigger_index + 1, 0, create_error_token(require.followed_by, require.message))
-			return trigger_index + 2
-		}
+	function checker_require_action(action_json) {
+		const require = create_checker_action(action_json)
+		return (tokens, trigger_index) => {
+			// The action will have a precededby, followedby, or neither. Never both.
+			if (require.preceded_by) {
+				tokens.splice(trigger_index, 0, create_error_token(require.preceded_by, require.message))
+				return trigger_index + 2
+			}
+			if (require.followed_by) {
+				tokens.splice(trigger_index + 1, 0, create_error_token(require.followed_by, require.message))
+				return trigger_index + 2
+			}
 
-		tokens[trigger_index] = {
-			...tokens[trigger_index],
-			type: TOKEN_TYPE.ERROR,
-			message: require.message,
+			tokens[trigger_index] = {
+				...tokens[trigger_index],
+				type: TOKEN_TYPE.ERROR,
+				message: require.message,
+			}
+			return trigger_index + 1
 		}
-		return trigger_index + 1
+	}
+
+	/**
+	 * suggest only applies on the trigger token (for now)
+	 * @param {any} suggest_json
+	 * @returns {RuleAction}
+	 */
+	function checker_suggest_action(suggest_json) {
+		const suggest = create_checker_action(suggest_json)
+		return (tokens, trigger_index) => {
+			tokens[trigger_index] = {
+				...tokens[trigger_index],
+				suggest: suggest.message,
+			}
+			return trigger_index + 1
+		}
 	}
 
 	/**
@@ -414,21 +436,16 @@ function create_directional_context_filter(context_json, offset) {
 	 */
 	function create_single_context_filter(context_json, offset) {
 		const filter = create_token_filter(context_json)
-		const skip_filter = context_json['skip'] !== undefined ? create_token_filter(context_json['skip']) : null
+
+		/** @type {TokenFilter} */
+		const skip_filter = context_json['skip'] !== undefined
+			? create_skip_filter(context_json['skip'])
+			: () => false
 	
 		/** @type {(tokens: Token[], i: number) => boolean} */
 		const end_check = offset < 0 ? (_, i) => i >= 0 : (tokens, i) => i < tokens.length
 	
-		if (skip_filter) {
-			return check_context_with_skip
-		}
-	
-		return (tokens, start_index) => {
-			const index = start_index + offset
-			return end_check(tokens, index) && filter(tokens[index])
-				? context_result(true, index)
-				: context_result(false)
-		}
+		return check_context_with_skip
 
 		/**
 		 * @param {Token[]} tokens 
@@ -440,13 +457,25 @@ function create_directional_context_filter(context_json, offset) {
 				if (filter(tokens[i])) {
 					return context_result(true, i)
 				}
-				// @ts-ignore
-				if (!skip_filter(tokens[i])) {
+				if (!skip_filter(tokens[i]) && tokens[i].type !== TOKEN_TYPE.NOTE) {
 					return context_result(false)
 				}
 			}
 			return context_result(false)
 		}
+	}
+
+	/**
+	 * Skip can have one token filter or an array of filters which act as OR conditions
+	 * @param {any} skip_json 
+	 * @returns {TokenFilter}
+	 */
+	function create_skip_filter(skip_json) {
+		if (Array.isArray(skip_json)) {
+			const filters = skip_json.map(create_token_filter)
+			return token => filters.some(filter => filter(token))
+		}
+		return create_token_filter(skip_json)
 	}
 }
 
@@ -484,7 +513,7 @@ export function create_token_transform(transform_json) {
 
 	const function_tag = transform_json['function']
 	if (function_tag !== undefined) {
-		transforms.push(token => ({...token, type: TOKEN_TYPE.FUNCTION_WORD, tag: function_tag}))
+		transforms.push(token => ({...token, type: TOKEN_TYPE.FUNCTION_WORD, tag: function_tag, lookup_results: []}))
 	}
 
 	const concept = transform_json['concept']

@@ -31,6 +31,7 @@ export const TOKEN_TYPE = {
  * @param {TokenType} type 
  * @param {Object} [other_data={}] 
  * @param {string} [other_data.message=''] 
+ * @param {string} [other_data.suggest=''] 
  * @param {string} [other_data.tag=''] 
  * @param {string} [other_data.lookup_term=''] 
  * @param {Token[]} [other_data.sub_tokens=[]] 
@@ -38,11 +39,12 @@ export const TOKEN_TYPE = {
  * @param {Token?} [other_data.pronoun=null] 
  * @return {Token}
  */
-export function create_token(token, type, {message='', tag='', lookup_term='', sub_tokens=[], pairing=null, pronoun=null}={}) {
+export function create_token(token, type, {message='', suggest= '', tag='', lookup_term='', sub_tokens=[], pairing=null, pronoun=null}={}) {
 	return {
 		token,
 		type,
 		message,
+		suggest,
 		tag,
 		lookup_term,
 		form_results: [],

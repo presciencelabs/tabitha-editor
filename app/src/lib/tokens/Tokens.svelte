@@ -5,6 +5,7 @@
 	import Punctuation from './Punctuation.svelte'
 	import LookupWord from './LookupWord.svelte'
 	import {TOKEN_TYPE} from '$lib/parser/token'
+    import Suggest from './Suggest.svelte';
 
 	/** @type {Token[]} */
 	export let tokens
@@ -21,5 +22,11 @@
 
 {#each tokens as token}
 	{@const component = component_map.get(token.type)}
-	<svelte:component this={component} {token} />
+	{#if token.suggest}
+		<Suggest {token}>
+			<svelte:component this={component} {token} />
+		</Suggest>
+	{:else}
+		<svelte:component this={component} {token} />
+	{/if}
 {/each}

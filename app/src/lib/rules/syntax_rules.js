@@ -129,7 +129,7 @@ const syntax_rule_info = [
 	},
 ]
 
-export const SYNTAX_RULES = syntax_rule_info.map(rule => rule.rule)
+export const SYNTAX_RULES = syntax_rule_info.map(({rule}) => rule)
 
 /**
  * 
