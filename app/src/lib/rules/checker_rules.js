@@ -83,10 +83,10 @@ const checker_rules_json = [
 		'trigger': { 'category': 'Verb' },
 		'context': {
 			'precededby': { 'category': 'Verb', 'skip': 'all' },
-			'notprecedeby': { 'token': '[' },
+			'notprecededby': { 'token': '[' },
 		},
 		'require': {
-			'message': 'Cannot have multiple verbs in the same clause. Consider splitting the sentence or checking for an unbracketed subordinate clause.',
+			'message': 'Cannot have multiple verbs in the same clause. Check for an unbracketed subordinate clause or consider splitting the sentence.',
 		},
 		'comment': 'Check for a [ error token in case an earlier check already identified a potential subordinate clause.',
 	},
@@ -147,11 +147,6 @@ const checker_rules_json = [
 			'message': 'Try using more specific units of time (eg. \'for many years\') or express it in a different way (eg. \'for much time\').',
 		},
 	},
-	// {
-	// 	'name': 'suggest on all tokens',
-	// 	'trigger': 'all',
-	// 	'suggest': 'test',
-	// },
 ]
 
 export const CHECKER_RULES = checker_rules_json.map(parse_checker_rule)
