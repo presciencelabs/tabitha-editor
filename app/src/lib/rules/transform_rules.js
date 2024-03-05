@@ -1,4 +1,3 @@
-import {TOKEN_TYPE} from '../parser/token'
 import {parse_transform_rule} from './rules_parser'
 
 /**

@@ -104,8 +104,7 @@ const syntax_rule_info = [
 				 */
 				function test_token(token) {
 					if (starts_lowercase(token.token)) {
-						token.type = TOKEN_TYPE.ERROR
-						token.message = token.message || ERRORS.FIRST_WORD_NOT_CAPITALIZED
+						token.error_message = token.error_message || ERRORS.FIRST_WORD_NOT_CAPITALIZED
 					}
 				}
 			},

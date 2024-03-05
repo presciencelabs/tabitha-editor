@@ -1,10 +1,10 @@
-type TokenType = 'Error' | 'Punctuation' | 'Note' | 'FunctionWord' | 'Word' | 'Pairing' | 'Clause'
+type TokenType = 'Punctuation' | 'Note' | 'FunctionWord' | 'Word' | 'Clause' |'Ghost'
 
 type Token = {
 	token: string
 	type: TokenType
-	message: string
-	suggest: string
+	error_message: string
+	suggest_message: string
 	tag: string
 	lookup_term: string
 	form_results: FormResult[]

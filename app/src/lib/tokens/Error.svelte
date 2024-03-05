@@ -10,7 +10,7 @@
 	export let classes = ''
 </script>
 
-<div data-tip={token.message} class="tooltip tooltip-error">
+<div data-tip={token.error_message} class="tooltip tooltip-error">
 	<TokenDisplay classes="badge-error gap-2 {classes}">
 		<Icon icon="mdi:close-circle" class="h-6 w-6" />
 

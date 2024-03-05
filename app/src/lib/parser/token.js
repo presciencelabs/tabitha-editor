@@ -1,7 +1,4 @@
 /** @type {TokenType} */
-const ERROR = 'Error'
-
-/** @type {TokenType} */
 const PUNCTUATION = 'Punctuation'
 
 /** @type {TokenType} */
@@ -16,13 +13,16 @@ const LOOKUP_WORD = 'Word'
 /** @type {TokenType} */
 const CLAUSE = 'Clause'
 
+/** @type {TokenType} */
+const GHOST = 'Ghost'
+
 export const TOKEN_TYPE = {
-	ERROR,
 	PUNCTUATION,
 	NOTE,
 	FUNCTION_WORD,
 	LOOKUP_WORD,
 	CLAUSE,
+	GHOST,
 }
 
 /**
@@ -30,7 +30,7 @@ export const TOKEN_TYPE = {
  * @param {string} token 
  * @param {TokenType} type 
  * @param {Object} [other_data={}] 
- * @param {string} [other_data.message=''] 
+ * @param {string} [other_data.error=''] 
  * @param {string} [other_data.suggest=''] 
  * @param {string} [other_data.tag=''] 
  * @param {string} [other_data.lookup_term=''] 
@@ -39,12 +39,12 @@ export const TOKEN_TYPE = {
  * @param {Token?} [other_data.pronoun=null] 
  * @return {Token}
  */
-export function create_token(token, type, {message='', suggest= '', tag='', lookup_term='', sub_tokens=[], pairing=null, pronoun=null}={}) {
+export function create_token(token, type, {error='', suggest= '', tag='', lookup_term='', sub_tokens=[], pairing=null, pronoun=null}={}) {
 	return {
 		token,
 		type,
-		message,
-		suggest,
+		error_message: error,
+		suggest_message: suggest,
 		tag,
 		lookup_term,
 		form_results: [],
@@ -58,11 +58,23 @@ export function create_token(token, type, {message='', suggest= '', tag='', look
 /**
  * 
  * @param {string} token 
+ * @param {Object} [other_data={}] 
+ * @param {string} [other_data.error=''] 
+ * @param {string} [other_data.suggest=''] 
+ * @returns {Token}
+ */
+export function create_ghost_token(token, {error='', suggest=''}={}) {
+	return create_token(token, TOKEN_TYPE.GHOST, { error, suggest })
+}
+
+/**
+ * 
+ * @param {Token} token 
  * @param {string} message 
  * @returns {Token}
  */
-export function create_error_token(token, message) {
-	return create_token(token, TOKEN_TYPE.ERROR, { message })
+export function convert_to_error_token(token, message) {
+	return {...token, error_message: message}
 }
 
 /**
@@ -123,11 +135,7 @@ export function token_has_concept(token) {
  * @returns {boolean}
  */
 export function token_has_error(token) {
-	return token.type === TOKEN_TYPE.ERROR
-		|| token.message.length > 0
-		|| token.sub_tokens.some(token_has_error)
-		|| token.complex_pairing !== null && token_has_error(token.complex_pairing)
-		|| token.pronoun !== null && token_has_error(token.pronoun)
+	return token.error_message.length > 0
 }
 
 /**

@@ -4,16 +4,14 @@
 
 	/** @type {Token} */
 	export let token
+
+	export let classes = ''
 </script>
 
 {#if token.error_message}
 	<Error {token} />
-{:else if token.suggest_message}
-	<TokenDisplay>
+{:else}
+	<TokenDisplay classes="{classes}">
 		{token.token}
 	</TokenDisplay>
-{:else}
-	<span>
-		{token.token}
-	</span>
 {/if}

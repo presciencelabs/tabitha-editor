@@ -1,11 +1,15 @@
 <script>
-    import TokenDisplay from "./TokenDisplay.svelte";
+	import TokenDisplay from './TokenDisplay.svelte'
+	import Error from './Error.svelte'
 
 	/** @type {Token} */
 	export let token
 </script>
 
-{#if token.suggest}
+
+{#if token.error_message}
+	<Error {token} />
+{:else if token.suggest_message}
 	<TokenDisplay classes="font-mono">
 		{token.token}
 	</TokenDisplay>

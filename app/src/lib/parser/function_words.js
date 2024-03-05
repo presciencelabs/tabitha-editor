@@ -10,6 +10,7 @@ export const FUNCTION_WORDS = new Map([
 	['here', 'at_this_place'],
 	['it', 'agent_proposition_subject'],
 	['least', 'least_degree'],
+	['may', 'may_permissive_mood'],
 	['might', 'might_mood'],
 	['must', 'must_mood'],
 	['not', 'negative_verb_polarity'],

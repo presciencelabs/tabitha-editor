@@ -1,4 +1,3 @@
-import { TOKEN_TYPE } from '$lib/parser/token'
 import {parse_checker_rule} from './rules_parser'
 
 const checker_rules_json = [
@@ -84,7 +83,7 @@ const checker_rules_json = [
 		'trigger': { 'category': 'Verb' },
 		'context': {
 			'precededby': { 'category': 'Verb', 'skip': 'all' },
-			'notprecedeby': { 'type': TOKEN_TYPE.ERROR, 'token': '[' },
+			'notprecedeby': { 'token': '[' },
 		},
 		'require': {
 			'message': 'Cannot have multiple verbs in the same clause. Consider splitting the sentence or checking for an unbracketed subordinate clause.',

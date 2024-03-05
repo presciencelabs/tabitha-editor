@@ -12,7 +12,7 @@
 </script>
 
 <div class="join">
-	{#if pronoun.message}
+	{#if pronoun.error_message}
 		<Error token={pronoun} classes="!px-1.5 join-item" />
 	{:else}
 		<TokenDisplay classes="!px-2 join-item">

@@ -1,4 +1,4 @@
-import {TOKEN_TYPE, check_token_lookup, create_error_token, set_token_concept} from '$lib/parser/token'
+import {TOKEN_TYPE, check_token_lookup, convert_to_error_token, create_ghost_token, set_token_concept} from '$lib/parser/token'
 
 /**
  *
@@ -157,19 +157,15 @@ export function parse_checker_rule(rule_json) {
 		return (tokens, trigger_index) => {
 			// The action will have a precededby, followedby, or neither. Never both.
 			if (require.preceded_by) {
-				tokens.splice(trigger_index, 0, create_error_token(require.preceded_by, require.message))
+				tokens.splice(trigger_index, 0, create_ghost_token(require.preceded_by, {error: require.message}))
 				return trigger_index + 2
 			}
 			if (require.followed_by) {
-				tokens.splice(trigger_index + 1, 0, create_error_token(require.followed_by, require.message))
+				tokens.splice(trigger_index + 1, 0, create_ghost_token(require.followed_by, {error: require.message}))
 				return trigger_index + 2
 			}
 
-			tokens[trigger_index] = {
-				...tokens[trigger_index],
-				type: TOKEN_TYPE.ERROR,
-				message: require.message,
-			}
+			tokens[trigger_index] = convert_to_error_token(tokens[trigger_index], require.message)
 			return trigger_index + 1
 		}
 	}
@@ -184,7 +180,7 @@ export function parse_checker_rule(rule_json) {
 		return (tokens, trigger_index) => {
 			tokens[trigger_index] = {
 				...tokens[trigger_index],
-				suggest: suggest.message,
+				suggest_message: suggest.message,
 			}
 			return trigger_index + 1
 		}

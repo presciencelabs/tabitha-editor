@@ -378,7 +378,7 @@ describe('token transforms', () => {
 		expect(result.token).toBe(token.token)
 		expect(result.type).toBe(TOKEN_TYPE.FUNCTION_WORD)
 		expect(result.lookup_term).toBe(token.lookup_term)
-		expect(result.message).toBe(token.message)
+		expect(result.error_message).toBe(token.error_message)
 	})
 	test('concept no lookup results', () => {
 		const transform_json = { 'concept': 'concept-A' }
@@ -390,7 +390,7 @@ describe('token transforms', () => {
 		expect(result.type).toBe(token.type)
 		expect(result.lookup_term).toBe('concept-A')
 		expect(result.lookup_results.length).toBe(0)
-		expect(result.message).toBe(token.message)
+		expect(result.error_message).toBe(token.error_message)
 	})
 	test('concept with lookup results', () => {
 		const transform_json = { 'concept': 'concept-A' }
@@ -422,7 +422,7 @@ describe('token transforms', () => {
 		expect(result.lookup_term).toBe('concept-A')
 		expect(result.lookup_results.length).toBe(1)
 		expect(result.lookup_results[0].sense).toBe('A')
-		expect(result.message).toBe(token.message)
+		expect(result.error_message).toBe(token.error_message)
 	})
 	test('type and concept', () => {
 		const transform_json = { 'type': TOKEN_TYPE.LOOKUP_WORD, 'concept': 'concept-A' }
@@ -433,7 +433,7 @@ describe('token transforms', () => {
 		expect(result.token).toBe(token.token)
 		expect(result.type).toBe(TOKEN_TYPE.LOOKUP_WORD)
 		expect(result.lookup_term).toBe('concept-A')
-		expect(result.message).toBe(token.message)
+		expect(result.error_message).toBe(token.error_message)
 	})
 	test('unrecognized', () => {
 		const transform_json = { 'other': 'other' }
