@@ -141,6 +141,15 @@ export function token_has_error(token) {
 /**
  * 
  * @param {Token} token 
+ * @returns {boolean}
+ */
+export function token_has_message(token) {
+	return token.error_message.length > 0 || token.suggest_message.length > 0
+}
+
+/**
+ * 
+ * @param {Token} token 
  * @returns {Token[]}
  */
 export function flatten_token(token) {

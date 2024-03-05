@@ -5,7 +5,7 @@
 
 	/** @type {Token} */
 	export let token
-	export let classes = ''
+	export let should_join = false
 
 	// TODO: more work needed to handle multiple matches with possibly different levels, e.g., son
 	const concept = token.lookup_results[0]
@@ -13,7 +13,7 @@
 </script>
 
 <div class='tooltip' data-tip={tooltip}>
-	<TokenDisplay classes="{classes} L{concept.level}">
+	<TokenDisplay classes="{should_join ? 'join-item' : ''} L{concept.level}">
 		<LinkedLookup {token} classes={`L${concept.level}-text`} />
 	</TokenDisplay>
 </div>

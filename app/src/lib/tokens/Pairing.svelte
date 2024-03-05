@@ -1,4 +1,5 @@
 <script>
+    import Message from './Message.svelte'
 	import TokenDisplay from './TokenDisplay.svelte'
 	import Word from './Word.svelte'
 
@@ -17,9 +18,11 @@
 </script>
 
 <div class="join">
-	<Word {token} classes="join-item" />
+	<Message {token} />
+	<Word {token} should_join={true} />
 
 	<TokenDisplay classes="!px-1.5 [font-family:cursive] join-item">/</TokenDisplay>
 
-	<Word token={pairing_token} classes="join-item" />
+	<Message token={pairing_token} />
+	<Word token={pairing_token} should_join={true} />
 </div>

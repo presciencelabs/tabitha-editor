@@ -1,17 +1,20 @@
 <script>
-	import Error from './Error.svelte'
+	import {token_has_message} from '$lib/parser/token'
+	import Message from './Message.svelte'
 	import TokenDisplay from './TokenDisplay.svelte'
 
 	/** @type {Token} */
 	export let token
-
-	export let classes = ''
 </script>
 
-{#if token.error_message}
-	<Error {token} />
+{#if token_has_message(token)}
+	<Message {token}>
+		<span class="text-lg tracking-widest">
+			{token.token}
+		</span>
+	</Message>
 {:else}
-	<TokenDisplay classes="{classes}">
+	<TokenDisplay>
 		{token.token}
 	</TokenDisplay>
 {/if}

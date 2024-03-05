@@ -1,18 +1,15 @@
 <script>
 	import {token_has_concept} from '$lib/parser/token'
-	import Error from './Error.svelte'
 	import NotFound from './NotFound.svelte'
 	import Result from './Result.svelte'
 
 	/** @type {Token} */
 	export let token
-	export let classes = ''
+	export let should_join = false
 </script>
 
-{#if token.error_message}
-	<Error {token} {classes} />
-{:else if token_has_concept(token)}
-	<Result {token} {classes} />
+{#if token_has_concept(token)}
+	<Result {token} {should_join} />
 {:else}
-	<NotFound {token} {classes} />
+	<NotFound {token} {should_join} />
 {/if}

@@ -4,9 +4,9 @@
 	/** @type {Token} */
 	export let token
 
-	export let classes = ''
+	export let should_join = false
 </script>
 
-<TokenDisplay {classes}>
+<TokenDisplay classes={should_join ? 'join-item' : ''}>
 	{token.token}
 </TokenDisplay>
