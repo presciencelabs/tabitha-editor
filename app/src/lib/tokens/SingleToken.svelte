@@ -23,7 +23,7 @@
 {#if token_has_message(token)}
 	<div class="join">
 		<Message {token} />
-		<svelte:component this={component} {token} should_join={true} />
+		<svelte:component this={component} {token} classes="join-item" />
 	</div>
 {:else}
 	<svelte:component this={component} {token} />

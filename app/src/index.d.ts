@@ -1,4 +1,4 @@
-type TokenType = 'Punctuation' | 'Note' | 'FunctionWord' | 'Word' | 'Clause' |'Ghost'
+type TokenType = 'Punctuation' | 'Note' | 'FunctionWord' | 'Word' | 'Clause' |'Added'
 
 type Token = {
 	token: string
@@ -60,8 +60,8 @@ type ContextFilterResult = {
 type TokenTransform = (token: Token) => Token
 
 type CheckerAction = {
-	preceded_by: string?;
-	followed_by: string?;
+	precededby: string?;
+	followedby: string?;
 	message: string
 }
 

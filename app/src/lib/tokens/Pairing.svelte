@@ -19,10 +19,10 @@
 
 <div class="join">
 	<Message {token} />
-	<Word {token} should_join={true} />
+	<Word {token} classes="join-item" />
 
 	<TokenDisplay classes="!px-1.5 [font-family:cursive] join-item">/</TokenDisplay>
 
 	<Message token={pairing_token} />
-	<Word token={pairing_token} should_join={true} />
+	<Word token={pairing_token} classes="join-item" />
 </div>

@@ -1,4 +1,4 @@
-import {TOKEN_TYPE, check_token_lookup, convert_to_error_token, create_ghost_token, set_token_concept} from '$lib/parser/token'
+import {TOKEN_TYPE, check_token_lookup, convert_to_error_token, create_added_token, set_token_concept} from '$lib/parser/token'
 
 /**
  *
@@ -149,19 +149,18 @@ export function parse_checker_rule(rule_json) {
 
 	/**
 	 * 
-	 * @param {any} action_json
+	 * @param {CheckerAction} require
 	 * @returns {RuleAction}
 	 */
-	function checker_require_action(action_json) {
-		const require = create_checker_action(action_json)
+	function checker_require_action(require) {
 		return (tokens, trigger_index) => {
 			// The action will have a precededby, followedby, or neither. Never both.
-			if (require.preceded_by) {
-				tokens.splice(trigger_index, 0, create_ghost_token(require.preceded_by, {error: require.message}))
+			if (require.precededby) {
+				tokens.splice(trigger_index, 0, create_added_token(require.precededby, {error: require.message}))
 				return trigger_index + 2
 			}
-			if (require.followed_by) {
-				tokens.splice(trigger_index + 1, 0, create_ghost_token(require.followed_by, {error: require.message}))
+			if (require.followedby) {
+				tokens.splice(trigger_index + 1, 0, create_added_token(require.followedby, {error: require.message}))
 				return trigger_index + 2
 			}
 
@@ -172,30 +171,16 @@ export function parse_checker_rule(rule_json) {
 
 	/**
 	 * suggest only applies on the trigger token (for now)
-	 * @param {any} suggest_json
+	 * @param {CheckerAction} suggest
 	 * @returns {RuleAction}
 	 */
-	function checker_suggest_action(suggest_json) {
-		const suggest = create_checker_action(suggest_json)
+	function checker_suggest_action(suggest) {
 		return (tokens, trigger_index) => {
 			tokens[trigger_index] = {
 				...tokens[trigger_index],
 				suggest_message: suggest.message,
 			}
 			return trigger_index + 1
-		}
-	}
-
-	/**
-	 *
-	 * @param {any} action_json
-	 * @returns {CheckerAction}
-	 */
-	function create_checker_action(action_json) {
-		return {
-			preceded_by: action_json['precededby'],
-			followed_by: action_json['followedby'],
-			message: action_json['message'],
 		}
 	}
 }

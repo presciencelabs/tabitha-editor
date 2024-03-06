@@ -14,7 +14,7 @@ const LOOKUP_WORD = 'Word'
 const CLAUSE = 'Clause'
 
 /** @type {TokenType} */
-const GHOST = 'Ghost'
+const ADDED = 'Added'
 
 export const TOKEN_TYPE = {
 	PUNCTUATION,
@@ -22,7 +22,7 @@ export const TOKEN_TYPE = {
 	FUNCTION_WORD,
 	LOOKUP_WORD,
 	CLAUSE,
-	GHOST,
+	ADDED,
 }
 
 /**
@@ -63,8 +63,8 @@ export function create_token(token, type, {error='', suggest= '', tag='', lookup
  * @param {string} [other_data.suggest=''] 
  * @returns {Token}
  */
-export function create_ghost_token(token, {error='', suggest=''}={}) {
-	return create_token(token, TOKEN_TYPE.GHOST, { error, suggest })
+export function create_added_token(token, {error='', suggest=''}={}) {
+	return create_token(token, TOKEN_TYPE.ADDED, { error, suggest })
 }
 
 /**

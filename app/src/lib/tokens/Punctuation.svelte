@@ -3,13 +3,13 @@
 
 	/** @type {Token} */
 	export let token
-	export let should_join = false
+	export let classes = ''
 </script>
 
-{#if should_join}
-	<TokenDisplay classes="join-item">{token.token}</TokenDisplay>
+{#if classes.includes('join-item')}
+	<TokenDisplay {classes}>{token.token}</TokenDisplay>
 {:else}
-	<span class="pb-3 text-6xl font-thin">
+	<span class="pb-3 text-6xl font-thin {classes}">
 		{token.token}
 	</span>
 {/if}

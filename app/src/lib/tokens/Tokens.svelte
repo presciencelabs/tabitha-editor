@@ -1,6 +1,6 @@
 <script>
 	import LookupWord from './LookupWord.svelte'
-	import Ghost from './Ghost.svelte'
+	import Added from './Added.svelte'
 	import SingleToken from './SingleToken.svelte'
 	import {TOKEN_TYPE} from '$lib/parser/token'
 
@@ -13,7 +13,7 @@
 		[TOKEN_TYPE.NOTE, SingleToken],
 		[TOKEN_TYPE.PUNCTUATION, SingleToken],
 		[TOKEN_TYPE.LOOKUP_WORD, LookupWord],
-		[TOKEN_TYPE.GHOST, Ghost],
+		[TOKEN_TYPE.ADDED, Added],
 	])
 </script>
 

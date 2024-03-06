@@ -18,7 +18,7 @@
 	<TokenDisplay classes="!px-1.5 [font-family:cursive] join-item">(</TokenDisplay>
 
 	<Message {token} />
-	<Word {token} should_join={true} />
+	<Word {token} classes="join-item" />
 
 	<TokenDisplay classes="!px-1.5 [font-family:cursive] join-item">)</TokenDisplay>
 </div>

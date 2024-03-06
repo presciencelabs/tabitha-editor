@@ -5,11 +5,11 @@
 
 	/** @type {Token} */
 	export let token
-	export let should_join = false
+	export let classes = ''
 </script>
 
 {#if token_has_concept(token)}
-	<Result {token} {should_join} />
+	<Result {token} {classes} />
 {:else}
-	<NotFound {token} {should_join} />
+	<NotFound {token} {classes} />
 {/if}

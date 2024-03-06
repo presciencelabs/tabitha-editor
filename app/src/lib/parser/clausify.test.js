@@ -1,5 +1,5 @@
 import {describe, expect, test} from 'vitest'
-import {TOKEN_TYPE, create_clause_token, create_ghost_token, create_token} from './token'
+import {TOKEN_TYPE, create_clause_token, create_added_token, create_token} from './token'
 import {ERRORS} from './error_messages'
 import {clausify} from './clausify'
 
@@ -32,7 +32,7 @@ function create_sentence(tokens) {
  * @returns {Token}
  */
 function create_error_token(token, message) {
-	return create_ghost_token(token, {error: message})
+	return create_added_token(token, {error: message})
 }
 
 describe('clausify: brackets', () => {
