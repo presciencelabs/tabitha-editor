@@ -15,6 +15,14 @@ const transform_rules_json = [
 		'transform': { 'function': 'auxilliary' },
 	},
 	{
+		'name': 'do in a question becomes an auxilliary',
+		'trigger': { 'stem': 'do' },
+		'context': {
+			'followedby': [{ 'category': 'Verb', 'skip': 'all' }, { 'token': '?', 'skip': 'all' }],
+		},
+		'transform': { 'function': 'auxilliary' },
+	},
+	{
 		'name': 'most before adjective or adverb becomes a function word',
 		'trigger': { 'stem': 'most' },
 		'context': {
