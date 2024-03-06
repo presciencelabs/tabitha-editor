@@ -16,7 +16,7 @@ const PAIRING_DIFFERENT_PARTS_OF_SPEECH = 'Cannot pair words of different parts 
 
 const WORD_LEVEL_TOO_HIGH = 'Word must be a level 0 or 1'
 const WORD_LEVEL_TOO_LOW = 'Word must be a level 2 or 3'
-const AMBIGUOUS_LEVEL = 'This word has multiple senses and ambiguous complexity. Consider adding the sense, e.g. son-A.'
+const AMBIGUOUS_LEVEL = 'This word has multiple senses and ambiguous complexity. Consider including the sense (e.g. son-A).'
 
 /**
  *
