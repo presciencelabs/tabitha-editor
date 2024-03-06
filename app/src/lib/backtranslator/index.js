@@ -64,7 +64,7 @@ export function backtranslate(input) {
 		.replace(/the ([^ ]*?) of (.+?) _metonymy/g, '<<$2 of>> the $1')
 		.replace(/([^ ]*?) of (.+?) _metonymy/g, '<<$2 of>> $1')
 		.replace(/ named /g, ' named& ')
-		.replace(/(tribe|region|city|country) named& ([^&]+?)/g, '$1 of $2')
+		.replace(/(tribe|region|city|town|country) named& ([^&]+?)/g, '$1 of $2')
 		.replace(/([^ ]*?) named& ([^&]+?) _explainName/g, '<<$2 of>> $1')
 		.replace(/([^ ]*?) named& ([^&]+?) _implicitExplainName/g, '<<$2 of>> $1')
 		.replace(/&/g, '')
