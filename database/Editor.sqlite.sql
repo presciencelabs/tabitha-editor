@@ -211,7 +211,7 @@ INSERT INTO Inflections VALUES('wonderful','Adjective','|wonderful  more|wonderf
 INSERT INTO Inflections VALUES('worthless','Adjective','|worthless  more|worthless  most|');
 INSERT INTO Inflections VALUES('worthy','Adjective','|worthy  more|worthy  most|');
 INSERT INTO Inflections VALUES('young','Adjective','|younger|youngest|');
-INSERT INTO Inflections VALUES('left','Adjective','|||');
+INSERT INTO Inflections VALUES('left','Adjective','||');
 INSERT INTO Inflections VALUES('badly','Adverb','|badlier|badliest|');
 INSERT INTO Inflections VALUES('carefully','Adverb','|carefully  more|carefully  most|');
 INSERT INTO Inflections VALUES('completely','Adverb','|completely  more|completely  most|');
