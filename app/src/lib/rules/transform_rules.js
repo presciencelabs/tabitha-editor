@@ -40,7 +40,7 @@ const transform_rules_json = [
 			},
 		},
 		'transform': { 'function': 'auxiliary|inceptive_aspect' },
-		'comment': 'support both "started eating" and "started to eat"'
+		'comment': 'support both "started eating" and "started to eat"',
 	},
 	{
 		'name': 'stop before a verb becomes a function word',
@@ -60,7 +60,7 @@ const transform_rules_json = [
 			},
 		},
 		'transform': { 'function': 'auxiliary|continuative_aspect' },
-		'comment': 'support both "continued eating" and "continued to eat"'
+		'comment': 'support both "continued eating" and "continued to eat"',
 	},
 	{
 		'name': 'finish before a verb becomes a function word',
