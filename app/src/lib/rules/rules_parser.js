@@ -242,6 +242,7 @@ export function create_token_filter(filter_json) {
 	}
 
 	add_lookup_filter('category', concept => concept.part_of_speech)
+	add_lookup_filter('level', concept => `${concept.level}`)
 
 	if (filters.length === 0) {
 		return () => false

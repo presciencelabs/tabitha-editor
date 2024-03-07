@@ -42,9 +42,11 @@ const lookup_rules_json = [
 		'combine': 1,
 	},
 	{
-		'name': 'much becomes much-many',
+		'name': 'much becomes much-many if followed by a Noun',
 		'trigger': { 'token': 'much' },
+		'context': { 'followedby': {'category': 'Noun'} },
 		'lookup': 'much-many',
+		'comment': 'something like "There is much water"',
 	},
 	{
 		'name': 'many becomes much-many',
