@@ -76,7 +76,7 @@ function output() {
 	Array.from(extracted_data)
 		.filter(has_inflections)
 		.filter(has_no_space)
-		.map(augment_missing_data)
+		.map(add_missing_inflections)
 		.concat(add_missing_words())
 		.map(log_csv)
 
@@ -88,7 +88,7 @@ function output() {
 		return !stem.includes(' ')
 	}
 
-	function augment_missing_data([stem, inflections]) {
+	function add_missing_inflections([stem, inflections]) {
 		if (stem === 'be') {
 			// these forms are not present in TBTA's lexical data because be is so irregular...
 			// they are only produced during the rules phase so they need to be added manually here.
@@ -106,10 +106,10 @@ function output() {
 				['left', ['','']],	// important for disambiguation with 'leave'
 			],
 			Verb: [
-				['goodbye', 'goodbied|goodbied|goodbying|goodbyes'.split('|')],
-				['pity', 'pitied|pitied|pitying|pities'.split('|')],
-				['prophesy', 'prophesied|prophesied|prophesying|prophesies'.split('|')],
-				['sex', 'sexed|sexed|sexing|sexes'.split('|')],
+				['goodbye', ['goodbied','goodbied','goodbying','goodbyes']],
+				['pity', ['pitied','pitied','pitying','pities']],
+				['prophesy', ['prophesied','prophesied','prophesying','prophesies']],
+				['sex', ['sexed','sexed','sexing','sexes']],
 			],
 			Noun: [
 				['result', ['results']],
