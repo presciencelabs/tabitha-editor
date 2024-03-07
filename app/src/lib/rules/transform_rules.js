@@ -90,6 +90,18 @@ const transform_rules_json = [
 		'transform': { 'function': 'auxiliary|imperfective_aspect' },
 	},
 	{
+		'name': 'have before a past participle Verb indicates flashback/perfect',
+		'trigger': { 'stem': 'have' },
+		'context': {
+			'followedby': {
+				'category': 'Verb',
+				'form': 'past participle',
+				'skip': [{ 'token': 'not' }, { 'category': 'Adverb'}],
+			},
+		},
+		'transform': { 'function': 'auxiliary|flashback' },
+	},
+	{
 		'name': 'be before an auxiliary becomes an auxiliary',
 		'trigger': { 'stem': 'be' },
 		'context': {
@@ -101,16 +113,27 @@ const transform_rules_json = [
 		'transform': { 'function': 'auxiliary' },
 	},
 	{
-		'name': 'have before a past participle Verb indicates flashback/perfect',
-		'trigger': { 'stem': 'have' },
+		'name': '\'named\' after a place becomes a function word',
+		'trigger': { 'token': 'named' },
+		'context': { 'precededby': {'stem': 'tribe|region|city|town|country'} },
+		'transform': { 'function': '-Name' },
+	},
+	{
+		'name': '\'of\' after group/crowd becomes a function word',
+		'trigger': { 'token': 'of' },
+		'context': { 'precededby': {'stem': 'group|crowd'} },
+		'transform': { 'function': '-Group' },
+	},
+	{
+		'name': 'by preceded by a passive be indicates the agent',
+		'trigger': { 'stem': 'by' },
 		'context': {
-			'followedby': {
-				'category': 'Verb',
-				'form': 'past participle',
-				'skip': [{ 'token': 'not' }, { 'category': 'Adverb'}],
+			'precededby': {
+				'tag': 'passive',
+				'skip': 'all',
 			},
 		},
-		'transform': { 'function': 'auxiliary|flashback' },
+		'transform': { 'function': 'agent_of_passive' },
 	},
 	{
 		'name': 'be before an adjective becomes be-D',
@@ -142,17 +165,6 @@ const transform_rules_json = [
 		},
 		'transform': { 'concept': 'be-E' },
 		'context_transform': { 'function': 'existential' },
-	},
-	{
-		'name': 'by preceded by a passive be indicates the agent',
-		'trigger': { 'stem': 'by' },
-		'context': {
-			'precededby': {
-				'tag': 'passive',
-				'skip': 'all',
-			},
-		},
-		'transform': { 'function': 'agent_of_passive' },
 	},
 ]
 
