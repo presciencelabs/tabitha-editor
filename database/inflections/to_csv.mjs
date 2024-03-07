@@ -77,6 +77,7 @@ function output() {
 		.filter(has_inflections)
 		.filter(has_no_space)
 		.map(augment_missing_data)
+		.concat(add_missing_words())
 		.map(log_csv)
 
 	function has_inflections([, inflections]) {
@@ -95,6 +96,26 @@ function output() {
 		}
 
 		return [stem, inflections]
+	}
+
+	function add_missing_words() {
+		// TODO add more or remove some when we include Analyzer inflections as well
+		// see https://github.com/presciencelabs/tabitha-editor/issues/37
+		const missing_words = {
+			Adjective: [
+				['left', ['','']],	// important for disambiguation with 'leave'
+			],
+			Verb: [
+				['goodbye', 'goodbied|goodbied|goodbying|goodbyes'.split('|')],
+				['pity', 'pitied|pitied|pitying|pities'.split('|')],
+				['prophesy', 'prophesied|prophesied|prophesying|prophesies'.split('|')],
+				['sex', 'sexed|sexed|sexing|sexes'.split('|')],
+			],
+			Noun: [
+				['result', ['results']],
+			],
+		}
+		return missing_words[part_of_speech] || []
 	}
 
 	function log_csv([stem, inflections]) {
