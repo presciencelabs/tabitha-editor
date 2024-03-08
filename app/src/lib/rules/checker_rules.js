@@ -180,8 +180,7 @@ const checker_rules_json = [
 			'notfollowedby': { 'token': 'that' },
 		},
 		'suggest': {
-			'followedby': 'that',
-			'message': 'Add \'that\' after \'so\' so that it doesn\'t get mistaken for the Conjunction.',
+			'message': 'Use \'so-that\' so-that it doesn\'t get mistaken for the Conjunction.',
 		},
 	},
 ]
