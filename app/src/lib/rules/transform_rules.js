@@ -103,7 +103,7 @@ const transform_rules_json = [
 			'precededby': {'stem': 'so', 'category': 'Adposition'},
 		},
 		'transform': { 'tag': '' },
-		'comment': 'both "so that" and "so-that" are supported and map to the Adposition "so"'
+		'comment': 'both "so that" and "so-that" are supported and map to the Adposition "so"',
 	},
 	{
 		'name': 'Adposition \'so\' followed by \'would\' becomes so-C',
@@ -127,7 +127,7 @@ const transform_rules_json = [
 		'trigger': { 'stem': 'be' },
 		'context': {
 			'followedby': [
-				{ 'token': 'like', 'skip': {'token': 'not'} }
+				{ 'token': 'like', 'skip': {'token': 'not'} },
 			],
 		},
 		'transform': { 'concept': 'be-U' },
