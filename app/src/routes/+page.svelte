@@ -5,20 +5,31 @@
 	import {Tokens} from '$lib/tokens'
 	import Icon from '@iconify/svelte'
 
-	let entered_text = ''
-	$: english_back_translation = backtranslate(entered_text)
-	$: english_back_translation && reset_copied()
-
-	let copied = false
-	async function copy() {
-		// https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/writeText
-		await navigator.clipboard.writeText(english_back_translation)
-
-		copied = true
+	const copy_tracker = {
+		english_back_translation: false,
+		entered_text: false,
 	}
 
-	function reset_copied() {
-		copied = false
+	let entered_text = ''
+	$: english_back_translation = backtranslate(entered_text)
+
+	/** @param {string} text */
+	async function copy(text) {
+		// https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/writeText
+		await navigator.clipboard.writeText(text)
+
+		const TWO_SECONDS = 2000
+		if (text === entered_text) {
+			copy_tracker.entered_text = true
+
+			setTimeout(() => copy_tracker.entered_text = false, TWO_SECONDS)
+		}
+
+		if (text === english_back_translation) {
+			copy_tracker.english_back_translation = true
+
+			setTimeout(() => copy_tracker.english_back_translation = false, TWO_SECONDS)
+		}
 	}
 
 	/**
@@ -34,6 +45,12 @@
 <form class="grid justify-items-center">
 	<!-- svelte-ignore a11y-autofocus -->
 	<textarea bind:value={entered_text} rows="5" autofocus class="textarea textarea-bordered textarea-lg w-4/5" />
+
+	<button on:click={async () => await copy(entered_text)} class="btn btn-secondary mt-8 gap-4 self-center">
+		Copy to clipboard
+
+		<Icon icon={ copy_tracker.entered_text ? 'mdi:check' : 'mdi:content-copy'} class="h-6 w-6" />
+	</button>
 </form>
 
 {#await parse(entered_text)}
@@ -67,14 +84,10 @@
 			{english_back_translation}
 		</p>
 
-		<button on:click={copy} class="btn btn-secondary mt-8 gap-4 self-center">
+		<button on:click={async () => await copy(english_back_translation)} class="btn btn-secondary mt-8 gap-4 self-center">
 			Copy to clipboard
 
-			{#if copied}
-				<Icon icon="mdi:check" class="h-6 w-6" />
-			{:else}
-				<Icon icon="mdi:content-copy" class="h-6 w-6" />
-			{/if}
+			<Icon icon={ copy_tracker.english_back_translation ? 'mdi:check' : 'mdi:content-copy'} class="h-6 w-6" />
 		</button>
 	</section>
 {/if}
