@@ -1,36 +1,13 @@
 <script>
+	import CopyButton from '$lib/CopyButton.svelte'
 	import {backtranslate} from '$lib/backtranslator'
 	import {parse} from '$lib/parser'
 	import {token_has_error} from '$lib/parser/token'
 	import {Tokens} from '$lib/tokens'
 	import Icon from '@iconify/svelte'
 
-	const copy_tracker = {
-		english_back_translation: false,
-		entered_text: false,
-	}
-
 	let entered_text = ''
 	$: english_back_translation = backtranslate(entered_text)
-
-	/** @param {string} text */
-	async function copy(text) {
-		// https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/writeText
-		await navigator.clipboard.writeText(text)
-
-		const TWO_SECONDS = 2000
-		if (text === entered_text) {
-			copy_tracker.entered_text = true
-
-			setTimeout(() => copy_tracker.entered_text = false, TWO_SECONDS)
-		}
-
-		if (text === english_back_translation) {
-			copy_tracker.english_back_translation = true
-
-			setTimeout(() => copy_tracker.english_back_translation = false, TWO_SECONDS)
-		}
-	}
 
 	/**
 	 * @param {Token[]} tokens
@@ -46,11 +23,7 @@
 	<!-- svelte-ignore a11y-autofocus -->
 	<textarea bind:value={entered_text} rows="5" autofocus class="textarea textarea-bordered textarea-lg w-4/5" />
 
-	<button on:click={async () => await copy(entered_text)} class="btn btn-secondary mt-8 gap-4 self-center">
-		Copy to clipboard
-
-		<Icon icon={ copy_tracker.entered_text ? 'mdi:check' : 'mdi:content-copy'} class="h-6 w-6" />
-	</button>
+	<CopyButton content={entered_text} classes="mt-8 gap-4 self-center" />
 </form>
 
 {#await parse(entered_text)}
@@ -84,11 +57,7 @@
 			{english_back_translation}
 		</p>
 
-		<button on:click={async () => await copy(english_back_translation)} class="btn btn-secondary mt-8 gap-4 self-center">
-			Copy to clipboard
-
-			<Icon icon={ copy_tracker.english_back_translation ? 'mdi:check' : 'mdi:content-copy'} class="h-6 w-6" />
-		</button>
+		<CopyButton content={english_back_translation} classes="mt-8 gap-4 self-center" />
 	</section>
 {/if}
 
