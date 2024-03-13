@@ -14,7 +14,6 @@
 	
 	const concept = concepts[0]
 	const tooltip = concepts.map(concept_with_sense).join('; ')
-
 </script>
 
 <div class='tooltip' data-tip={tooltip}>

@@ -333,6 +333,21 @@ const builtin_checker_rules = [
 			}),
 		},
 	},
+	{
+		name: 'Check for words not in the ontology',
+		comment: '',
+		rule: {
+			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD && token.lookup_results.every(result => result.concept === null),
+			context: create_context_filter({}),
+			action: create_token_modify_action(token => {
+				token.error_message = 'This word is not in the Ontology. Consult the How-To document or consider using a different word.'
+
+				if (token.lookup_results.some(result => result.how_to.length > 0)) {
+					token.error_message = `${token.error_message} (Hover word for hints)`
+				}
+			}),
+		},
+	},
 ]
 
 /**

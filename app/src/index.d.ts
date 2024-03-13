@@ -49,8 +49,13 @@ interface FormResult extends LookupWord {
 	form: string
 }
 
-interface HowToResult extends LookupWord {
+interface HowToResult extends LookupWord, HowToResponse {
 	sense: string
+}
+
+type HowToResponse = {
+	term: string
+	part_of_speech: string
 	structure: string
 	pairing: string
 	explication: string

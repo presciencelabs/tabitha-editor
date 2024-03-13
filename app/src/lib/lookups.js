@@ -1,5 +1,4 @@
-import { TOKEN_TYPE } from './parser/token'
-import { REGEXES } from './regexes'
+import { TOKEN_TYPE, concept_with_sense, split_stem_and_sense } from './parser/token'
 
 // TODO move whole token pipeline to the server
 
@@ -26,6 +25,7 @@ export async function perform_ontology_lookups(sentences) {
 
 	// TODO only send one api request for all occurrences of a term
 	await Promise.all(lookup_tokens.map(check_ontology))
+	await Promise.all(lookup_tokens.map(check_how_to))
 
 	return sentences
 }
@@ -95,14 +95,8 @@ async function check_forms(lookup_token) {
 	 * @param {FormResult} form_result 
 	 * @returns {LookupResult}
 	 */
-	function transform_result({ stem, part_of_speech, form }) {
-		return {
-			stem,
-			part_of_speech,
-			form,
-			concept: null,
-			how_to: [],
-		}
+	function transform_result(form_result) {
+		return create_lookup_result(form_result, { form: form_result.form })
 	}
 }
 
@@ -138,13 +132,67 @@ async function check_ontology(lookup_token) {
 	 */
 	function transform_result(ontology_result) {
 		const existing_result = lookup_token.lookup_results.find(lookup => lookups_match(lookup, ontology_result))
-		return {
-			stem: ontology_result.stem,
-			part_of_speech: ontology_result.part_of_speech,
-			form: existing_result?.form ?? 'stem',
-			concept: ontology_result,
-			how_to: [],
+		const form = existing_result?.form ?? 'stem'
+		return create_lookup_result(ontology_result, { form, concept: ontology_result })
+	}
+}
+
+/**
+ * @param {Token} lookup_token
+ */
+async function check_how_to(lookup_token) {
+	// get how-to for the possible stems and for any complex concepts
+	const terms = new Set(lookup_token.lookup_terms.map(term => `${term[0].toLowerCase()}${term.substring(1)}`))
+	lookup_token.lookup_results
+		.map(result => result.concept)
+		.filter(concept => concept !== null && [2, 3].includes(concept.level))
+		// @ts-ignore null values filtered out above
+		.map(concept_with_sense)
+		.forEach(term => terms.add(term))
+
+	const results = (await Promise.all([...terms].map(check_word_in_how_to))).flat()
+	
+	for (let how_to_result of results) {
+		const existing_result = lookup_token.lookup_results.find(lookup => lookups_match(lookup, how_to_result) && senses_match(lookup, how_to_result))
+		if (existing_result) {
+			existing_result.how_to.push(how_to_result)
+		} else {
+			const new_result = create_lookup_result(how_to_result, { how_to: [how_to_result] })
+			lookup_token.lookup_results.push(new_result)
 		}
+	}
+
+	/**
+	 * 
+	 * @param {string} lookup 
+	 * @returns {Promise<HowToResult[]>}
+	 */
+	async function check_word_in_how_to(lookup) {
+		const response = await fetch(`/lookup/how_to?word=${lookup}`)
+
+		/** @type {LookupResponse<HowToResult>} */
+		const results = await response.json()
+		let matches = results.matches
+
+		return matches
+	}
+}
+
+/**
+ * 
+ * @param {LookupWord} lookup
+ * @param {Object} [other_data={}] 
+ * @param {string} [other_data.form='stem'] 
+ * @param {OntologyResult?} [other_data.concept=null] 
+ * @param {HowToResult[]} [other_data.how_to=[]] 
+ */
+function create_lookup_result({ stem, part_of_speech }, { form='stem', concept=null, how_to=[] }={}) {
+	return {
+		stem,
+		part_of_speech,
+		form,
+		concept,
+		how_to,
 	}
 }
 
@@ -156,4 +204,15 @@ async function check_ontology(lookup_token) {
  */
 function lookups_match(lookup1, lookup2) {
 	return lookup1.stem === lookup2.stem && lookup1.part_of_speech === lookup2.part_of_speech
+}
+
+/**
+ * 
+ * @param {LookupResult} lookup 
+ * @param {HowToResult} how_to_result 
+ * @returns {boolean}
+ */
+function senses_match(lookup, how_to_result) {
+	return lookup.concept?.sense === how_to_result.sense
+		|| lookup.how_to.some(result => result.sense === how_to_result.sense)
 }

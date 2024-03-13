@@ -292,6 +292,7 @@ export function create_token_transform(transform_json) {
 
 	const function_tag = transform_json['function']
 	if (function_tag !== undefined) {
+		// TODO keep form name value from lookup somehow
 		transforms.push(token => ({ ...token, type: TOKEN_TYPE.FUNCTION_WORD, tag: function_tag, lookup_results: [] }))
 	}
 
