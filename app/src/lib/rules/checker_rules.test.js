@@ -69,6 +69,8 @@ function create_lookup_result(stem, { sense='A', part_of_speech='Noun', level=1 
 
 describe('built-in checker rules', () => {
 	describe('complexity level check', () => {
+		const LEVEL_CHECK_RULES = CHECKER_RULES.slice(0, 3)
+
 		test('different levels', () => {
 			const test_tokens = [create_sentence([
 				create_lookup_token('token0', { lookup_results: [create_lookup_result('token0', { level: 0 })] }),
@@ -78,7 +80,7 @@ describe('built-in checker rules', () => {
 				create_lookup_token('token4', { lookup_results: [create_lookup_result('token4', { level: 4 })] }),
 			])]
 	
-			const checked_tokens = apply_rules(test_tokens, CHECKER_RULES).flatMap(flatten_sentence)
+			const checked_tokens = apply_rules(test_tokens, LEVEL_CHECK_RULES).flatMap(flatten_sentence)
 	
 			expect(checked_tokens[0].error_message).toBe('')
 			expect(checked_tokens[1].error_message).toBe('')
@@ -98,7 +100,7 @@ describe('built-in checker rules', () => {
 				),
 			])]
 	
-			const checked_tokens = apply_rules(test_tokens, CHECKER_RULES)
+			const checked_tokens = apply_rules(test_tokens, LEVEL_CHECK_RULES)
 	
 			expect(checked_tokens).toEqual(test_tokens)
 		})
@@ -110,7 +112,7 @@ describe('built-in checker rules', () => {
 				),
 			])]
 	
-			const checked_tokens = apply_rules(test_tokens, CHECKER_RULES)
+			const checked_tokens = apply_rules(test_tokens, LEVEL_CHECK_RULES)
 	
 			expect(checked_tokens).toEqual(test_tokens)
 		})
@@ -126,7 +128,7 @@ describe('built-in checker rules', () => {
 				),
 			])]
 	
-			const checked_tokens = apply_rules(test_tokens, CHECKER_RULES).flatMap(flatten_sentence)
+			const checked_tokens = apply_rules(test_tokens, LEVEL_CHECK_RULES).flatMap(flatten_sentence)
 	
 			expect(checked_tokens[0].error_message).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)
 			expect(checked_tokens[0].complex_pairing?.error_message).toBe('')
@@ -145,7 +147,7 @@ describe('built-in checker rules', () => {
 				),
 			])]
 	
-			const checked_tokens = apply_rules(test_tokens, CHECKER_RULES).flatMap(flatten_sentence)
+			const checked_tokens = apply_rules(test_tokens, LEVEL_CHECK_RULES).flatMap(flatten_sentence)
 	
 			expect(checked_tokens[0].error_message).toBe('')
 			expect(checked_tokens[0].complex_pairing?.error_message).toBe(ERRORS.WORD_LEVEL_TOO_LOW)
@@ -164,31 +166,18 @@ describe('built-in checker rules', () => {
 				),
 			])]
 	
-			const checked_tokens = apply_rules(test_tokens, CHECKER_RULES).flatMap(flatten_sentence)
+			const checked_tokens = apply_rules(test_tokens, LEVEL_CHECK_RULES).flatMap(flatten_sentence)
 	
 			expect(checked_tokens[0].error_message).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)
 			expect(checked_tokens[0].complex_pairing?.error_message).toBe(ERRORS.WORD_LEVEL_TOO_LOW)
 			expect(checked_tokens[1].error_message).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)
 			expect(checked_tokens[1].complex_pairing?.error_message).toBe(ERRORS.WORD_LEVEL_TOO_LOW)
 		})
-		test('no results no error', () => {
-			const test_tokens = [create_sentence([
-				create_lookup_token('token'),
-				create_pairing_token(
-					create_lookup_token('first'),
-					create_lookup_token('second'),
-				),
-			])]
-	
-			const checked_tokens = apply_rules(test_tokens, CHECKER_RULES).flatMap(flatten_sentence)
-	
-			expect(checked_tokens[0].error_message).toBe('')
-			expect(checked_tokens[1].error_message).toBe('')
-			expect(checked_tokens[1].complex_pairing?.error_message).toBe('')
-		})
 	})
 	
 	describe('ambiguous level check', () => {
+		const AMBIGUOUS_LEVEL_CHECK = CHECKER_RULES.slice(3, 4)
+
 		test('main token level check', () => {
 			const test_tokens = [create_sentence([
 				create_lookup_token('token', { lookup_results: [] }),
@@ -206,7 +195,7 @@ describe('built-in checker rules', () => {
 				] }),
 			])]
 	
-			const checked_tokens = apply_rules(test_tokens, CHECKER_RULES).flatMap(flatten_sentence)
+			const checked_tokens = apply_rules(test_tokens, AMBIGUOUS_LEVEL_CHECK).flatMap(flatten_sentence)
 	
 			expect(checked_tokens[0].suggest_message).toBe('')
 			expect(checked_tokens[1].suggest_message).toBe('')
@@ -242,12 +231,32 @@ describe('built-in checker rules', () => {
 				),
 			])]
 	
-			const checked_tokens = apply_rules(test_tokens, CHECKER_RULES).flatMap(flatten_sentence)
+			const checked_tokens = apply_rules(test_tokens, AMBIGUOUS_LEVEL_CHECK).flatMap(flatten_sentence)
 	
 			expect(checked_tokens[0].complex_pairing?.suggest_message).toBe('')
 			expect(checked_tokens[1].complex_pairing?.suggest_message).toBe('')
 			expect(checked_tokens[2].complex_pairing?.suggest_message).toBe('')
 			expect(checked_tokens[3].complex_pairing?.suggest_message).toBe(ERRORS.AMBIGUOUS_LEVEL)
+		})
+	})
+	
+	describe('no lookup check', () => {
+		const NO_LOOKUP_CHECK = CHECKER_RULES.slice(4, 5)
+
+		test('no results, lookup error', () => {
+			const test_tokens = [create_sentence([
+				create_lookup_token('token'),
+				create_pairing_token(
+					create_lookup_token('first'),
+					create_lookup_token('second'),
+				),
+			])]
+	
+			const checked_tokens = apply_rules(test_tokens, NO_LOOKUP_CHECK).flatMap(flatten_sentence)
+	
+			expect(checked_tokens[0].error_message).toMatch(/^This word is not in the Ontology/)
+			expect(checked_tokens[1].error_message).toMatch(/^This word is not in the Ontology/)
+			expect(checked_tokens[1].complex_pairing?.error_message).toMatch(/^This word is not in the Ontology/)
 		})
 	})
 })
