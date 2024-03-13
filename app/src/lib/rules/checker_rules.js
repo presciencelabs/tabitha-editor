@@ -462,7 +462,7 @@ function check_ambiguous_level(level_check) {
  * @param {OntologyResult?} result 
  */
 function is_level_simple(result) {
-	return result !== null && (result.level === 0 || result.level === 1)
+	return result !== null && [0, 1].includes(result.level)
 }
 
 /**
@@ -470,5 +470,5 @@ function is_level_simple(result) {
  * @param {OntologyResult?} result 
  */
 function is_level_complex(result) {
-	return result !== null && (result.level === 2 || result.level === 3)
+	return result !== null && [2, 3].includes(result.level)
 }

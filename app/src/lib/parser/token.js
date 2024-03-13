@@ -100,7 +100,7 @@ export function set_token_concept(token, concept) {
 
 	const { stem, sense } = split_stem_and_sense(concept)
 	token.lookup_terms = [concept]
-	token.lookup_results = token.lookup_results.filter(result => result.stem === stem && result.concept !== null && result.concept.sense === sense)
+	token.lookup_results = token.lookup_results.filter(result => result.stem === stem && result.concept?.sense === sense)
 	return token
 }
 
@@ -122,7 +122,7 @@ export function split_stem_and_sense(term) {
  * @returns {boolean}
  */
 export function token_has_concept(token) {
-	return token.lookup_results.some(result => result.concept !== null)
+	return token.lookup_results.some(result => result.concept)
 }
 
 /**
