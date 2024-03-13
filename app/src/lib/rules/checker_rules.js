@@ -351,11 +351,11 @@ const builtin_checker_rules = [
 				 * @param {Token} token 
 				 */
 				function check_has_ontology_results(token) {
-					if (token.lookup_results.some(result => result.concept === null)) {
+					if (token.lookup_results.some(result => result.concept !== null)) {
 						return
 					}
-					
-					token.error_message = 'This word is not in the Ontology. Consult the How-To document or consider using a different word.'
+
+					token.error_message = 'This word is not in the Ontology, or its form is not recognized. Consult the How-To document or consider using a different word.'
 	
 					if (token.lookup_results.some(result => result.how_to.length > 0)) {
 						token.error_message = `${token.error_message} (Hover word for hints)`
