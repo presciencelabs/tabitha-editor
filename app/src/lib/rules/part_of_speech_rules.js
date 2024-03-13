@@ -161,9 +161,8 @@ export function parse_part_of_speech_rule(rule_json) {
 	 */
 	function create_remove_action(remove_json) {
 		return create_token_map_action(token => {
-			const form_results = token.form_results.filter(result => result.part_of_speech !== remove_json)
 			const lookup_results = token.lookup_results.filter(result => result.part_of_speech !== remove_json)
-			return { ...token, form_results, lookup_results }
+			return { ...token, lookup_results }
 		})
 	}
 }

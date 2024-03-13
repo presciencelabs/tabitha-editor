@@ -24,6 +24,7 @@ export async function perform_form_lookups(sentences) {
 export async function perform_ontology_lookups(sentences) {
 	const lookup_tokens = sentences.flatMap(flatten_for_lookup).filter(is_lookup_token)
 
+	// TODO only send one api request for all occurrences of a term
 	await Promise.all(lookup_tokens.map(check_ontology))
 
 	return sentences
@@ -66,16 +67,14 @@ function is_lookup_token(token) {
  */
 async function check_forms(lookup_token) {
 	// At this point there is always just one lookup term
-	const stem_match = lookup_token.lookup_terms[0].match(REGEXES.EXTRACT_STEM_AND_SENSE)
-	const stem = stem_match?.[1] ?? ''
-	const sense = stem_match?.[2]
+	const { stem, sense } = split_stem_and_sense(lookup_token.lookup_terms[0])
 
-	const response = await fetch(`/form-lookup?word=${stem}`)
+	const response = await fetch(`/lookup/form?word=${stem}`)
 
-	/** @type {LookupResult<FormResult>} */
+	/** @type {LookupResponse<FormResult>} */
 	const results = await response.json()
 
-	lookup_token.form_results = results.matches
+	lookup_token.lookup_results = results.matches.map(transform_result)
 
 	if (results.matches.length === 0) {
 		return
@@ -90,14 +89,32 @@ async function check_forms(lookup_token) {
 
 	// Reattach the sense if present
 	lookup_token.lookup_terms = sense ? [...unique_stems].map(stem => `${stem}-${sense}`) : [...unique_stems]
+
+	/**
+	 * 
+	 * @param {FormResult} form_result 
+	 * @returns {LookupResult}
+	 */
+	function transform_result({ stem, part_of_speech, form }) {
+		return {
+			stem,
+			part_of_speech,
+			form,
+			concept: null,
+			how_to: [],
+		}
+	}
 }
 
 /**
  * @param {Token} lookup_token
  */
 async function check_ontology(lookup_token) {
-	const results = await Promise.all(lookup_token.lookup_terms.map(check_word_in_ontology))
-	lookup_token.lookup_results = results.flat()
+	const results = (await Promise.all(lookup_token.lookup_terms.map(check_word_in_ontology))).flat()
+
+	const found_results = results.map(transform_result)
+	const not_found_results = lookup_token.lookup_results.filter(lookup => !results.some(result => lookups_match(lookup, result)))
+	lookup_token.lookup_results = found_results.concat(not_found_results)
 
 	/**
 	 * 
@@ -105,12 +122,38 @@ async function check_ontology(lookup_token) {
 	 * @returns {Promise<OntologyResult[]>}
 	 */
 	async function check_word_in_ontology(lookup) {
-		const response = await fetch(`/ontology-lookup?word=${lookup}`)
+		const response = await fetch(`/lookup/ontology?word=${lookup}`)
 
-		/** @type {LookupResult<OntologyResult>} */
+		/** @type {LookupResponse<OntologyResult>} */
 		const results = await response.json()
 		let matches = results.matches
 
 		return matches
 	}
+
+	/**
+	 * 
+	 * @param {OntologyResult} ontology_result 
+	 * @returns {LookupResult}
+	 */
+	function transform_result(ontology_result) {
+		const existing_result = lookup_token.lookup_results.find(lookup => lookups_match(lookup, ontology_result))
+		return {
+			stem: ontology_result.stem,
+			part_of_speech: ontology_result.part_of_speech,
+			form: existing_result?.form ?? 'stem',
+			concept: ontology_result,
+			how_to: [],
+		}
+	}
+}
+
+/**
+ * 
+ * @param {LookupWord} lookup1 
+ * @param {LookupWord} lookup2 
+ * @returns {boolean}
+ */
+function lookups_match(lookup1, lookup2) {
+	return lookup1.stem === lookup2.stem && lookup1.part_of_speech === lookup2.part_of_speech
 }
