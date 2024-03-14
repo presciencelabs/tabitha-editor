@@ -351,7 +351,7 @@ const builtin_checker_rules = [
 				 * @param {Token} token 
 				 */
 				function check_has_ontology_results(token) {
-					if (token.lookup_results.some(result => result.concept !== null)) {
+					if (token.lookup_results.some(result => result.concept)) {
 						return
 					}
 
@@ -453,7 +453,7 @@ function check_ambiguous_level(level_check) {
 	return token => {
 		return token.lookup_results.length > 0
 			&& level_check(token.lookup_results[0].concept)
-			&& token.lookup_results.filter(result => result.concept !== null).some(result => !level_check(result.concept))
+			&& token.lookup_results.filter(result => result.concept).some(result => !level_check(result.concept))
 	}
 }
 
