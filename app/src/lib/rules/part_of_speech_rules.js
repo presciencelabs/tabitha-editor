@@ -38,7 +38,7 @@ const part_of_speech_rules_json = [
 			'precededby': { 'tag': 'negative_verb_polarity|modal' },
 		},
 		'remove': 'Noun',
-		'comment': 'I will judge(N/V). I do not judge(N/V). I should judge(N/V). etc'
+		'comment': 'I will judge(N/V). I do not judge(N/V). I should judge(N/V). etc',
 	},
 	{
 		'name': 'If Noun-Verb preceded by Verb, Adjective, Conjunction, delete the Verb',

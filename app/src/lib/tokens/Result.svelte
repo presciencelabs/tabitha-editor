@@ -2,7 +2,6 @@
 	import { PUBLIC_ONTOLOGY_API_HOST } from '$env/static/public'
 	import { concept_with_sense } from '$lib/parser/token'
 	import TokenDisplay from './TokenDisplay.svelte'
-	import Badge from '$lib/Badge.svelte'
 	import PopupTable from './PopupTable.svelte'
 
 	/** @type {Token} */
@@ -33,16 +32,16 @@
 			</td>
 			<td class="whitespace-nowrap">{concept.part_of_speech}</td>
 			<td class="whitespace-nowrap">
-				<Badge classes="L{concept.level} font-mono">L{concept.level}</Badge>
+				<span class="badge badge-md L{concept.level} font-mono">L{concept.level}</span>
 			</td>
 			<td>{concept.gloss}</td>
 			<!-- TODO integrate hints from how-to -->
 		{:else}
-			<th class="whitespace-nowrap">{entry.stem}</th>
+			<td class="whitespace-nowrap">{entry.stem}</td>
 			<td class="whitespace-nowrap">{entry.part_of_speech}</td>
-			<td></td>
+			<td>N/A</td>
 			<!-- TODO integrate hints from how-to -->
-			<td>Check How-To document for usage</td>
+			<td>Not in Ontology. Check the How-To document.</td>
 		{/if}
 	</tr>
 </PopupTable>
