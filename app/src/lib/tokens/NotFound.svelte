@@ -18,9 +18,9 @@
 				<thead>
 					<tr>
 						<th></th>
-						{#if has_structure}<th>Structure</th>{/if}
-						{#if has_pairing}<th>Pairing</th>{/if}
-						{#if has_explication}<th>Explication</th>{/if}
+						{#if has_structure}<th class="text-info-content">Structure</th>{/if}
+						{#if has_pairing}<th class="text-info-content">Pairing</th>{/if}
+						{#if has_explication}<th class="text-info-content">Explication</th>{/if}
 					</tr>
 				</thead>
 				<tbody>
