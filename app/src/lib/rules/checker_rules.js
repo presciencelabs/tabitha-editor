@@ -355,10 +355,10 @@ const builtin_checker_rules = [
 						return
 					}
 
-					token.error_message = 'This word is not in the Ontology, or its form is not recognized. Consult the How-To document or consider using a different word.'
+					token.suggest_message = 'This word is not in the Ontology, or its form is not recognized. Consult the How-To document or consider using a different word.'
 	
 					if (token.lookup_results.some(result => result.how_to.length > 0)) {
-						token.error_message = `${token.error_message} (Hover word for hints)`
+						token.error_message = `This word is not in the Ontology. Hover over the word for hints from the How-To document.`
 					}
 				}
 			}),
@@ -453,7 +453,7 @@ function check_ambiguous_level(level_check) {
 	return token => {
 		return token.lookup_results.length > 0
 			&& level_check(token.lookup_results[0].concept)
-			&& token.lookup_results.some(result => !level_check(result.concept))
+			&& token.lookup_results.filter(result => result.concept !== null).some(result => !level_check(result.concept))
 	}
 }
 
