@@ -13,8 +13,8 @@
 
 {#if how_to_entries.length}
 	<div class="dropdown dropdown-hover dropdown-top">
-		<div class="overflow-x-auto dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-96">
-			<table class="table table-xs my-0">
+		<div class="overflow-x-auto dropdown-content z-[1] menu shadow-xl bg-info text-info-content rounded-box w-96">
+			<table class="table table-xs my-2">
 				<thead>
 					<tr>
 						<th></th>
@@ -26,8 +26,8 @@
 				<tbody>
 					{#each how_to_entries as entry}
 					<tr>
-						<th>{`${entry.term} (${entry.part_of_speech})`}</th>
-						{#if has_structure}<td>{entry.structure}</td>{/if}
+						<th class="whitespace-nowrap">{`${entry.term} (${entry.part_of_speech})`}</th>
+						{#if has_structure}<td class="whitespace-nowrap">{entry.structure}</td>{/if}
 						{#if has_pairing}<td>{entry.pairing}</td>{/if}
 						{#if has_explication}<td>{entry.explication}</td>{/if}
 					</tr>
