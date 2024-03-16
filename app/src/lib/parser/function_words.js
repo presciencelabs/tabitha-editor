@@ -31,7 +31,7 @@ export const FUNCTION_WORDS = new Map([
 	['would', 'conditional_would|modal'],
 	['who', 'interrogative_person|relativizer'],
 	['whom', 'relativizer'],
-	['what', 'interrogative_thing|relativizer'],
+	['what', 'interrogative_thing'],
 	['which', 'interrogative_which|relativizer'],
 ])
 
