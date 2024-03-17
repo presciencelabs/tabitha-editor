@@ -311,7 +311,7 @@ const checker_rules_json = [
 		'name': 'Check for unhyphenated Verbs with \'up\'',
 		'trigger': { 'token': 'up' },
 		'context': {
-			'precededby': { 'stem': 'pick|run|sit|stand|wake|walk', 'category': 'Verb', 'skip': 'all' },
+			'precededby': { 'stem': 'go|pick|run|sit|stand|wake|walk', 'category': 'Verb', 'skip': 'all' },
 		},
 		'require': {
 			'message': '\'up\' must be hyphenated with the Verb (e.g. pick-up). DO NOT inflect the Verb (e.g. NOT picked-up).',
@@ -434,6 +434,26 @@ const checker_rules_json = [
 			'message': 'Use \'will\' instead of \'going to\' to express future tense. See P1 Checklist 0.28.',
 		},
 		'comment': 'See section 0.28 of the Phase 1 checklist.',
+	},
+	{
+		'name': 'Cannot use \'is to {Verb}\' as an obligation',
+		'trigger': { 'stem': 'be' },
+		'context': {
+			'followedby': [{ 'token': 'to' }, { 'category': 'Verb' }],
+		},
+		'require': {
+			'message': 'Use \'will\', \'must\', or \'should\' instead of \'is to...\' to express a future obligation.',
+		},
+	},
+	{
+		'name': 'Cannot use \'have to {Verb}\' as an obligation',
+		'trigger': { 'stem': 'have' },
+		'context': {
+			'followedby': [{ 'token': 'to' }, { 'category': 'Verb' }],
+		},
+		'require': {
+			'message': 'Use \'must\' or \'should\' instead of \'have to...\' to express an obligation.',
+		},
 	},
 ]
 
