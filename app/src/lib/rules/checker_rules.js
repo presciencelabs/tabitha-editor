@@ -534,25 +534,29 @@ const builtin_checker_rules = [
 			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD,
 			context: create_context_filter({}),
 			action: create_token_modify_action(token => {
-				check_has_ontology_results(token)
+				check_lookup_results(token)
 
 				if (token.complex_pairing) {
-					check_has_ontology_results(token.complex_pairing)
+					check_lookup_results(token.complex_pairing)
 				}
 				
 				/**
 				 * 
 				 * @param {Token} token 
 				 */
-				function check_has_ontology_results(token) {
-					if (token.lookup_results.some(result => result.concept)) {
+				function check_lookup_results(token) {
+					if (token.lookup_results.some(result => result.concept !== null && result.concept.id !== '0')) {
 						return
 					}
 
-					token.suggest_message = 'This word is not in the Ontology, or its form is not recognized. Consult the How-To document or consider using a different word.'
-	
-					if (token.lookup_results.some(result => result.how_to.length > 0)) {
+					if (token.lookup_results.at(0)?.concept?.id === '0') {
+						token.suggest_message = 'This word is not yet in the Ontology, but should be soon. Consult the How-To document for more info.'
+
+					} else if (token.lookup_results.some(result => result.how_to.length > 0)) {
 						token.error_message = 'This word is not in the Ontology. Hover over the word for hints from the How-To document.'
+						
+					} else {
+						token.suggest_message = 'This word is not in the Ontology, or its form is not recognized. Consult the How-To document or consider using a different word.'
 					}
 				}
 			}),
