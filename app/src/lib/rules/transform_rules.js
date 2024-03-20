@@ -261,7 +261,7 @@ const transform_rules_json = [
 			'notfollowedby': {
 				'category': 'Noun',
 				'skip': ['vp_modifiers', 'adjp'],
-			}
+			},
 		},
 		'transform': { 'concept': 'be-D' },
 	},
@@ -276,7 +276,7 @@ const transform_rules_json = [
 			'notfollowedby': {
 				'category': 'Noun',
 				'skip': ['vp_modifiers', 'adjp'],
-			}
+			},
 		},
 		'transform': { 'concept': 'become-A' },
 	},
@@ -358,8 +358,8 @@ const transform_rules_json = [
 		'name': 'tag head nouns',
 		'trigger': { 'category': 'Noun' },
 		'context': {
-			'notprecededby': [{ 'category': 'Noun'}, { 'token': 'of', 'skip': 'np_modifiers'}],
-			'notfollowedby': { 'category': 'Noun', 'skip': 'np_modifiers' }
+			'notprecededby': [{ 'category': 'Noun' }, { 'token': 'of', 'skip': 'np_modifiers' }],
+			'notfollowedby': { 'category': 'Noun', 'skip': 'np_modifiers' },
 		},
 		'transform': { 'tag': 'head_np' },
 	},

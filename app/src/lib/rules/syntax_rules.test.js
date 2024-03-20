@@ -170,9 +170,9 @@ function create_sentence(tokens) {
 describe('sentence syntax: capitalization', () => {
 	test('valid', () => {
 		const test_tokens = [create_sentence([
-			create_lookup_token('Token', { tag: 'first_word'}),
+			create_lookup_token('Token', { tag: 'first_word' }),
 			create_pairing_token(
-				create_lookup_token('First', { tag: 'first_word'}),
+				create_lookup_token('First', { tag: 'first_word' }),
 				create_lookup_token('second'),
 			),
 			create_token('Function', TOKEN_TYPE.FUNCTION_WORD, { tag: 'first_word' }),
@@ -186,9 +186,9 @@ describe('sentence syntax: capitalization', () => {
 
 	test('invalid', () => {
 		const test_tokens = [create_sentence([
-			create_lookup_token('token', { tag: 'first_word'}),
+			create_lookup_token('token', { tag: 'first_word' }),
 			create_pairing_token(
-				create_lookup_token('first', { tag: 'first_word'}),
+				create_lookup_token('first', { tag: 'first_word' }),
 				create_lookup_token('second'),
 			),
 			create_token('function', TOKEN_TYPE.FUNCTION_WORD, { tag: 'first_word' }),

@@ -382,10 +382,13 @@ const checker_rules_json = [
 		'trigger': { 'token': 'all' },
 		'context': {
 			'notfollowedby': [
-				{ 'token': 'of|_generic', 'skip': [
-					{ 'token': 'the|those|these' },
-					{ 'category': 'Noun' },
-				]},
+				{
+					'token': 'of|_generic',
+					'skip': [
+						{ 'token': 'the|those|these' },
+						{ 'category': 'Noun' },
+					],
+				},
 			],
 		},
 		'suggest': {

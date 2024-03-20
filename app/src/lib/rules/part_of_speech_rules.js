@@ -225,9 +225,6 @@ const builtin_part_of_speech_rules = [
 				const left_categories = new Set(left.lookup_results.map(result => result.part_of_speech))
 				const right_categories = new Set(right.lookup_results.map(result => result.part_of_speech))
 				const overlapping_categories = new Set([...left_categories].filter(x => right_categories.has(x)))
-				console.log(left_categories)
-				console.log(right_categories)
-				console.log(overlapping_categories)
 
 				if (overlapping_categories.size > 0) {
 					const category_filter = keep_parts_of_speech(overlapping_categories)
