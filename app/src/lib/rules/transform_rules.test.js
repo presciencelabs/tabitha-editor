@@ -4,6 +4,7 @@ import { clausify } from '../parser/clausify'
 import { apply_rules } from './rules_processor'
 import { describe, expect, test } from 'vitest'
 import { TRANSFORM_RULES } from './transform_rules'
+import { create_case_frame } from './case_frame'
 
 /**
  * 
@@ -30,6 +31,7 @@ function create_lookup_result(stem, { sense='A', part_of_speech='Noun', level=1 
 		form: 'stem',
 		concept,
 		how_to: [],
+		case_frame: create_case_frame(),
 	}
 }
 
@@ -59,7 +61,7 @@ describe('builtin tag setting', () => {
 
 		const checked_tokens = apply_rules(test_tokens, TRANSFORM_RULES_BUILTIN)
 		
-		expect(checked_tokens[0].clause.sub_tokens[2].tag).toBe('relative_clause')
+		expect(checked_tokens[0].clause.sub_tokens[2].tag).toBe('relative_clause|relative_clause_that')
 		expect(checked_tokens[0].clause.sub_tokens[2].sub_tokens[1].tag).toBe('relativizer')
 		
 		expect(checked_tokens[1].clause.sub_tokens[2].tag).toBe('subordinate_clause')

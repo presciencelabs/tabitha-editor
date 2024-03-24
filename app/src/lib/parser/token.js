@@ -90,7 +90,18 @@ export function create_clause_token(sub_tokens, tag='subordinate_clause') {
 /**
  * 
  * @param {Token} token 
- * @param {string} concept must include the sense
+ * @param {WordSense} concept 
+ * @return {number}
+ */
+export function find_result_index(token, concept) {
+	const { stem, sense } = split_stem_and_sense(concept)
+	return token.lookup_results.findIndex(result => result.stem === stem && result.concept?.sense === sense)
+}
+
+/**
+ * 
+ * @param {Token} token 
+ * @param {WordSense} concept must include the sense
  * @returns {Token}
  */
 export function set_token_concept(token, concept) {
@@ -99,8 +110,7 @@ export function set_token_concept(token, concept) {
 		return token
 	}
 
-	const { stem, sense } = split_stem_and_sense(concept)
-	const concept_index = token.lookup_results.findIndex(result => result.stem === stem && result.concept?.sense === sense)
+	const concept_index = find_result_index(token, concept)
 	const selected_result = token.lookup_results.splice(concept_index, 1)
 
 	// put the selected sense at the top

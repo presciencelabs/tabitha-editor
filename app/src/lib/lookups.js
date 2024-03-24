@@ -1,5 +1,6 @@
 import { TOKEN_TYPE, split_stem_and_sense } from './parser/token'
 import { REGEXES } from './regexes'
+import { create_case_frame, create_sense_argument_rule } from './rules/case_frame'
 import { create_context_filter, create_token_filter, create_token_modify_action } from './rules/rules_parser'
 import { apply_rule_to_tokens } from './rules/rules_processor'
 
@@ -201,6 +202,7 @@ async function check_how_to(lookup_token) {
  * @param {string} [other_data.form='stem'] 
  * @param {OntologyResult?} [other_data.concept=null] 
  * @param {HowToResult[]} [other_data.how_to=[]] 
+ * @returns {LookupResult}
  */
 function create_lookup_result({ stem, part_of_speech }, { form='stem', concept=null, how_to=[] }={}) {
 	return {
@@ -209,6 +211,7 @@ function create_lookup_result({ stem, part_of_speech }, { form='stem', concept=n
 		form,
 		concept,
 		how_to,
+		case_frame: create_case_frame({ is_valid: true, rule: create_sense_argument_rule({ sense: concept?.sense }) })
 	}
 }
 

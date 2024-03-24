@@ -42,11 +42,14 @@ export function create_token_filter(filter_json) {
 	// only support single character usages right now
 	add_lookup_filter('usage', filter_value => has_usage(filter_value))
 
-	add_lookup_filter('form', filter_value => lookup => get_value_checker(lookup.form)(filter_value))
+	add_lookup_filter('form', filter_value => {
+		const filter_forms = filter_value.split('|')
+		return lookup => {
+			const lookup_forms = lookup.form.split('|')
+			return lookup_forms.some(form => filter_forms.includes(form))
+		}
+	})
 
-	if (filters.length === 0) {
-		return () => false
-	}
 	return token => filters.every(filter => filter(token))
 
 	/**
@@ -427,6 +430,7 @@ const SKIP_GROUPS = new Map([
 	['degree_indicators', { 'tag': 'intensified_degree|extremely_intensified_degree|least_degree|comparative_degree|too_degree' }],
 	['adjp_modifiers', [
 		'degree_indicators',
+		{ 'tag': 'patient_clause_same_participant|patient_clause_different_participant' },	// some adjectives can take a patient argument
 		{ 'category': 'Adverb' },
 	]],
 	['adjp', [
@@ -450,7 +454,7 @@ const SKIP_GROUPS = new Map([
 		{ 'category': 'Noun' },
 	]],
 	['vp_modifiers', [
-		{ 'tag': 'negative_verb_polarity|modal|infinitive|auxilliary' },
+		{ 'tag': 'negative_verb_polarity|modal|infinitive|auxiliary' },
 		{ 'category': 'Adverb' },
 	]],
 	['vp', [

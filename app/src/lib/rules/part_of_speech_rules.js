@@ -142,6 +142,24 @@ const part_of_speech_rules_json = [
 		'comment': 'Daniel 7:4 I saw the second(N/Adj) animal.',
 	},
 	{
+		'name': 'If Noun-Adjective followed by Verb, remove Adjective',
+		'category': 'Noun|Adjective',
+		'context': {
+			'followedby': { 'category': 'Verb' },
+		},
+		'remove': 'Noun',
+		'comment': 'Daniel 7:4 I saw the second(N/Adj) animal.',
+	},
+	{
+		'name': 'If Noun-Adjective preceded by \'be\' or \'feel\', remove Noun',
+		'category': 'Noun|Adjective',
+		'context': {
+			'precededby': { 'category': 'Verb', 'stem': 'be|feel', 'skip': ['vp_modifiers', 'adjp_modifiers'] },
+		},
+		'remove': 'Noun',
+		'comment': 'Infected Eye 1:1 Melissa\'s eye is sore(N/Adj).  Infected Eye 1:15 Janet\'s eyes were still sore(N/Adj).',
+	},
+	{
 		'name': 'If Verb-Adjective preceded by an article or possessive, remove Verb',
 		'category': 'Verb|Adjective',
 		'context': {
@@ -180,6 +198,15 @@ const part_of_speech_rules_json = [
 		'comment': 'Luke 3:22 I am pleased(V/Adj) with you.',
 	},
 	{
+		'name': 'If Adjective-Adverb followed by Noun, remove the Adverb',
+		'category': 'Adverb|Adjective',
+		'context': {
+			'followedby': { 'category': 'Noun' },
+		},
+		'remove': 'Adverb',
+		'comment': 'Dan. 1:12 Please give only(Adj/Adv) vegetables ...',
+	},
+	{
 		'name': 'If Adverb-Adjective followed by Verb, remove Adjective',
 		'category': 'Adverb|Adjective',
 		'context': {
@@ -187,6 +214,33 @@ const part_of_speech_rules_json = [
 		},
 		'remove': 'Adjective',
 		'comment': 'Infected Eye 1:5  You must first(Adj/Adv) wash ...',
+	},
+	{
+		'name': 'If Adverb-Adposition followed by a Noun, delete the Adverb',
+		'category': 'Adverb|Adposition',
+		'context': {
+			'followedby': { 'category': 'Noun', 'skip': 'np_modifiers' },
+		},
+		'remove': 'Adverb',
+		'comment': 'Daniel 1:1 when(Adv/Adp) Jehoiakim ... 3:5 when(Adv/Adp) the people hear ...',
+	},
+	{
+		'name': 'If Verb-Adposition precededby by a modal or \'not\', delete the Adposition',
+		'category': 'Verb|Adposition',
+		'context': {
+			'precededby': { 'tag': 'modal|negative_verb_polarity', 'skip': 'vp_modifiers' },
+		},
+		'remove': 'Adposition',
+		'comment': 'John should like(V/Adp) that book.',
+	},
+	{
+		'name': 'If Verb-Adposition at the beginning of a clause, delete the Verb',
+		'category': 'Verb|Adposition',
+		'context': {
+			'precededby': { 'token': '[', 'skip': { 'category': 'Conjunction' } },
+		},
+		'remove': 'Verb',
+		'comment': 'Daniel 2:40  The fourth kingom will be strong [like(V/Adp) iron is strong].',
 	},
 ]
 
