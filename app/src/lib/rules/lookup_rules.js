@@ -128,7 +128,7 @@ const lookup_rules_json = [
 		'name': 'like -> just-like (the adposition)',
 		'trigger': { 'token': 'like' },
 		'lookup': 'like|just-like',
-		'comment': 'this is needed so the adposition is found as well, which is handled by words like be/seem/sound/etc'
+		'comment': 'this is needed so the adposition is found as well, which is handled by words like be/seem/sound/etc',
 	},
 	{
 		'name': 'worry about',

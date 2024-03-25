@@ -96,8 +96,8 @@ export function parse_case_frame_rule([role_tag, rule_json]) {
 			'context': {
 				'precededby': [
 					{ 'category': 'Verb', 'skip': 'vp_modifiers' },
-					{ 'token': directly_after_verb_with_adposition, 'skip': 'np_modifiers' }
-				]
+					{ 'token': directly_after_verb_with_adposition, 'skip': 'np_modifiers' },
+				],
 			},
 			'context_transform': [{}, { 'function': '' }],
 			'missing_message': `A ${role_tag} is required, which for this verb must be preceded by '${directly_after_verb_with_adposition}'.`,
@@ -118,7 +118,7 @@ export function parse_case_frame_rule([role_tag, rule_json]) {
 
 	const context = create_context_filter(rule_json['context'])
 
-	const transform = create_token_transform({ 'tag': role_tag, ...(rule_json['transform'] ?? {}) })
+	const transform = create_token_transform({ 'tag': role_tag, ...rule_json['transform'] ?? {} })
 	const context_transforms = create_token_transforms(rule_json['context_transform'])
 	const missing_message = rule_json['missing_message'] ?? missing_argument_message(role_tag)
 

@@ -5,6 +5,7 @@ import { LOOKUP_RULES } from './lookup_rules'
 import { parse_transform_rule } from './transform_rules'
 import { parse_checker_rule } from './checker_rules'
 import { parse_part_of_speech_rule } from './part_of_speech_rules'
+import { create_case_frame } from './case_frame'
 
 /**
  * 
@@ -53,6 +54,7 @@ function create_lookup_result(stem, { sense='A', part_of_speech='Noun', level=1 
 		form: 'stem',
 		concept,
 		how_to: [],
+		case_frame: create_case_frame(),
 	}
 }
 

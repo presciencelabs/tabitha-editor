@@ -63,7 +63,7 @@ const part_of_speech_rules_json = [
 		'name': 'If Noun-Verb preceded by an \'s, delete the Verb',
 		'category': 'Noun|Verb',
 		'context': {
-			'precededby': { 'tag': 'genitive_saxon', 'skip': { 'category': 'Adjective' } },
+			'precededby': { 'tag': 'genitive_saxon', 'skip': 'adjp_attributive' },
 		},
 		'remove': 'Verb',
 		'comment': 'Gideon returned to the Israelite\'s camp.',
@@ -120,26 +120,26 @@ const part_of_speech_rules_json = [
 		'comment': 'John only(Adv/Adj) saw a book.',
 	},
 	{
+		'name': 'If Noun-Adjective followed by Noun, remove Noun',
+		'category': 'Noun|Adjective',
+		'context': {
+			'followedby': { 'category': 'Noun', 'skip': 'adjp_attributive' },
+		},
+		'remove': 'Noun',
+		'comment': 'Daniel 7:4 I saw the second(N/Adj) animal. The chief(N/Adj) evil spirit.',
+	},
+	{
 		'name': 'If Noun-Adjective is preceded by an article but not followed by Noun, remove Adjective',
 		'category': 'Noun|Adjective',
 		'context': {
 			'precededby': {
-				'tag': 'indefinite_article|definite_article|near_demonstrative|remote_demonstrative',
-				'skip': { 'category': 'Adjective' },
+				'tag': 'indefinite_article|definite_article|near_demonstrative|remote_demonstrative|negative_noun_polarity',
+				'skip': 'adjp_attributive',
 			},
-			'notfollowedby': { 'category': 'Noun' },
+			'notfollowedby': { 'category': 'Noun', 'skip': 'adjp_attributive' },
 		},
 		'remove': 'Adjective',
 		'comment': 'John knew about the secret(N/Adj).',
-	},
-	{
-		'name': 'If Noun-Adjective followed by Noun, remove Noun',
-		'category': 'Noun|Adjective',
-		'context': {
-			'followedby': { 'category': 'Noun' },
-		},
-		'remove': 'Noun',
-		'comment': 'Daniel 7:4 I saw the second(N/Adj) animal.',
 	},
 	{
 		'name': 'If Noun-Adjective followed by Verb, remove Adjective',
@@ -148,13 +148,13 @@ const part_of_speech_rules_json = [
 			'followedby': { 'category': 'Verb' },
 		},
 		'remove': 'Noun',
-		'comment': 'Daniel 7:4 I saw the second(N/Adj) animal.',
+		'comment': 'Daniel 3:4 The one official(N/Adj) shouted ...',
 	},
 	{
 		'name': 'If Noun-Adjective preceded by \'be\' or \'feel\', remove Noun',
 		'category': 'Noun|Adjective',
 		'context': {
-			'precededby': { 'category': 'Verb', 'stem': 'be|feel', 'skip': ['vp_modifiers', 'adjp_modifiers'] },
+			'precededby': { 'category': 'Verb', 'stem': 'be|feel', 'skip': ['vp_modifiers', 'adjp_modifiers_predicative'] },
 		},
 		'remove': 'Noun',
 		'comment': 'Infected Eye 1:1 Melissa\'s eye is sore(N/Adj).  Infected Eye 1:15 Janet\'s eyes were still sore(N/Adj).',

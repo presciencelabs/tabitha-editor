@@ -89,20 +89,8 @@ const checker_rules_json = [
 			'message': 'An imperative clause must have an explicit subject.',
 		},
 	},
-	// TODO uncomment when tags are expanded. currently tags keep getting overwritten, so
-	// at this point, the tag is not necessarily 'second_person' anymore.
-	// {
-	// 	'name': 'Check for an imperative note that does not follow the \'you\'',
-	// 	'trigger': { 'token': '(imp)' },
-	// 	'context': {
-	// 		'notprecededby': { 'tag': 'second_person' },
-	// 	},
-	// 	'suggest': {
-	// 		'message': 'Consider putting the imperative (imp) notation after the \'you\' subject of the clause.',
-	// 	},
-	// },
 	{
-		'name': 'Check for an imperative note in a complement clause',
+		'name': 'Check for an imperative note in a non-quote subordinate clause',
 		'trigger': { 'token': '(imp)' },
 		'context': {
 			'precededby': { 'token': '[', 'skip': 'all' },

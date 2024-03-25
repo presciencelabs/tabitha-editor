@@ -428,13 +428,20 @@ export function create_token_modify_action(action) {
 const SKIP_GROUPS = new Map([
 	['determiners', { 'tag': 'indefinite_article|definite_article|near_demonstrative|remote_demonstrative|negative_noun_polarity' }],
 	['degree_indicators', { 'tag': 'intensified_degree|extremely_intensified_degree|least_degree|comparative_degree|too_degree' }],
-	['adjp_modifiers', [
+	['adjp_modifiers_predicative', [
 		'degree_indicators',
 		{ 'tag': 'patient_clause_same_participant|patient_clause_different_participant' },	// some adjectives can take a patient argument
 		{ 'category': 'Adverb' },
 	]],
-	['adjp', [
-		'adjp_modifiers',
+	['adjp_predicative', [
+		'adjp_modifiers_predicative',
+		{ 'category': 'Adjective' },
+	]],
+	['adjp_modifiers_attributive', [
+		'degree_indicators',
+	]],
+	['adjp_attributive', [
+		'adjp_modifiers_attributive',
 		{ 'category': 'Adjective' },
 	]],
 	['advp_modifiers', [
@@ -447,7 +454,7 @@ const SKIP_GROUPS = new Map([
 	['np_modifiers', [
 		{ 'tag': 'genitive_saxon|genitive_norman|relative_clause' },
 		'determiners',
-		'adjp',
+		'adjp_attributive',
 	]],
 	['np', [
 		'np_modifiers',

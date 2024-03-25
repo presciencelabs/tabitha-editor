@@ -290,7 +290,7 @@ const transform_rules_json = [
 			'notfollowedby': { 'category': 'Noun', 'skip': [
 				{ 'tag': 'genitive_saxon|relative_clause' },	// can't use 'np_modifiers' since we don't skip the genitive_norman 'of'
 				'determiners',
-				'adjp',
+				'adjp_attributive',
 			]},
 		},
 		'transform': { 'tag': 'head_np' },
@@ -300,7 +300,7 @@ const transform_rules_json = [
 		'name': 'tag predicate adjectives',
 		'trigger': { 'category': 'Adjective' },
 		'context': {
-			'precededby': { 'category': 'Verb', 'skip': ['vp_modifiers', 'adjp_modifiers'] },
+			'precededby': { 'category': 'Verb', 'skip': ['vp_modifiers', 'adjp_modifiers_predicative'] },
 			'notfollowedby': { 'category': 'Noun', 'skip': 'np_modifiers' },
 		},
 		'transform': { 'tag': 'predicate_adjective' },

@@ -25,7 +25,7 @@ const default_verb_case_frame_json = {
 	},
 	'addressee': {
 		'trigger': { 'tag': 'head_np' },
-		'context': { 'followedby': [{'token': ','}, { 'category': 'Verb', 'skip': 'all' }] },
+		'context': { 'followedby': [{ 'token': ',' }, { 'category': 'Verb', 'skip': 'all' }] },
 	},
 	'beneficiary': {
 		// TODO check feature on lexicon word like the Analyzer does. beneficiaries have to be animate, not things.
@@ -77,7 +77,7 @@ const verb_case_frames = new Map([
 		['be-E', {
 			'agent': {
 				'trigger': { 'tag': 'head_np' },
-				'context': { 'precededby': [{'tag': 'existential'}, { 'category': 'Verb', 'skip': ['vp_modifiers', 'np_modifiers'] }] },
+				'context': { 'precededby': [{ 'tag': 'existential' }, { 'category': 'Verb', 'skip': ['vp_modifiers', 'np_modifiers'] }] },
 				'missing_message': 'be-E requires the format \'there be X\'.',
 			},
 			'state': { },
@@ -139,19 +139,19 @@ const verb_case_frames = new Map([
 		['be-R', {
 			'state': {
 				'directly_after_verb_with_adposition': 'part',
-				'missing_message': 'be-R requires the format \'X be part of Y\''
+				'missing_message': 'be-R requires the format \'X be part of Y\'',
 			},
 		}],
 		['be-S', {
 			'predicate_adjective': {
-				'trigger': { 'token': 'old', },
+				'trigger': { 'token': 'old' },
 				'context': { 'precededby': [{ 'category': 'Adjective' }, { 'stem': 'year|month|day' }] },
 				'transform': { 'concept': 'old-B' },
-				'missing_message': 'be-S requires the format \'be X years//months//etc old(-B)\'.'
+				'missing_message': 'be-S requires the format \'be X years//months//etc old(-B)\'.',
 			},
 			'state': { },
 			'other_required': 'predicate_adjective',
-			'comment': 'clear the \'state\' argument so it doesn\'t get triggered by \'year/month/day\' etc. \'old\' is the predicate adjective.',
+			'comment': "clear the 'state' argument so it doesn't get triggered by 'year/month/day' etc. 'old' is the predicate adjective.",
 		}],
 		['be-T', {
 			'state': { 'directly_after_verb_with_adposition': 'from' },
@@ -166,9 +166,9 @@ const verb_case_frames = new Map([
 		['give-A', {
 			'patient': {
 				'directly_after_verb': { },
-				'missing_message': "\'give\' requires the patient to immediately follow the Verb. Make sure to use 'to X' for the destination.",
-			}
-		}]
+				'missing_message': "'give' requires the patient to immediately follow the Verb. Make sure to use 'to X' for the destination.",
+			},
+		}],
 	]],
 	['have', [
 		['know-J', { 'instrument': { 'by_adposition': 'with' } }],
@@ -276,7 +276,7 @@ const VERB_CASE_FRAME_RULES = create_verb_argument_rules()
  * @param {number} verb_index 
  * @param {((rules: ArgumentRulesForSense[]) => ArgumentRulesForSense[])} rules_modifier
  */
-export function check_verb_case_frames(tokens, verb_index, rules_modifier=(rules => rules)) {
+export function check_verb_case_frames(tokens, verb_index, rules_modifier=rules => rules) {
 	const verb_token = tokens[verb_index]
 	if (!token_has_concept(verb_token)) {
 		return
@@ -307,19 +307,19 @@ export function check_verb_case_frames_passive(tokens, verb_index) {
 	const passive_rules = [
 		parse_case_frame_rule(['patient', {
 			'directly_before_verb': { },
-			'missing_message': 'A patient is required, which goes before the Verb in the passive.'
+			'missing_message': 'A patient is required, which goes before the Verb in the passive.',
 		}]),
 		parse_case_frame_rule(['agent', {
 			'by_adposition': 'by',
-			'missing_message': 'An agent is required, which for a passive is preceded by \'by\'.'
+			'missing_message': 'An agent is required, which for a passive is preceded by \'by\'.',
 		}]),
 	]
 
 	check_verb_case_frames(tokens, verb_index, sense_rules => 
 		sense_rules.map(rules_for_sense => ({
 			...rules_for_sense,
-			rules: rules_for_sense.rules.filter(rule => !['patient', 'agent'].includes(rule.role_tag)).concat(passive_rules)
-		}))
+			rules: rules_for_sense.rules.filter(rule => !['patient', 'agent'].includes(rule.role_tag)).concat(passive_rules),
+		})),
 	)
 }
 

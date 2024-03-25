@@ -211,7 +211,7 @@ function create_lookup_result({ stem, part_of_speech }, { form='stem', concept=n
 		form,
 		concept,
 		how_to,
-		case_frame: create_case_frame({ is_valid: true, rule: create_sense_argument_rule({ sense: concept?.sense }) })
+		case_frame: create_case_frame({ is_valid: true, rule: create_sense_argument_rule({ sense: concept?.sense }) }),
 	}
 }
 

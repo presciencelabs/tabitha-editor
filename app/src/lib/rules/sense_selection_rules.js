@@ -38,7 +38,7 @@ const verb_sense_rules = [
 		// senses with unique states
 		['be-C', { 'state': {
 			'stem': 'man|woman',
-			'context': { 'precededby': [{ 'tag': 'indefinite_article', 'skip': 'adjp_modifiers' }, { 'category': 'Adjective' }] },
+			'context': { 'precededby': [{ 'tag': 'indefinite_article', 'skip': 'adjp_modifiers_attributive' }, { 'category': 'Adjective' }] },
 		} }],	// class membership (eg. John is a wicked man)
 		['be-Q', { 'state': { 'stem': 'bronze|clay|cloth|gold|iron|metal|sackcloth|silver|wood' } } ],	// substance (made of)
 		['be-M', { 'state': { 'stem': 'ancestor|brother|child|daughter|descendant|father|husband|mother|sister|son|wife' } }],	// kinship

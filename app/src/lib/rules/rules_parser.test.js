@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { TOKEN_TYPE, create_token } from '../parser/token'
 import { create_context_filter, create_token_filter, create_token_transform } from './rules_parser'
+import { create_case_frame } from './case_frame'
 
 describe('token filters', () => {
 	test('all', () => {
@@ -84,7 +85,7 @@ describe('context filters', () => {
 
 		expect(results.every(result => result.success)).toBe(true)
 	})
-	test('invalid filter results in false', () => {
+	test('invalid filter results in true', () => {
 		const context_json = { 'followedby': 'invalid' }
 		const filter = create_context_filter(context_json)
 
@@ -95,7 +96,20 @@ describe('context filters', () => {
 		]
 		const results = tokens.map((_, i) => filter(tokens, i))
 
-		expect(results.some(result => result.success)).toBe(false)
+		expect(results.some(result => result.success)).toBe(true)
+	})
+	test('empty filter results in true', () => {
+		const context_json = { 'followedby': { } }
+		const filter = create_context_filter(context_json)
+
+		const tokens = [
+			create_token('text', TOKEN_TYPE.LOOKUP_WORD, { lookup_term: 'text' }),
+			create_token('token', TOKEN_TYPE.LOOKUP_WORD, { lookup_term: 'token' }),
+			create_token('other', TOKEN_TYPE.LOOKUP_WORD, { lookup_term: 'other' }),
+		]
+		const results = tokens.map((_, i) => filter(tokens, i))
+
+		expect(results.some(result => result.success)).toBe(true)
 	})
 	test('followed by', () => {
 		const context_json = { 'followedby': { 'token': 'other' } }
@@ -393,6 +407,7 @@ function create_lookup_result(stem, { sense='A', part_of_speech='Noun', level=1 
 		form: 'stem',
 		concept,
 		how_to: [],
+		case_frame: create_case_frame(),
 	}
 }
 

@@ -3,6 +3,7 @@ import { ERRORS } from '../parser/error_messages'
 import { apply_rules } from './rules_processor'
 import { describe, expect, test } from 'vitest'
 import { PART_OF_SPEECH_RULES } from './part_of_speech_rules'
+import { create_case_frame } from './case_frame'
 
 /**
  * 
@@ -62,6 +63,7 @@ function create_lookup_result(stem, { sense='A', part_of_speech='Noun', level=1 
 		form: 'stem',
 		concept,
 		how_to: [],
+		case_frame: create_case_frame(),
 	}
 }
 
