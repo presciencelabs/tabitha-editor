@@ -170,8 +170,7 @@ function find_matching_sense(tokens, token_index) {
  */
 function select_verb_sense(tokens, verb_index) {
 	const verb_token = tokens[verb_index]
-	// At this point, a token with a specified sense only has one lookup result, so can be treated normally
-	// TODO after #84 check if token has specified sense (https://github.com/presciencelabs/tabitha-editor/issues/84)
+	const stem = verb_token.lookup_results[0].stem
 
 	// Move the valid lookups to the top
 	const valid_lookups = verb_token.lookup_results.filter(result => result.case_frame.is_valid)
@@ -180,8 +179,16 @@ function select_verb_sense(tokens, verb_index) {
 	
 	// Use the matching valid sense, or else the first valid sense, or else sense A.
 	// The lookups should already be ordered alphabetically so the first valid sense is the lowest letter
-	const sense_to_select = find_matching_sense(tokens, verb_index)
-		|| `${verb_token.lookup_results[0].stem}-${valid_lookups.at(0)?.concept?.sense ?? 'A'}`
+	const default_matching_sense = find_matching_sense(tokens, verb_index)
+		|| `${stem}-${valid_lookups.at(0)?.concept?.sense ?? 'A'}`
+
+	const specified_sense = verb_token.specified_sense ? `${stem}-${verb_token.specified_sense}` : ''
+
+	if (specified_sense === default_matching_sense) {
+		verb_token.suggest_message = 'Consider removing the sense, as it would be selected by default.'
+	}
+
+	const sense_to_select = specified_sense ? specified_sense : default_matching_sense
 	set_token_concept(verb_token, sense_to_select)
 
 	const selected_result = verb_token.lookup_results[0]
