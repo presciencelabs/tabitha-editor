@@ -1,4 +1,4 @@
-import { find_result_index, set_token_concept } from '$lib/parser/token'
+import { TOKEN_TYPE, find_result_index, set_token_concept } from '$lib/parser/token'
 import { create_context_filter, create_token_filter } from './rules_parser'
 
 /**
@@ -117,16 +117,20 @@ function parse_verb_sense_rule([sense, sense_rule_json]) {
 /** @type {Map<WordStem, [WordSense, ArgumentMatchFilter][]>} */
 const VERB_SENSE_FILTER_RULES = new Map(verb_sense_rules.map(([stem, sense_rules]) => [stem, sense_rules.map(parse_verb_sense_rule)]))
 
+const SENSE_FILTER_RULES = new Map([
+	['Verb', VERB_SENSE_FILTER_RULES],
+])
+
 /** @type {BuiltInRule[]} */
 const sense_rules = [
 	{
-		name: 'Verb sense selection',
-		comment:'',
+		name: 'Word sense selection',
+		comment: '',
 		rule: {
-			trigger: create_token_filter({ 'category': 'Verb' }),
+			trigger: create_token_filter({ 'type': TOKEN_TYPE.LOOKUP_WORD }),
 			context: create_context_filter({ }),
 			action: (tokens, trigger_index) => {
-				select_verb_sense(tokens, trigger_index)
+				select_word_sense(tokens, trigger_index)
 				return trigger_index + 1
 			},
 		},
@@ -144,8 +148,9 @@ export const SENSE_RULES = sense_rules.map(({ rule }) => rule)
 function find_matching_sense(tokens, token_index) {
 	const token = tokens[token_index]
 	const stem = token.lookup_results[0].stem
-	const verb_sense_filters = VERB_SENSE_FILTER_RULES.get(stem) ?? []
-	return verb_sense_filters.find(sense_matches)?.[0]
+	const category = token.lookup_results[0].part_of_speech
+	const sense_filters = SENSE_FILTER_RULES.get(category)?.get(stem) ?? []
+	return sense_filters.find(sense_matches)?.[0]
 
 	/**
 	 * 
@@ -168,7 +173,7 @@ function find_matching_sense(tokens, token_index) {
  * @param {Token[]} tokens
  * @param {number} verb_index
  */
-function select_verb_sense(tokens, verb_index) {
+function select_word_sense(tokens, verb_index) {
 	const verb_token = tokens[verb_index]
 	const stem = verb_token.lookup_results[0].stem
 
