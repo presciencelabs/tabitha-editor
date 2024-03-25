@@ -194,3 +194,46 @@ export function flatten_sentence(sentence) {
 export function concept_with_sense(concept) {
 	return `${concept.stem}-${concept.sense}`
 }
+
+/**
+ * 
+ * @param {LookupWord} lookup
+ * @param {Object} [other_data={}] 
+ * @param {string} [other_data.form='stem'] 
+ * @param {OntologyResult?} [other_data.concept=null] 
+ * @param {HowToResult[]} [other_data.how_to=[]] 
+ * @param {CaseFrameResult?} [other_data.case_frame=null] 
+ * @returns {LookupResult}
+ */
+export function create_lookup_result({ stem, part_of_speech }, { form='stem', concept=null, how_to=[], case_frame=null }={}) {
+	return {
+		stem,
+		part_of_speech,
+		form,
+		concept,
+		how_to,
+		case_frame: case_frame ?? create_case_frame({ is_valid: true, is_checked: false }),
+	}
+}
+
+/**
+ * 
+ * @param {Object} [data={}] 
+ * @param {boolean} [data.is_valid=false] 
+ * @param {boolean} [data.is_checked=false] 
+ * @param {ArgumentRulesForSense?} [data.rule={}] 
+ * @param {RoleMatchResult[]} [data.valid_arguments=[]] 
+ * @param {RoleMatchResult[]} [data.extra_arguments=[]] 
+ * @param {RoleTag[]} [data.missing_arguments=[]] 
+ * @returns {CaseFrameResult}
+ */
+export function create_case_frame({ is_valid=false, is_checked=false, rule=null, valid_arguments=[], extra_arguments=[], missing_arguments=[] }={}) {
+	return {
+		is_valid,
+		is_checked,
+		rule: rule ?? { sense: '', rules: [], other_optional: [], other_required: [], patient_clause_type: '' },
+		valid_arguments,
+		extra_arguments,
+		missing_arguments,
+	}
+}

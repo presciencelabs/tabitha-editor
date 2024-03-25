@@ -1,6 +1,6 @@
 import { ERRORS } from '$lib/parser/error_messages'
 import { TOKEN_TYPE, convert_to_error_token, create_added_token } from '$lib/parser/token'
-import { validate_case_frame } from './case_frame/common'
+import { validate_case_frame } from './case_frame'
 import { create_context_filter, create_token_filter, create_token_modify_action } from './rules_parser'
 
 const checker_rules_json = [

@@ -157,7 +157,7 @@ const part_of_speech_rules_json = [
 			'precededby': { 'category': 'Verb', 'stem': 'be|feel', 'skip': ['vp_modifiers', 'adjp_modifiers_predicative'] },
 		},
 		'remove': 'Noun',
-		'comment': 'Infected Eye 1:1 Melissa\'s eye is sore(N/Adj).  Infected Eye 1:15 Janet\'s eyes were still sore(N/Adj).',
+		'comment': "Infected Eye 1:1 Melissa's eye is sore(N/Adj).  Infected Eye 1:15 Janet's eyes were still sore(N/Adj).",
 	},
 	{
 		'name': 'If Verb-Adjective preceded by an article or possessive, remove Verb',

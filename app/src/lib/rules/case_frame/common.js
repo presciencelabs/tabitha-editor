@@ -1,7 +1,6 @@
-import { TOKEN_TYPE, concept_with_sense } from '$lib/parser/token'
+import { TOKEN_TYPE, concept_with_sense, create_case_frame } from '$lib/parser/token'
 import { pipe } from '$lib/pipeline'
 import { apply_token_transforms, create_context_filter, create_token_filter, create_token_transform, create_token_transforms } from '../rules_parser'
-import { check_verb_case_frames, check_verb_case_frames_passive } from './verbs'
 
 /**
  * 
@@ -10,11 +9,11 @@ import { check_verb_case_frames, check_verb_case_frames_passive } from './verbs'
  */
 function missing_argument_message(role_tag) {
 	const messages = new Map([
-		['agent_clause', 'And agent clause is required (e.g. \'It Verb [X...]\' or \'[X...] Verb...\').'],
+		['agent_clause', "And agent clause is required (e.g. 'It Verb [X...]' or '[X...] Verb...')."],
 		['patient_clause_quote_begin', 'A direct-speech patient clause is required.'],
 		['patient_clause_different_participant', 'A different-participant patient clause is required (i.e. the clause subject must be explicit).'],
-		['patient_clause_same_participant', 'A same-participant patient clause is required (e.g. \'... [to sing]\').'],
-		['patient_clause_simultaneous', 'A simultaneous perception clause is required (e.g. \'John saw [Mary singing]\').'],
+		['patient_clause_same_participant', "A same-participant patient clause is required (e.g. '... [to sing]')."],
+		['patient_clause_simultaneous', "A simultaneous perception clause is required (e.g. 'John saw [Mary singing]')."],
 	])
 	return messages.get(role_tag) ?? `A ${role_tag} is required.`
 }
@@ -337,76 +336,3 @@ export function validate_case_frame(tokens, trigger_index) {
 		}
 	}
 }
-
-/**
- * 
- * @param {Object} [data={}] 
- * @param {boolean} [data.is_valid=false] 
- * @param {boolean} [data.is_checked=false] 
- * @param {ArgumentRulesForSense?} [data.rule={}] 
- * @param {RoleMatchResult[]} [data.valid_arguments=[]] 
- * @param {RoleMatchResult[]} [data.extra_arguments=[]] 
- * @param {RoleTag[]} [data.missing_arguments=[]] 
- * @returns {CaseFrameResult}
- */
-export function create_case_frame({ is_valid=false, is_checked=false, rule=null, valid_arguments=[], extra_arguments=[], missing_arguments=[] }={}) {
-	return {
-		is_valid,
-		is_checked,
-		rule: rule ?? create_sense_argument_rule(),
-		valid_arguments,
-		extra_arguments,
-		missing_arguments,
-	}
-}
-
-/**
- * 
- * @param {Object} [data={}] 
- * @param {string} [data.sense=''] 
- * @param {ArgumentRoleRule[]} [data.rules=[]] 
- * @param {RoleTag[]} [data.other_optional=[]] 
- * @param {RoleTag[]} [data.other_required=[]] 
- * @param {RoleTag} [data.patient_clause_type=''] 
- * @returns {ArgumentRulesForSense}
- */
-export function create_sense_argument_rule({ sense='', rules=[], other_optional=[], other_required=[], patient_clause_type='' }={}) {
-	return { sense, rules, other_optional, other_required, patient_clause_type }
-}
-
-/** @type {BuiltInRule[]} */
-const case_frame_rules = [
-	{
-		name: 'Verb case frame, active',
-		comment: 'For now, only trigger when not within a relative clause, question, or possible same-subject clause since arguments get moved around',
-		rule: {
-			trigger: create_token_filter({ 'category': 'Verb' }),
-			context: create_context_filter({
-				'notprecededby': { 'tag': 'relativizer|passive|infinitive', 'skip': 'all' },
-				'notfollowedby': { 'token': '?', 'skip': 'all' },
-			}),
-			action: (tokens, trigger_index) => {
-				check_verb_case_frames(tokens, trigger_index)
-				return trigger_index + 1
-			},
-		},
-	},
-	{
-		name: 'Verb case frame, passive',
-		comment: 'For now, only trigger when not within a relative clause or a question since arguments get moved around',
-		rule: {
-			trigger: create_token_filter({ 'category': 'Verb' }),
-			context: create_context_filter({
-				'precededby': { 'tag': 'passive', 'skip': 'all' },
-				'notprecededby': { 'tag': 'relativizer', 'skip': 'all' },
-				'notfollowedby': { 'token': '?', 'skip': 'all' },
-			}),
-			action: (tokens, trigger_index) => {
-				check_verb_case_frames_passive(tokens, trigger_index)
-				return trigger_index + 1
-			},
-		},
-	},
-]
-
-export const CASE_FRAME_RULES = case_frame_rules.map(({ rule }) => rule)

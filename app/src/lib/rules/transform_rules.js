@@ -58,14 +58,14 @@ const transform_rules_json = [
 		'trigger': { 'tag': 'subordinate_clause' },
 		'context': { 'precededby': { 'tag': 'agent_proposition_subject', 'skip': 'all' } },
 		'transform': { 'tag': 'agent_clause' },
-		'comment': 'Ruth 2:22 It is good that you continue working...'
+		'comment': 'Ruth 2:22 It is good that you continue working...',
 	},
 	{
 		'name': 'tag subordinate clauses that directly precede the verb as agent clauses',
 		'trigger': { 'tag': 'subordinate_clause' },
 		'context': { 'followedby': { 'category': 'Verb' } },
 		'transform': { 'tag': 'agent_clause' },
-		'comment': 'It is true that John read that book'
+		'comment': 'It is true that John read that book',
 	},
 	{
 		'name': 'tag \'that\' relative clauses that occur with \'it\' as agent clauses',
@@ -287,11 +287,14 @@ const transform_rules_json = [
 		'trigger': { 'category': 'Noun' },
 		'context': {
 			'notprecededby': [{ 'category': 'Noun' }, { 'token': 'of', 'skip': 'np_modifiers' }],
-			'notfollowedby': { 'category': 'Noun', 'skip': [
-				{ 'tag': 'genitive_saxon|relative_clause' },	// can't use 'np_modifiers' since we don't skip the genitive_norman 'of'
-				'determiners',
-				'adjp_attributive',
-			]},
+			'notfollowedby': {
+				'category': 'Noun',
+				'skip': [
+					{ 'tag': 'genitive_saxon|relative_clause' },	// can't use 'np_modifiers' since we don't skip the genitive_norman 'of'
+					'determiners',
+					'adjp_attributive',
+				]
+			},
 		},
 		'transform': { 'tag': 'head_np' },
 	},

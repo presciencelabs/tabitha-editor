@@ -128,7 +128,7 @@ const sense_rules = [
 			action: (tokens, trigger_index) => {
 				select_verb_sense(tokens, trigger_index)
 				return trigger_index + 1
-			}
+			},
 		},
 	},
 ]

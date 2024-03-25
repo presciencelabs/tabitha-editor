@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'vitest'
-import { TOKEN_TYPE, create_token } from '../parser/token'
+import { TOKEN_TYPE, create_token, create_lookup_result } from '../parser/token'
 import { create_context_filter, create_token_filter, create_token_transform } from './rules_parser'
-import { create_case_frame } from './case_frame'
 
 describe('token filters', () => {
 	test('all', () => {
@@ -391,7 +390,7 @@ describe('context filters', () => {
  * @param {number} [data.level=1] 
  * @returns {LookupResult}
  */
-function create_lookup_result(stem, { sense='A', part_of_speech='Noun', level=1 }={}) {
+function lookup_w_concept(stem, { sense='A', part_of_speech='Noun', level=1 }={}) {
 	const concept = {
 		id: '0',
 		stem,
@@ -401,14 +400,7 @@ function create_lookup_result(stem, { sense='A', part_of_speech='Noun', level=1 
 		gloss: '',
 		categorization: '',
 	}
-	return {
-		stem,
-		part_of_speech,
-		form: 'stem',
-		concept,
-		how_to: [],
-		case_frame: create_case_frame(),
-	}
+	return create_lookup_result({ stem, part_of_speech }, { concept })
 }
 
 describe('token transforms', () => {
@@ -441,8 +433,8 @@ describe('token transforms', () => {
 
 		const token = create_token('token', TOKEN_TYPE.LOOKUP_WORD, { lookup_term: 'token' })
 		token.lookup_results = [
-			create_lookup_result('concept', { 'sense': 'A', 'part_of_speech': 'Noun' }),
-			create_lookup_result('concept', { 'sense': 'B', 'part_of_speech': 'Noun' }),
+			lookup_w_concept('concept', { 'sense': 'A', 'part_of_speech': 'Noun' }),
+			lookup_w_concept('concept', { 'sense': 'B', 'part_of_speech': 'Noun' }),
 		]
 
 		const result = transform(token)
