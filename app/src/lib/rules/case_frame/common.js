@@ -378,11 +378,11 @@ export function create_sense_argument_rule({ sense='', rules=[], other_optional=
 const case_frame_rules = [
 	{
 		name: 'Verb case frame, active',
-		comment: 'For now, only trigger when not within a relative clause, or a question since arguments get moved around',
+		comment: 'For now, only trigger when not within a relative clause, question, or possible same-subject clause since arguments get moved around',
 		rule: {
 			trigger: create_token_filter({ 'category': 'Verb' }),
 			context: create_context_filter({
-				'notprecededby': { 'tag': 'relativizer|passive', 'skip': 'all' },
+				'notprecededby': { 'tag': 'relativizer|passive|infinitive', 'skip': 'all' },
 				'notfollowedby': { 'token': '?', 'skip': 'all' },
 			}),
 			action: (tokens, trigger_index) => {
