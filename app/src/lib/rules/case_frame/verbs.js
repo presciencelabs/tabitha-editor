@@ -99,13 +99,13 @@ const verb_case_frames = new Map([
 		['ask-C', {
 			'patient': {
 				'by_clause_tag': 'patient_clause_different_participant',
-				'missing_message': "ask-C should be written in the format 'X asked [Y to Verb]'."
+				'missing_message': "ask-C should be written in the format 'X asked [Y to Verb]'.",
 			},
 			'other_extra': {
 				'extra_patient': {
 					'directly_after_verb': { },
-					'extra_message': "ask-C should not be written with the patient. Use the format 'X asked [Y to Verb]'."
-				}
+					'extra_message': "ask-C should not be written with the patient. Use the format 'X asked [Y to Verb]'.",
+				},
 			},
 			'comment': 'the patient is omitted in the phase 1 and copied from within the subordinate. so treat the clause like the patient',
 		}],
@@ -117,7 +117,7 @@ const verb_case_frames = new Map([
 		['ask-F', {
 			'patient_clause_different_participant': [
 				{
-					'by_clause_tag': 'patient_clause_quote_begin',
+					'by_clause_tag': 'patient_clause_different_participant',
 					'missing_message': "ask-F should be written in the format 'asked X [(if//whether) ...]' (with or without the if/whether)",
 				},
 				{
@@ -128,6 +128,7 @@ const verb_case_frames = new Map([
 					// TODO make if/whether function words using a subtoken context transform
 				},
 			],
+			'comment': "This can be written as 'asked X [(if//whether) ...]' (with or without the if/whether)",
 		}],
 	]],
 	['be', [
@@ -250,12 +251,15 @@ const verb_case_frames = new Map([
 			'instrument': { 'by_adposition': 'with' },
 		}],
 		['make-C', {
-			// TODO find a better way to handle the different situations. examples:
+			// Possible accepted formats:
 			// Gen 22:16 make a promise [in my name](instrument).
 			// Gen 6:18 God made a covenant [with Noah](destination). (specific to 'covenant', usually 'to' indicates destination)
 			// Daniel 12:7 That man made a promise [by God](instrument). (not recognized in Analyzer but valid phase 1)
 			'instrument': [
-				{ 'by_adposition': 'by' },
+				{
+					'by_adposition': 'by',
+					'trigger': { 'tag': 'head_np', 'stem': 'God|Yahweh' },
+				},
 				{
 					'by_adposition': 'in',
 					'trigger': { 'tag': 'head_np', 'stem': 'name' },
@@ -267,8 +271,8 @@ const verb_case_frames = new Map([
 					'trigger': { 'tag': 'head_np' },
 					'context': { 'precededby': [{ 'stem': 'covenant' }, { 'token': 'with', 'skip': 'np_modifiers' }] },
 					'context_transform': [{}, { 'function': '' }],
-				}
-			]
+				},
+			],
 		}],
 		['make-E', { 'instrument': { 'by_adposition': 'with' } }],
 	]],
@@ -298,13 +302,13 @@ const verb_case_frames = new Map([
 		['tell-B', {
 			'patient': {
 				'by_clause_tag': 'patient_clause_different_participant',
-				'missing_message': "tell-B should be written in the format 'X told [Y to Verb]'."
+				'missing_message': "tell-B should be written in the format 'X told [Y to Verb]'.",
 			},
 			'other_extra': {
 				'extra_patient': {
 					'directly_after_verb': { },
-					'extra_message': "tell-B should not be written with the patient. Use the format 'X told [Y to Verb]'."
-				}
+					'extra_message': "tell-B should not be written with the patient. Use the format 'X told [Y to Verb]'.",
+				},
 			},
 			'comment': 'the patient is omitted in the phase 1 and copied from within the subordinate. so treat the clause like the patient',
 		}],
@@ -319,6 +323,9 @@ const verb_case_frames = new Map([
 			'patient': { },		// clear the patient so it doesn't get confused with the destination
 			'patient_clause_type': 'patient_clause_quote_begin',
 		}],
+	]],
+	['want', [
+		['want-B', { 'patient_clause_type': 'patient_clause_same_participant' }],
 	]],
 ])
 
@@ -418,7 +425,7 @@ export function check_verb_case_frames_passive(tokens, verb_index) {
 	const passive_rules = Object.entries(passive_rules_json).flatMap(parse_case_frame_rule)
 
 	check_verb_case_frames(tokens, verb_index,
-		role_rules => role_rules.filter(rule => !['patient', 'agent'].includes(rule.role_tag)).concat(passive_rules)
+		role_rules => role_rules.filter(rule => !['patient', 'agent'].includes(rule.role_tag)).concat(passive_rules),
 	)
 }
 

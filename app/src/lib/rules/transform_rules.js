@@ -110,6 +110,16 @@ const transform_rules_json = [
 		'transform': { 'tag': 'patient_clause_different_participant' },
 	},
 	{
+		'name': 'tag \'that\' at the beginning of a main clause as remove_demonstrative when followed by a noun',
+		'trigger': { 'token': 'That|that' },
+		'context': {
+			'notprecededby': { 'token': '[', 'skip': { 'category': 'Conjunction' } },
+			'followedby': { 'category': 'Noun', 'skip': 'np_modifiers' },
+		},
+		'transform': { 'tag': 'remote_demonstrative' },
+		'comment': 'this clears the relativizer tag',
+	},
+	{
 		'name': '"no" before a noun becomes negative_noun_polarity',
 		'trigger': { 'token': 'no' },
 		'context': { 'followedby': { 'category': 'Noun', 'skip': { 'category': 'Adjective' } } },
@@ -227,7 +237,7 @@ const transform_rules_json = [
 			},
 		},
 		'transform': { 'function': 'auxiliary|passive' },
-		'comment': 'skip all because it may be a question (eg. "Are those words written in the book?"). We\'ll have to assume it\'s not an error.'
+		'comment': 'skip all because it may be a question (eg. "Are those words written in the book?"). We\'ll have to assume it\'s not an error.',
 	},
 	{
 		'name': 'be before a participle Verb indicates imperfective',
@@ -240,7 +250,7 @@ const transform_rules_json = [
 			},
 		},
 		'transform': { 'function': 'auxiliary|imperfective_aspect' },
-		'comment': 'skip all because it may be a question (eg. "Are those people going?"). We\'ll have to assume it\'s not an error.'
+		'comment': 'skip all because it may be a question (eg. "Are those people going?"). We\'ll have to assume it\'s not an error.',
 	},
 	{
 		'name': 'Any \'be\' verb remaining before another verb becomes a generic auxiliary',
@@ -267,7 +277,7 @@ const transform_rules_json = [
 			'followedby': { 'tag': 'auxiliary', 'skip': 'all' },
 		},
 		'transform': { 'function': 'auxiliary' },
-		'comment': 'skip all because it may be a question (eg. "Is that bread being eaten?"). We\'ll have to assume it\'s not an error.'
+		'comment': 'skip all because it may be a question (eg. "Is that bread being eaten?"). We\'ll have to assume it\'s not an error.',
 	},
 	{
 		'name': 'by preceded by a passive be indicates the agent',
@@ -318,6 +328,7 @@ const transform_rules_json = [
 	},
 ]
 
+// TODO make these not built-in when we support subtokens context transforms. These need to be here in order to set the tag on the relativizers.
 /** @type {BuiltInRule[]} */
 const builtin_transform_rules = [
 	{
@@ -327,7 +338,7 @@ const builtin_transform_rules = [
 			trigger: create_token_filter({ 'tag': 'subordinate_clause' }),
 			context: create_context_filter({
 				'precededby': { 'category': 'Noun' },
-				'subtokens': { 'tag': 'relativizer', 'skip': { 'token': '[' } },
+				'subtokens': { 'tag': 'relativizer', 'skip': [{ 'token': '[' }, { 'category': 'Conjunction' }] },
 			}),
 			action: create_token_modify_action(token => {
 				const relativizer = token.sub_tokens[1]
@@ -343,7 +354,7 @@ const builtin_transform_rules = [
 			trigger: create_token_filter({ 'tag': 'subordinate_clause' }),
 			context: create_context_filter({
 				'notprecededby': { 'category': 'Noun' },
-				'subtokens': { 'token': 'that', 'skip': { 'token': '[' } },
+				'subtokens': { 'token': 'that', 'skip': [{ 'token': '[' }, { 'category': 'Conjunction' }] },
 			}),
 			action: create_token_modify_action(token => {
 				token.sub_tokens[1].tag = 'remote_demonstrative'

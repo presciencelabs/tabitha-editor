@@ -15,6 +15,7 @@ const verb_sense_rules = [
 	['ask', [
 		['ask-B', { }],	// prioritize ask-B over ask-A
 		['ask-D', { }],	// prioritize ask-D over ask-A
+		['ask-F', { }],	// prioritize ask-F over ask-A
 	]],
 	['be', [
 		// 'be' is very particular and so each sense is specified to make the priority clear. Not all verbs will need this.
@@ -89,6 +90,9 @@ const verb_sense_rules = [
 	['tell', [
 		// prioritize tell-C over tell-A due to the presence of the 'about'. tell-A may count as valid if there is a relative clause on its patient.
 		['tell-C', { }],
+	]],
+	['want', [
+		['want-D', { 'patient': { 'stem': 'peace|health|life' } }],
 	]],
 ]
 
