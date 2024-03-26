@@ -14,6 +14,14 @@ const transform_rules_json = [
 		'transform': { 'function': 'infinitive' },
 	},
 	{
+		'name': 'infinitive "to" as the first word of a subordinate should be tagged as "same subject"',
+		'trigger': { 'tag': 'infinitive' },
+		'context': {
+			'precededby': { 'token': '[', 'skip': { 'category': 'Conjunction' } },
+		},
+		'transform': { 'function': 'infinitive|infinitive_same_subject' },
+	},
+	{
 		'name': 'start or begin before a verb becomes a function word',
 		'trigger': { 'stem': 'start|begin' },
 		'context': {
@@ -79,7 +87,7 @@ const transform_rules_json = [
 	{
 		'name': 'tag subordinate clauses starting with the infinitive \'to\' as \'same_participant\'',
 		'trigger': { 'tag': 'subordinate_clause' },
-		'context': { 'subtokens': { 'tag': 'infinitive', 'skip': { 'token': '[' } } },
+		'context': { 'subtokens': { 'tag': 'infinitive_same_subject', 'skip': { 'token': '[' } } },
 		'transform': { 'tag': 'patient_clause_same_participant' },
 	},
 	{
@@ -215,10 +223,11 @@ const transform_rules_json = [
 			'followedby': {
 				'category': 'Verb',
 				'form': 'past participle',
-				'skip': 'vp_modifiers',
+				'skip': 'all',
 			},
 		},
 		'transform': { 'function': 'auxiliary|passive' },
+		'comment': 'skip all because it may be a question (eg. "Are those words written in the book?"). We\'ll have to assume it\'s not an error.'
 	},
 	{
 		'name': 'be before a participle Verb indicates imperfective',
@@ -227,16 +236,17 @@ const transform_rules_json = [
 			'followedby': {
 				'category': 'Verb',
 				'form': 'participle',
-				'skip': 'vp_modifiers',
+				'skip': 'all',
 			},
 		},
 		'transform': { 'function': 'auxiliary|imperfective_aspect' },
+		'comment': 'skip all because it may be a question (eg. "Are those people going?"). We\'ll have to assume it\'s not an error.'
 	},
 	{
 		'name': 'Any \'be\' verb remaining before another verb becomes a generic auxiliary',
 		'trigger': { 'category': 'Verb', 'stem': 'be' },
 		'context': {
-			'followedby': { 'category': 'Verb', 'skip': 'vp_modifiers' },
+			'followedby': { 'category': 'Verb', 'skip': 'all' },
 		},
 		'transform': { 'function': 'auxiliary' },
 		'comment': 'the more precise function may be ambiguous e.g. "was cry-out"',
@@ -245,10 +255,7 @@ const transform_rules_json = [
 		'name': 'have before a Verb indicates flashback/perfect',
 		'trigger': { 'stem': 'have' },
 		'context': {
-			'followedby': {
-				'category': 'Verb',
-				'skip': 'vp_modifiers',
-			},
+			'followedby': { 'category': 'Verb', 'skip': 'all' },
 		},
 		'transform': { 'function': 'auxiliary|flashback' },
 		'comment': 'don\'t check for the past participle form because of cases like "have cry-out"',
@@ -257,9 +264,10 @@ const transform_rules_json = [
 		'name': 'be before an auxiliary becomes an auxiliary',
 		'trigger': { 'stem': 'be' },
 		'context': {
-			'followedby': { 'tag': 'auxiliary', 'skip': 'vp_modifiers' },
+			'followedby': { 'tag': 'auxiliary', 'skip': 'all' },
 		},
 		'transform': { 'function': 'auxiliary' },
+		'comment': 'skip all because it may be a question (eg. "Is that bread being eaten?"). We\'ll have to assume it\'s not an error.'
 	},
 	{
 		'name': 'by preceded by a passive be indicates the agent',
@@ -303,8 +311,8 @@ const transform_rules_json = [
 		'name': 'tag predicate adjectives',
 		'trigger': { 'category': 'Adjective' },
 		'context': {
-			'precededby': { 'category': 'Verb', 'skip': ['vp_modifiers', 'adjp_modifiers_predicative'] },
-			'notfollowedby': { 'category': 'Noun', 'skip': 'np_modifiers' },
+			'precededby': { 'category': 'Verb', 'skip': 'all' },
+			'notfollowedby': { 'category': 'Noun', 'skip': ['np_modifiers', 'adjp_modifiers_predicative'] },
 		},
 		'transform': { 'tag': 'predicate_adjective' },
 	},
