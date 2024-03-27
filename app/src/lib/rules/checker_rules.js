@@ -462,7 +462,7 @@ const checker_rules_json = [
 	{
 		'name': 'Warn that \'come\' cannot be used for events, only things that move',
 		'trigger': { 'stem': 'come' },
-		'require': {
+		'suggest': {
 			'message': 'Note that \'come\' can only be used for things that move, NOT for events.',
 		},
 	},
