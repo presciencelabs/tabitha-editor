@@ -185,7 +185,7 @@ export function create_context_filter(context_json) {
 			}
 
 			const clause = tokens[start_index]
-			const result = subtoken_filter(clause.sub_tokens, 0)
+			const result = subtoken_filter(clause.sub_tokens, -1)	// use -1 so that the checks start at 0
 			return result.success ? context_result(true, { subtoken_indexes: result.context_indexes }) : result
 		}
 	}
