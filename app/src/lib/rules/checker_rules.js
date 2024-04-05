@@ -555,7 +555,7 @@ const builtin_checker_rules = [
 			context: create_context_filter({}),
 			action: message_set_action(({ trigger_token: token }) => {
 				const token_to_test = token.pronoun ? token.pronoun : token
-				if (REGEXES.STARTS_LOWERCASE.test(token_to_test.token) && !token_to_test.error_message) {
+				if (REGEXES.STARTS_LOWERCASE.test(token_to_test.token)) {
 					return { token_to_flag: token_to_test, error: ERRORS.FIRST_WORD_NOT_CAPITALIZED }
 				}
 			}),
@@ -578,7 +578,7 @@ const builtin_checker_rules = [
 		name: 'Check that level 2 words are not on their own',
 		comment: '',
 		rule: {
-			trigger: create_token_filter({ 'level': '2' }),
+			trigger: check_token_level(is_level(2)),
 			context: create_context_filter({}),
 			action: message_set_action(() => ({ error: ERRORS.WORD_LEVEL_TOO_HIGH })),
 		},
@@ -775,7 +775,8 @@ export const CHECKER_RULES = builtin_checker_rules.map(({ rule }) => rule).conca
 function check_token_level(level_check) {
 	return token => {
 		return token.lookup_results.length > 0
-			&& token.lookup_results.every(result => level_check(result.concept))
+			&& (token.specified_sense && level_check(token.lookup_results[0].concept)
+				|| token.lookup_results.every(result => level_check(result.concept)))
 	}
 }
 /**
@@ -785,7 +786,8 @@ function check_token_level(level_check) {
  */
 function check_ambiguous_level(level_check) {
 	return token => {
-		return token.lookup_results.length > 0
+		return token.specified_sense.length === 0
+			&& token.lookup_results.length > 0
 			&& level_check(token.lookup_results[0].concept)
 			&& token.lookup_results.filter(result => result.concept).some(result => !level_check(result.concept))
 	}

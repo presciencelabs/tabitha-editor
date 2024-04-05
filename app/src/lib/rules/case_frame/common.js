@@ -343,11 +343,17 @@ export function* validate_case_frame(trigger_context) {
 	const selected_result = token.lookup_results[0]
 	const case_frame = selected_result.case_frame
 
+	if (!case_frame.is_valid) {
+		yield { error: 'Invalid argument structure for {sense}. Consult the Ontology for correct usage.' }
+	}
+
 	// Show errors for missing and unexpected arguments
 	if (case_frame.missing_arguments.length) {
 		// TODO add appropriate error tokens instead of putting all the messages on the verb
 		const missing_messages = case_frame.missing_arguments.map(rule => rule.missing_message)
-		yield { error: `${missing_messages.join(' | ')} Consult the Ontology for correct usage.` }
+		for (const message of missing_messages) {
+			yield { error: message }
+		}
 	}
 
 	for (const extra_argument of case_frame.extra_arguments) {

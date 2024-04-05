@@ -67,7 +67,7 @@ describe('invalid tokens: pronouns', () => {
 
 			for (let i = 0; i < checked_tokens.length; i++) {
 				expect(checked_tokens[i].token).toEqual(test_tokens[i].token)
-				expect(checked_tokens[i].error_message).toMatch(/^First person pronouns/)
+				expect(checked_tokens[i].messages[0].error).toMatch(/^First person pronouns/)
 			}
 		})
 	})
@@ -91,7 +91,7 @@ describe('invalid tokens: pronouns', () => {
 			const checked_tokens = apply_rules(INPUT, PRONOUN_RULES).flatMap(flatten_sentence)
 
 			expect(checked_tokens[0].token).toEqual(test_tokens[0].token)
-			expect(checked_tokens[0].error_message).toMatch(/^Second person pronouns/)
+			expect(checked_tokens[0].messages[0].error).toMatch(/^Second person pronouns/)
 		})
 	})
 
@@ -147,7 +147,7 @@ describe('invalid tokens: pronouns', () => {
 			const checked_tokens = apply_rules(INPUT, PRONOUN_RULES).flatMap(flatten_sentence)
 
 			expect(checked_tokens[0].token).toEqual(test_tokens[0].token)
-			expect(checked_tokens[0].error_message).toMatch(/^Third person pronouns/)
+			expect(checked_tokens[0].messages[0].error).toMatch(/^Third person pronouns/)
 		})
 	})
 
@@ -160,9 +160,9 @@ describe('invalid tokens: pronouns', () => {
 
 		const test_clause_tokens = test_tokens[0].clause.sub_tokens
 		expect(checked_tokens[0].token).toEqual(test_clause_tokens[0].token)
-		expect(checked_tokens[0].pronoun?.error_message).toMatch(/^Third person pronouns/)
+		expect(checked_tokens[0].pronoun?.messages[0].error).toMatch(/^Third person pronouns/)
 		expect(checked_tokens[1].token).toEqual(test_clause_tokens[1].token)
-		expect(checked_tokens[1].pronoun?.error_message).toMatch(/^Unrecognized pronoun/)
+		expect(checked_tokens[1].pronoun?.messages[0].error).toMatch(/^Unrecognized pronoun/)
 	})
 
 	test('invalid: catches mine, yours, ours, and each-other', () => {
@@ -172,12 +172,12 @@ describe('invalid tokens: pronouns', () => {
 		const test_clause_tokens = test_tokens[0].clause.sub_tokens
 
 		expect(checked_tokens[0].token).toEqual(test_clause_tokens[0].token)
-		expect(checked_tokens[0].error_message).toMatch(/^"mine" should be/)
+		expect(checked_tokens[0].messages[0].error).toMatch(/^"mine" should be/)
 		expect(checked_tokens[1].token).toEqual(test_clause_tokens[1].token)
-		expect(checked_tokens[1].error_message).toMatch(/^"yours" should be/)
+		expect(checked_tokens[1].messages[0].error).toMatch(/^"yours" should be/)
 		expect(checked_tokens[2].token).toEqual(test_clause_tokens[2].token)
-		expect(checked_tokens[2].error_message).toMatch(/^"ours" should be/)
+		expect(checked_tokens[2].messages[0].error).toMatch(/^"ours" should be/)
 		expect(checked_tokens[3].token).toEqual(test_clause_tokens[3].token)
-		expect(checked_tokens[3].error_message).toMatch(/^"each-other" requires/)
+		expect(checked_tokens[3].messages[0].error).toMatch(/^"each-other" requires/)
 	})
 })

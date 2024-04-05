@@ -4,8 +4,7 @@ interface MessagedToken {
 	token: string
 	type: TokenType
 	tag: Tag
-	error_message: string
-	suggest_message: string
+	messages: Message[]
 }
 
 interface Token extends MessagedToken {

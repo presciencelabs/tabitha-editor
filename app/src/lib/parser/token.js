@@ -32,8 +32,7 @@ export const TOKEN_TYPE = {
  * @param {string} token 
  * @param {TokenType} type 
  * @param {Object} [other_data={}] 
- * @param {string} [other_data.error=''] 
- * @param {string} [other_data.suggest=''] 
+ * @param {Message?} [other_data.message=null] 
  * @param {Tag} [other_data.tag={}] 
  * @param {string} [other_data.specified_sense=''] 
  * @param {string} [other_data.lookup_term=''] 
@@ -42,12 +41,11 @@ export const TOKEN_TYPE = {
  * @param {Token?} [other_data.pronoun=null] 
  * @return {Token}
  */
-export function create_token(token, type, { error='', suggest= '', tag={}, specified_sense='', lookup_term='', sub_tokens=[], pairing=null, pronoun=null }={}) {
+export function create_token(token, type, { message=null, tag={}, specified_sense='', lookup_term='', sub_tokens=[], pairing=null, pronoun=null }={}) {
 	return {
 		token,
 		type,
-		error_message: error,
-		suggest_message: suggest,
+		messages: message ? [message] : [],
 		tag,
 		specified_sense,
 		lookup_terms: lookup_term ? [lookup_term] : [],
@@ -65,7 +63,7 @@ export function create_token(token, type, { error='', suggest= '', tag={}, speci
  * @returns {Token}
  */
 export function create_added_token(token, message) {
-	return create_token(token, TOKEN_TYPE.ADDED, { ...message })
+	return create_token(token, TOKEN_TYPE.ADDED, { message })
 }
 
 /**
@@ -79,7 +77,9 @@ export function set_message(trigger_context, message_info) {
 	const token_to_flag = message_info.token_to_flag ?? trigger_context.trigger_token
 	
 	if (message_info.plain) {
-		set_message_plain(token_to_flag, message_info)
+		// Can't pass in message_info directly because it has extra fields that can't be sent in the API.
+		const { error, suggest } = message_info
+		set_message_plain(token_to_flag, { error, suggest })
 		return
 	}
 
@@ -95,11 +95,9 @@ export function set_message(trigger_context, message_info) {
  * @param {Message} message
  */
 export function set_message_plain(token, message) {
-	if (message.error) {
-		token.error_message = message.error
-	}
-	if (message.suggest) {
-		token.suggest_message = message.suggest
+	// We don't want to add the message if an empty string is passed in
+	if (message.error || message.suggest) {
+		token.messages.push(message)
 	}
 }
 
@@ -198,7 +196,7 @@ export function split_stem_and_sense(term) {
  * @returns {boolean}
  */
 export function token_has_error(token) {
-	return token.error_message.length > 0
+	return token.messages.some(message => message.error)
 }
 
 /**
@@ -207,7 +205,7 @@ export function token_has_error(token) {
  * @returns {boolean}
  */
 export function token_has_message(token) {
-	return token.error_message.length > 0 || token.suggest_message.length > 0
+	return token.messages.length > 0
 }
 
 /**

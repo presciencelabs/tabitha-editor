@@ -93,10 +93,10 @@ describe('built-in checker rules', () => {
 
 			const checked_tokens = apply_rules(test_tokens, CAPITALIZATION_RULE).flatMap(flatten_sentence)
 
-			expect(checked_tokens[0].error_message).toBe(ERRORS.FIRST_WORD_NOT_CAPITALIZED)
-			expect(checked_tokens[1].error_message).toBe(ERRORS.FIRST_WORD_NOT_CAPITALIZED)
-			expect(checked_tokens[2].error_message).toBe(ERRORS.FIRST_WORD_NOT_CAPITALIZED)
-			expect(checked_tokens[3].pronoun?.error_message).toBe(ERRORS.FIRST_WORD_NOT_CAPITALIZED)
+			expect(checked_tokens[0].messages[0].error).toBe(ERRORS.FIRST_WORD_NOT_CAPITALIZED)
+			expect(checked_tokens[1].messages[0].error).toBe(ERRORS.FIRST_WORD_NOT_CAPITALIZED)
+			expect(checked_tokens[2].messages[0].error).toBe(ERRORS.FIRST_WORD_NOT_CAPITALIZED)
+			expect(checked_tokens[3].pronoun?.messages[0].error).toBe(ERRORS.FIRST_WORD_NOT_CAPITALIZED)
 		})
 	})
 
@@ -114,11 +114,11 @@ describe('built-in checker rules', () => {
 	
 			const checked_tokens = apply_rules(test_tokens, LEVEL_CHECK_RULES).flatMap(flatten_sentence)
 	
-			expect(checked_tokens[0].error_message).toBe('')
-			expect(checked_tokens[1].error_message).toBe('')
-			expect(checked_tokens[2].error_message).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)
-			// expect(checked_tokens[3].error_message).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)	// TODO renable when the rule is fixed
-			expect(checked_tokens[4].error_message).toBe('')
+			expect(checked_tokens[0].messages.length).toBe(0)
+			expect(checked_tokens[1].messages.length).toBe(0)
+			expect(checked_tokens[2].messages[0].error).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)
+			// expect(checked_tokens[3].messages[0].error).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)	// TODO renable when the rule is fixed
+			expect(checked_tokens[4].messages.length).toBe(0)
 		})
 		test('pairing: both words right level', () => {
 			const test_tokens = [create_sentence([
@@ -162,10 +162,10 @@ describe('built-in checker rules', () => {
 	
 			const checked_tokens = apply_rules(test_tokens, LEVEL_CHECK_RULES).flatMap(flatten_sentence)
 	
-			expect(checked_tokens[0].error_message).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)
-			expect(checked_tokens[0].complex_pairing?.error_message).toBe('')
-			expect(checked_tokens[1].error_message).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)
-			expect(checked_tokens[1].complex_pairing?.error_message).toBe('')
+			expect(checked_tokens[0].messages[0].error).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)
+			expect(checked_tokens[0].complex_pairing?.messages.length).toBe(0)
+			expect(checked_tokens[1].messages[0].error).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)
+			expect(checked_tokens[1].complex_pairing?.messages.length).toBe(0)
 		})
 		test('pairing: second word wrong level', () => {
 			const test_tokens = [create_sentence([
@@ -181,10 +181,10 @@ describe('built-in checker rules', () => {
 	
 			const checked_tokens = apply_rules(test_tokens, LEVEL_CHECK_RULES).flatMap(flatten_sentence)
 	
-			expect(checked_tokens[0].error_message).toBe('')
-			expect(checked_tokens[0].complex_pairing?.error_message).toBe(ERRORS.WORD_LEVEL_TOO_LOW)
-			expect(checked_tokens[1].error_message).toBe('')
-			expect(checked_tokens[1].complex_pairing?.error_message).toBe(ERRORS.WORD_LEVEL_TOO_LOW)
+			expect(checked_tokens[0].messages.length).toBe(0)
+			expect(checked_tokens[0].complex_pairing?.messages[0].error).toBe(ERRORS.WORD_LEVEL_TOO_LOW)
+			expect(checked_tokens[1].messages.length).toBe(0)
+			expect(checked_tokens[1].complex_pairing?.messages[0].error).toBe(ERRORS.WORD_LEVEL_TOO_LOW)
 		})
 		test('pairing: both words wrong level', () => {
 			const test_tokens = [create_sentence([
@@ -200,10 +200,10 @@ describe('built-in checker rules', () => {
 	
 			const checked_tokens = apply_rules(test_tokens, LEVEL_CHECK_RULES).flatMap(flatten_sentence)
 	
-			expect(checked_tokens[0].error_message).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)
-			expect(checked_tokens[0].complex_pairing?.error_message).toBe(ERRORS.WORD_LEVEL_TOO_LOW)
-			expect(checked_tokens[1].error_message).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)
-			expect(checked_tokens[1].complex_pairing?.error_message).toBe(ERRORS.WORD_LEVEL_TOO_LOW)
+			expect(checked_tokens[0].messages[0].error).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)
+			expect(checked_tokens[0].complex_pairing?.messages[0].error).toBe(ERRORS.WORD_LEVEL_TOO_LOW)
+			expect(checked_tokens[1].messages[0].error).toBe(ERRORS.WORD_LEVEL_TOO_HIGH)
+			expect(checked_tokens[1].complex_pairing?.messages[0].error).toBe(ERRORS.WORD_LEVEL_TOO_LOW)
 		})
 	})
 	
@@ -229,10 +229,10 @@ describe('built-in checker rules', () => {
 	
 			const checked_tokens = apply_rules(test_tokens, AMBIGUOUS_LEVEL_CHECK).flatMap(flatten_sentence)
 	
-			expect(checked_tokens[0].suggest_message).toBe('')
-			expect(checked_tokens[1].suggest_message).toBe('')
-			expect(checked_tokens[2].suggest_message).toBe('')
-			expect(checked_tokens[3].suggest_message).toMatch(/^This word has multiple senses/)
+			expect(checked_tokens[0].messages.length).toBe(0)
+			expect(checked_tokens[1].messages.length).toBe(0)
+			expect(checked_tokens[2].messages.length).toBe(0)
+			expect(checked_tokens[3].messages[0].suggest).toMatch(/^This word has multiple senses/)
 		})
 		test('complex pairing level check', () => {
 			const test_tokens = [create_sentence([
@@ -265,10 +265,10 @@ describe('built-in checker rules', () => {
 	
 			const checked_tokens = apply_rules(test_tokens, AMBIGUOUS_LEVEL_CHECK).flatMap(flatten_sentence)
 	
-			expect(checked_tokens[0].complex_pairing?.suggest_message).toBe('')
-			expect(checked_tokens[1].complex_pairing?.suggest_message).toBe('')
-			expect(checked_tokens[2].complex_pairing?.suggest_message).toBe('')
-			expect(checked_tokens[3].complex_pairing?.suggest_message).toMatch(/^This word has multiple senses/)
+			expect(checked_tokens[0].complex_pairing?.messages.length).toBe(0)
+			expect(checked_tokens[1].complex_pairing?.messages.length).toBe(0)
+			expect(checked_tokens[2].complex_pairing?.messages.length).toBe(0)
+			expect(checked_tokens[3].complex_pairing?.messages[0].suggest).toMatch(/^This word has multiple senses/)
 		})
 	})
 	
@@ -286,9 +286,9 @@ describe('built-in checker rules', () => {
 	
 			const checked_tokens = apply_rules(test_tokens, NO_LOOKUP_CHECK).flatMap(flatten_sentence)
 	
-			expect(checked_tokens[0].suggest_message).toMatch(/^'token' is not in the Ontology/)
-			expect(checked_tokens[1].suggest_message).toMatch(/^'first' is not in the Ontology/)
-			expect(checked_tokens[1].complex_pairing?.suggest_message).toMatch(/^'second' is not in the Ontology/)
+			expect(checked_tokens[0].messages[0].suggest).toMatch(/^'token' is not in the Ontology/)
+			expect(checked_tokens[1].messages[0].suggest).toMatch(/^'first' is not in the Ontology/)
+			expect(checked_tokens[1].complex_pairing?.messages[0].suggest).toMatch(/^'second' is not in the Ontology/)
 		})
 	})
 })

@@ -48,7 +48,7 @@ function create_pronoun_token(pronoun, referent_token) {
  * @returns {Token}
  */
 function create_error_token(token, message) {
-	return create_token(token, TOKEN_TYPE.NOTE, { error: message })
+	return create_token(token, TOKEN_TYPE.NOTE, { message: { error: message } })
 }
 
 describe('tokenize_input', () => {
