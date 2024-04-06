@@ -53,7 +53,7 @@ function simplify_tokens(sentences) {
 			token,
 			type,
 			tag,
-			messages,
+			messages: messages.sort(message_compare),
 			lookup_results: lookup_results.map(simplify_lookup),
 			complex_pairing: complex_pairing ? simplify_token(complex_pairing) : null,
 			pronoun: pronoun ? simplify_token(pronoun) : null,
@@ -102,4 +102,22 @@ function simplify_tokens(sentences) {
 			missing_arguments: missing_arguments.map(rule => rule.role_tag),
 		}
 	}
+}
+
+/** @type {Map<MessageType, number>} */
+const MESSAGE_SEVERITY = new Map([
+	['error', 0],
+	['warning', 1],
+	['suggest', 2],
+	['info', 3],
+])
+
+/**
+ * 
+ * @param {Message} a 
+ * @param {Message} b 
+ */
+function message_compare(a, b) {
+	// @ts-ignore
+	return MESSAGE_SEVERITY.get(a.message_type) - MESSAGE_SEVERITY.get(b.message_type)
 }

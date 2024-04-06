@@ -425,8 +425,8 @@ function flag_extra_argument(trigger_context, message) {
 		if (['beneficiary', 'instrument'].includes(extra_argument.role_tag)) {
 			// These arguments are not necessarily an error, as many verbs could technically take them.
 			// Sometimes they just haven't occurred yet for a sense and so don't appear in the Verb categorization.
-			// So show a suggest message (or info message??) instead of an error.
-			return { token_to_flag, suggest: formatted_message, plain: true }
+			// So show a warning instead of an error.
+			return { token_to_flag, warning: formatted_message, plain: true }
 		} else {
 			return { token_to_flag, error: formatted_message, plain: true }
 		}

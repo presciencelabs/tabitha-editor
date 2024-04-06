@@ -67,6 +67,18 @@ export function create_added_token(token, message) {
 }
 
 /**
+ * 
+ * @param {Token[]} sub_tokens 
+ * @param {Tag} tag
+ */
+export function create_clause_token(sub_tokens, tag={ 'clause_type': 'subordinate_clause' }) {
+	return create_token('', TOKEN_TYPE.CLAUSE, { sub_tokens, tag })
+}
+
+/** @type {MessageType[]} */
+const MESSAGE_TYPES = ['error', 'warning', 'suggest', 'info']
+
+/**
  * Set the message on the given token in the message info, or the trigger token by default.
  * The message will be formatted based on the given token and the token context values within the rule context.
  * 
@@ -75,17 +87,18 @@ export function create_added_token(token, message) {
  */
 export function set_message(trigger_context, message_info) {
 	const token_to_flag = message_info.token_to_flag ?? trigger_context.trigger_token
-	
-	if (message_info.plain) {
-		// Can't pass in message_info directly because it has extra fields that can't be sent in the API.
-		const { error, suggest } = message_info
-		set_message_plain(token_to_flag, { error, suggest })
+
+	const message_type = MESSAGE_TYPES.find(message_type => message_type in message_info)
+	const message_text = message_type ? message_info[message_type] : undefined
+	if (!message_type || !message_text) {
 		return
 	}
 
-	const error = message_info.error ? format_token_message(trigger_context, message_info.error, token_to_flag) : ''
-	const suggest = message_info.suggest ? format_token_message(trigger_context, message_info.suggest, token_to_flag) : ''
-	set_message_plain(token_to_flag, { error, suggest })
+	const message = {
+		message_type,
+		message: message_info.plain ? message_text : format_token_message(trigger_context, message_text, token_to_flag),
+	}
+	set_message_plain(token_to_flag, message)
 }
 
 /**
@@ -95,10 +108,7 @@ export function set_message(trigger_context, message_info) {
  * @param {Message} message
  */
 export function set_message_plain(token, message) {
-	// We don't want to add the message if an empty string is passed in
-	if (message.error || message.suggest) {
-		token.messages.push(message)
-	}
+	token.messages.push(message)
 }
 
 /**
@@ -140,11 +150,23 @@ export function format_token_message({ tokens, trigger_token, context_indexes },
 
 /**
  * 
- * @param {Token[]} sub_tokens 
- * @param {Tag} tag
+ * @param {MessagedToken} token 
+ * @returns {boolean}
  */
-export function create_clause_token(sub_tokens, tag={ 'clause_type': 'subordinate_clause' }) {
-	return create_token('', TOKEN_TYPE.CLAUSE, { sub_tokens, tag })
+export function token_has_error(token) {
+	return token_has_message(token, 'error')
+}
+
+/**
+ * 
+ * @param {MessagedToken} token 
+ * @param {MessageType?} type_to_check
+ * @returns {boolean}
+ */
+export function token_has_message(token, type_to_check=null) {
+	return type_to_check
+		? token.messages.some(({ message_type }) => message_type === type_to_check)
+		: token.messages.length > 0
 }
 
 /**
@@ -188,24 +210,6 @@ export function split_stem_and_sense(term) {
 	// @ts-ignore the match will always succeed
 	const match = term.match(REGEXES.EXTRACT_STEM_AND_SENSE)
 	return { stem: match[1], sense: match[2] ?? '' }
-}
-
-/**
- * 
- * @param {MessagedToken} token 
- * @returns {boolean}
- */
-export function token_has_error(token) {
-	return token.messages.some(message => message.error)
-}
-
-/**
- * 
- * @param {MessagedToken} token 
- * @returns {boolean}
- */
-export function token_has_message(token) {
-	return token.messages.length > 0
 }
 
 /**

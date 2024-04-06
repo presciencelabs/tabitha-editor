@@ -24,12 +24,20 @@ type Sentence = {
 	clause: Clause
 }
 
+type MessageType = 'error' | 'warning' | 'suggest' | 'info'
+
 interface Message {
-	error?: string
-	suggest?: string
+	message_type: MessageType
+	message: string
+	// TODO #101 add optional fix_action structure
 }
 
-interface MessageInfo extends Message {
+interface MessageInfo {
+	// TODO find a more elegant way to do this?
+	error?: string
+	warning?: string
+	suggest?: string
+	info?: string
 	token_to_flag?: Token
 	plain?: boolean
 }

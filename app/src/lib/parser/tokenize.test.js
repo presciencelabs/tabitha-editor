@@ -35,7 +35,6 @@ function create_pairing(left_token, right_token) {
  * @returns {Token}
  */
 function create_pronoun_token(pronoun, referent_token) {
-	// const referent_token = create_word_token(referent, referent_lookup)
 	const pronoun_token = create_token(pronoun, TOKEN_TYPE.FUNCTION_WORD)
 	referent_token.pronoun = pronoun_token
 	return referent_token
@@ -48,7 +47,7 @@ function create_pronoun_token(pronoun, referent_token) {
  * @returns {Token}
  */
 function create_error_token(token, message) {
-	return create_token(token, TOKEN_TYPE.NOTE, { message: { error: message } })
+	return create_token(token, TOKEN_TYPE.NOTE, { message: { message_type: 'error', message: message } })
 }
 
 describe('tokenize_input', () => {

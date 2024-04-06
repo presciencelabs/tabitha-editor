@@ -40,7 +40,7 @@ const builtin_pronoun_rules = [
 		'name': 'Check for invalid stand-alone pronouns',
 		'comment': '',
 		'rule': {
-			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD,
+			trigger: ({ token }) => PRONOUN_MESSAGES.has(token.toLowerCase()),
 			context: create_context_filter({}),
 			action: message_set_action(({ trigger_token: { token } }) => ({ error: PRONOUN_MESSAGES.get(token.toLowerCase()) })),
 		},

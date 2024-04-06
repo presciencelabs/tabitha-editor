@@ -3,40 +3,33 @@
 	import Table from './Table.svelte'
 	import { Badge } from '$lib'
 	import Icon from '@iconify/svelte'
-    import { token_has_message } from '$lib/parser/token'
+	import { token_has_message } from '$lib/parser/token'
 
 	/** @type {SimpleToken} */
 	export let token
 
-	const any_errors = token.messages.some(message => message.error)
-	const any_suggests = token.messages.some(message => message.suggest)
-
-	const text_class = any_errors ? 'text-error' : any_suggests ? 'text-warning' : ''
+	const message_ui = {
+		error: { text_class: 'text-error', icon: 'close-circle' },
+		warning: { text_class: 'text-warning', icon: 'warning' },
+		suggest: { text_class: 'text-warning', icon: 'lightbulb' },
+		info: { text_class: 'text-info', icon: 'information' },
+	}
 </script>
 
 {#if token_has_message(token)}
-<PopupMenu color_classes="bg-base-200 text-base-content">
-	<Badge classes="badge-outline px-2 py-5 gap-2 join-item {text_class}" slot="button_content">
-		{#if any_errors}
-			<Icon icon="mdi:close-circle" class="h-6 w-6" />
-		{:else if any_suggests}
-			<Icon icon="mdi:lightbulb" class="h-6 w-6" />
-		{/if}
-		<slot />
-	</Badge>
+	{@const top_ui = message_ui[token.messages[0].message_type]}
+	<PopupMenu color_classes="bg-base-200 text-base-content">
+		<Badge classes="badge-outline px-2 py-5 gap-2 join-item {top_ui.text_class}" slot="button_content">
+			<Icon icon="mdi:{top_ui.icon}" class="h-6 w-6" />
+			<slot />
+		</Badge>
 
-	<Table slot="popup_content" entries={token.messages} classes="my-2">
-		<tr slot="entry_row" let:entry>
-			{#if entry.error}
-				<td><Icon icon="mdi:close-circle" class="h-6 w-6 text-error" /></td>
-				<td>{entry.error}</td>
-			{:else if entry.suggest}
-				<td><Icon icon="mdi:lightbulb" class="h-6 w-6 text-warning" /></td>
-				<td>{entry.suggest}</td>
-			{/if}
-		</tr>
-	</Table>
-</PopupMenu>
+		<Table slot="popup_content" entries={token.messages} classes="my-2">
+			<tr slot="entry_row" let:entry>
+				{@const { text_class, icon } = message_ui[entry.message_type]}
+				<td><Icon icon="mdi:{icon}" class="h-6 w-6 {text_class}" /></td>
+				<td>{entry.message}</td>
+			</tr>
+		</Table>
+	</PopupMenu>
 {/if}
-
-

@@ -241,7 +241,7 @@ export function tokenize_input(text = '') {
 	 * @returns {Token}
 	 */
 	function error_token(message) {
-		return create_token(collect_text(), TOKEN_TYPE.NOTE, { message: { error: message } })
+		return create_token(collect_text(), TOKEN_TYPE.NOTE, { message: { message_type: 'error', message: message } })
 	}
 
 	/**

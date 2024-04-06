@@ -5,6 +5,7 @@ import { LOOKUP_RULES } from './lookup_rules'
 import { parse_transform_rule } from './transform_rules'
 import { parse_checker_rule } from './checker_rules'
 import { parse_part_of_speech_rule } from './part_of_speech_rules'
+import { expect_error } from '$lib/test_helps'
 
 /**
  * 
@@ -290,7 +291,7 @@ describe('checker rules', () => {
 		expect(output_tokens.length).toBe(3)
 		expect(output_tokens[0].messages.length).toBe(0)
 		expect(output_tokens[1].token).toBe('add')
-		expect(output_tokens[1].messages[0].error).toBe('message')
+		expect_error(output_tokens[1], 'message')
 		expect(output_tokens[2].messages.length).toBe(0)
 	})
 	test('triggered with require precededby', () => {
@@ -316,7 +317,7 @@ describe('checker rules', () => {
 
 		expect(output_tokens.length).toBe(3)
 		expect(output_tokens[0].token).toBe('add')
-		expect(output_tokens[0].messages[0].error).toBe('message')
+		expect_error(output_tokens[0], 'message')
 		expect(output_tokens[1].messages.length).toBe(0)
 		expect(output_tokens[2].messages.length).toBe(0)
 	})
@@ -351,9 +352,9 @@ describe('checker rules', () => {
 
 		expect(output_tokens.length).toBe(4)
 		expect(output_tokens[0].token).toBe('add1')
-		expect(output_tokens[0].messages[0].error).toBe('message1')
+		expect_error(output_tokens[0], 'message1')
 		expect(output_tokens[1].token).toBe('add2')
-		expect(output_tokens[1].messages[0].error).toBe('message2')
+		expect_error(output_tokens[1], 'message2')
 		expect(output_tokens[2].messages.length).toBe(0)
 		expect(output_tokens[3].messages.length).toBe(0)
 	})
@@ -377,7 +378,7 @@ describe('checker rules', () => {
 
 		expect(output_tokens.length).toBe(2)
 		expect(output_tokens[0].token).toBe('token')
-		expect(output_tokens[0].messages[0].error).toBe('message')
+		expect_error(output_tokens[0], 'message')
 		expect(output_tokens[1].messages.length).toBe(0)
 	})
 	test('not triggered across sentences', () => {
@@ -456,7 +457,7 @@ describe('checker rules', () => {
 
 		expect(results.length).toBe(3)
 		expect(results[1].token).toBe('add')
-		expect(results[1].messages[0].error).toBe('message')
+		expect_error(results[1], 'message')
 	})
 })
 
