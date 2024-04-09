@@ -15,7 +15,7 @@ const checker_rules_json = [
 			'message': 'Third person pronouns should be replaced with the Noun they represent, e.g., Paul (instead of him).',
 		},
 	},
-	// TODO make an error again when certain passive-like verbs are dealt with better (eg. united-C with, married with, locked, etc, see #102)
+	// TODO make an error again when certain passive-like verbs are dealt with better (eg. united-C with, married with, locked, etc, see #105)
 	{
 		'name': 'Expect an agent of a passive',
 		'trigger': { 'category': 'Verb' },
