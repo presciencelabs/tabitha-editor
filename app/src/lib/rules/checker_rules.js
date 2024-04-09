@@ -519,7 +519,7 @@ const checker_rules_json = [
 		'comment': 'eg. John wanted XX[to be seen by Mary]XX.',
 	},
 	{
-		'name': 'Don\'t allow passives in \'same subject\' adverbial clauses',
+		'name': 'Don\'t allow passives in \'in-order-to\' adverbial clauses',
 		'trigger': { 'tag': { 'auxiliary': 'passive' } },
 		'context': {
 			'precededby': { 'stem': 'in-order-to', 'skip': 'all' },
@@ -529,7 +529,17 @@ const checker_rules_json = [
 		},
 		'comment': 'eg. John went to the market XX[in-order-to be seen by Mary]XX.',
 	},
-	
+	{
+		'name': 'Don\'t allow passives in \'by\' adverbial clauses',
+		'trigger': { 'tag': { 'auxiliary': 'passive' } },
+		'context': {
+			'precededby': { 'stem': 'by', 'skip': 'all' },
+		},
+		'require': {
+			'message': "Cannot use a passive within a 'by' clause because its subject is required to be the same as the outer Verb. Consider using 'because' instead. See P1 Checklist 24.",
+		},
+		'comment': 'eg. John went to the market XX[by being taken by Mary]XX.',
+	},
 	{
 		'name': "Don't allow negatives with 'purpose' adverbial clauses",
 		'trigger': { 'tag': { 'clause_type': 'adverbial_clause' } },
