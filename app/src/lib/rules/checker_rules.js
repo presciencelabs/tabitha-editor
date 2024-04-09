@@ -15,6 +15,7 @@ const checker_rules_json = [
 			'message': 'Third person pronouns should be replaced with the Noun they represent, e.g., Paul (instead of him).',
 		},
 	},
+	// TODO make an error again when certain passive-like verbs are dealt with better (eg. united-C with, married with, locked, etc, see #102)
 	{
 		'name': 'Expect an agent of a passive',
 		'trigger': { 'category': 'Verb' },
@@ -22,10 +23,11 @@ const checker_rules_json = [
 			'precededby': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
 			'notfollowedby': { 'tag': [{ 'role': 'agent' }, { 'syntax': 'agent_of_passive' }], 'skip': 'all' },
 		},
-		'require': {
+		'suggest': {
 			'followedby': 'by X',
-			'message': 'Missing agent of passive verb. Use _implicitActiveAgent if necessary.',
+			'message': 'If this is a passive Verb, make sure to include an explicit agent. Use _implicitActiveAgent if necessary.',
 		},
+		'comment': 'A passive verb requires a "by X" agent. Some verbs that look like passives aren\'t actually passives, so make this a suggestion instead of error.',
 	},
 	{
 		'name': 'Suggest avoiding the Perfect aspect',
