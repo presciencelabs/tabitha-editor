@@ -72,10 +72,10 @@ const part_of_speech_rules_json = [
 		'name': 'If Noun-Verb preceded by a Noun, delete the Noun',
 		'category': 'Noun|Verb',
 		'context': {
-			'precededby': { 'category': 'Noun' },
+			'precededby': { 'category': 'Noun', 'skip': { 'tag': { 'clause_type': 'relative_clause' } } },
 		},
 		'remove': 'Noun',
-		'comment': 'Daniel 3:9  I(astrologer) hope(N/V) that...',
+		'comment': 'Daniel 3:9  I(astrologer) hope(N/V) that... "The people [that are in the tribe named Levi] saw(N/V) Mary."',
 	},
 	{
 		'name': 'If Adposition-Conjunction is the first word of a sentence, remove Adposition',
