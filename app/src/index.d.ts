@@ -24,15 +24,19 @@ type Sentence = {
 	clause: Clause
 }
 
-type MessageType = 'error' | 'warning' | 'suggest' | 'info'
+type MessageLabel = 'error' | 'warning' | 'suggest' | 'info'
 
-interface Message {
-	message_type: MessageType
+interface MessageType {
+	label: MessageLabel
+	severity: number
+}
+
+interface Message extends MessageType {
 	message: string
 	// TODO #101 add optional fix_action structure
 }
 
-interface MessageInfo {
+type MessageInfo = {
 	// TODO find a more elegant way to do this?
 	error?: string
 	warning?: string

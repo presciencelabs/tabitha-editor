@@ -1,5 +1,5 @@
 import { ERRORS } from '$lib/parser/error_messages'
-import { TOKEN_TYPE, create_added_token, format_token_message, set_message_plain } from '$lib/parser/token'
+import { TOKEN_TYPE, create_added_token, format_token_message, get_message_type, set_message_plain } from '$lib/parser/token'
 import { REGEXES } from '$lib/regexes'
 import { validate_case_frame } from './case_frame'
 import { create_context_filter, create_token_filter, message_set_action } from './rules_parser'
@@ -716,9 +716,11 @@ export function parse_checker_rule(rule_json) {
 	// @ts-ignore there will always be a message tag
 	const message_tag = ['require', 'warning', 'suggest', 'info'].find(tag => tag in rule_json)
 
-	/** @type {MessageType} */
+	/** @type {MessageLabel} */
 	// @ts-ignore the string will always be a MessageType
-	const message_type = message_tag === 'require' ? 'error' : message_tag
+	const message_label = message_tag === 'require' ? 'error' : message_tag
+	const message_type = get_message_type(message_label)
+
 	const action = checker_action(rule_json[message_tag], message_type)
 
 	return {
@@ -729,7 +731,7 @@ export function parse_checker_rule(rule_json) {
 
 	/**
 	 * @param {CheckerAction} action 
-	 * @param {MessageType} message_type 
+	 * @param {MessageType} message_type
 	 * @returns {RuleAction}
 	 */
 	function checker_action(action, message_type) {
@@ -738,7 +740,7 @@ export function parse_checker_rule(rule_json) {
 
 			const formatted_message = format_token_message(trigger_context, action.message)
 			const message = {
-				message_type,
+				...message_type,
 				message: formatted_message,
 			}
 

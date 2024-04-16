@@ -1,30 +1,21 @@
 import { REGEXES } from '$lib/regexes'
 
-/** @type {TokenType} */
-const PUNCTUATION = 'Punctuation'
-
-/** @type {TokenType} */
-const NOTE = 'Note'
-
-/** @type {TokenType} */
-const FUNCTION_WORD = 'FunctionWord'
-
-/** @type {TokenType} */
-const LOOKUP_WORD = 'Word'
-
-/** @type {TokenType} */
-const CLAUSE = 'Clause'
-
-/** @type {TokenType} */
-const ADDED = 'Added'
-
+/** @type { { [key: string]: TokenType } } */
 export const TOKEN_TYPE = {
-	PUNCTUATION,
-	NOTE,
-	FUNCTION_WORD,
-	LOOKUP_WORD,
-	CLAUSE,
-	ADDED,
+	PUNCTUATION: 'Punctuation',
+	NOTE: 'Note',
+	FUNCTION_WORD: 'FunctionWord',
+	LOOKUP_WORD: 'Word',
+	CLAUSE: 'Clause',
+	ADDED: 'Added',
+}
+
+/** @type { { [key: string]: MessageType } } */
+export const MESSAGE_TYPE = {
+	ERROR: { label: 'error', severity: 0 },
+	WARNING: { label: 'warning', severity: 1 },
+	SUGGEST: { label: 'suggest', severity: 2 },
+	INFO: { label: 'info', severity: 3 },
 }
 
 /**
@@ -75,8 +66,15 @@ export function create_clause_token(sub_tokens, tag={ 'clause_type': 'subordinat
 	return create_token('', TOKEN_TYPE.CLAUSE, { sub_tokens, tag })
 }
 
-/** @type {MessageType[]} */
-const MESSAGE_TYPES = ['error', 'warning', 'suggest', 'info']
+/**
+ * 
+ * @param {MessageLabel} label 
+ * @returns {MessageType}
+ */
+export function get_message_type(label) {
+	// @ts-ignore
+	return Object.values(MESSAGE_TYPE).find(message_type => message_type.label === label)
+}
 
 /**
  * Set the message on the given token in the message info, or the trigger token by default.
@@ -88,14 +86,14 @@ const MESSAGE_TYPES = ['error', 'warning', 'suggest', 'info']
 export function set_message(trigger_context, message_info) {
 	const token_to_flag = message_info.token_to_flag ?? trigger_context.trigger_token
 
-	const message_type = MESSAGE_TYPES.find(message_type => message_type in message_info)
-	const message_text = message_type ? message_info[message_type] : undefined
-	if (!message_type || !message_text) {
+	const message_type = Object.values(MESSAGE_TYPE).find(message_type => message_type.label in message_info)
+	const message_text = message_type ? message_info[message_type.label] : undefined
+	if (!message_text || !message_type) {
 		return
 	}
 
 	const message = {
-		message_type,
+		...message_type,
 		message: message_info.plain ? message_text : format_token_message(trigger_context, message_text, token_to_flag),
 	}
 	set_message_plain(token_to_flag, message)
@@ -160,12 +158,12 @@ export function token_has_error(token) {
 /**
  * 
  * @param {MessagedToken} token 
- * @param {MessageType?} type_to_check
+ * @param {MessageLabel?} type_to_check
  * @returns {boolean}
  */
 export function token_has_message(token, type_to_check=null) {
 	return type_to_check
-		? token.messages.some(({ message_type }) => message_type === type_to_check)
+		? token.messages.some(({ label }) => label === type_to_check)
 		: token.messages.length > 0
 }
 
