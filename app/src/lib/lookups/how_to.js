@@ -27,10 +27,14 @@ export async function check_how_to(lookup_token) {
 			}
 			lookup_token.lookup_results.push(new_result)
 
-		} else {
+		} else if (how_to_result.stem.toLowerCase() === lookup_token.lookup_terms[0].toLowerCase()) {
 			// The word exists in the how-to but not in the ontology, and may never be
 			const new_result = create_lookup_result(how_to_result, { how_to: [how_to_result] })
 			lookup_token.lookup_results.push(new_result)
+
+		} else {
+			// The word exists in the how-to but it doesn't match the token based on the form
+			// eg. the token 'witnessing' should not match with the how-to result for the Noun 'witness'
 		}
 	}
 
