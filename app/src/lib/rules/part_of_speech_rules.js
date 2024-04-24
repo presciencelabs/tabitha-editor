@@ -359,7 +359,7 @@ const builtin_part_of_speech_rules = [
 		comment: '',
 		rule: {
 			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD,
-			context: create_context_filter({ 'followedby': { 'token': '_noun|_verb|_adj|_adv' } }),
+			context: create_context_filter({ 'followedby': { 'token': '_noun|_verb|_adj|_adv|_adp' } }),
 			action: simple_rule_action(({ trigger_token, tokens, context_indexes }) => {
 				const part_of_speech_note = tokens[context_indexes[0]].token
 				const part_of_speech = new Map([
@@ -367,6 +367,7 @@ const builtin_part_of_speech_rules = [
 					['_verb', 'Verb'],
 					['_adj', 'Adjective'],
 					['_adv', 'Adverb'],
+					['_adp', 'Adposition'],
 				]).get(part_of_speech_note) ?? ''
 
 				keep_parts_of_speech(new Set([part_of_speech]))(trigger_token)
