@@ -652,6 +652,22 @@ const builtin_checker_rules = [
 		},
 	},
 	{
+		name: 'Check for words with ambiguous parts of speech',
+		comment: '',
+		rule: {
+			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD,
+			context: create_context_filter({}),
+			action: message_set_action(function* ({ trigger_token: token }) {
+				if (token.lookup_results.every(result => result.part_of_speech.toLowerCase() === token.lookup_results[0].part_of_speech.toLowerCase())) {
+					return {}
+				}
+				
+				yield { warning: 'The editor cannot determine which part of speech this word is, so some errors and warnings within the same clause may not be accurate.' }
+				yield { suggest: "Add '_noun', '_verb', '_adj', '_adv', or '_adp' after '{token}' if you want the editor to check the syntax more accurately." }
+			}),
+		},
+	},
+	{
 		name: 'Check argument structure/case frame',
 		comment: 'case frame rules can eventually be used for verbs, adjectives, adverbs, adpositions, and even conjunctions',
 		rule: {
