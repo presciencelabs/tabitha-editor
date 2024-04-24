@@ -358,7 +358,7 @@ const builtin_part_of_speech_rules = [
 		name: 'Select part-of-speech based on a note',
 		comment: '',
 		rule: {
-			trigger: token => token.type === TOKEN_TYPE.LOOKUP,
+			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD,
 			context: create_context_filter({ 'followedby': { 'token': '_noun|_verb|_adj|_adv' } }),
 			action: simple_rule_action(({ trigger_token, tokens, context_indexes }) => {
 				const part_of_speech_note = tokens[context_indexes[0]].token
