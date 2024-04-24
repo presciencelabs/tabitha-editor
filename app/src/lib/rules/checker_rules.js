@@ -643,10 +643,10 @@ const builtin_checker_rules = [
 			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD,
 			context: create_context_filter({}),
 			action: message_set_action(function* ({ trigger_token: token }) {
-				yield check_lookup_results(token)
+				yield* check_lookup_results(token)
 
 				if (token.complex_pairing) {
-					yield check_lookup_results(token.complex_pairing)
+					yield* check_lookup_results(token.complex_pairing)
 				}
 			}),
 		},
@@ -819,21 +819,21 @@ function check_ambiguous_level(level_check) {
 /**
  * 
  * @param {Token} token 
- * @returns {MessageInfo}
  */
-function check_lookup_results(token) {
+function* check_lookup_results(token) {
 	if (token.lookup_results.some(result => result.concept !== null && result.concept.id !== '0')) {
 		return {}
 	}
 
 	if (token.lookup_results.at(0)?.concept?.id === '0') {
-		return { token_to_flag: token, info: 'The {category} \'{stem}\' is not yet in the Ontology, but should be soon. Consult the How-To document for more info.' }
+		yield { token_to_flag: token, info: 'The {category} \'{stem}\' is not yet in the Ontology, but should be soon. Consult the How-To document for more info.' }
 
 	} else if (token.lookup_results.some(result => result.how_to.length > 0)) {
-		return { token_to_flag: token, error: 'The {category} \'{stem}\' is not in the Ontology. Hover over the word for hints from the How-To document.' }
+		yield { token_to_flag: token, error: 'The {category} \'{stem}\' is not in the Ontology. Hover over the word for hints from the How-To document.' }
 		
 	} else {
-		return { token_to_flag: token, warning: '\'{token}\' is not in the Ontology, or its form is not recognized. Consult the How-To document or consider using a different word.' }
+		yield { token_to_flag: token, warning: '\'{token}\' is not in the Ontology, or its form is not recognized. Consult the How-To document or consider using a different word.' }
+		yield { token_to_flag: token, warning: 'WARNING: Because this word is not recognized, errors and warnings within the same clause may not be accurate.' }
 	}
 }
 
