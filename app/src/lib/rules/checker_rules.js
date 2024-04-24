@@ -831,9 +831,13 @@ function* check_lookup_results(token) {
 	} else if (token.lookup_results.some(result => result.how_to.length > 0)) {
 		yield { token_to_flag: token, error: 'The {category} \'{stem}\' is not in the Ontology. Hover over the word for hints from the How-To document.' }
 		
+	} else if (token.lookup_results.length > 0) {
+		// a dummy result for an unknown word
+		yield { token_to_flag: token, warning: 'The {category} \'{token}\' is not in the Ontology, or its form is not recognized. Consult the How-To document or consider using a different word.' }
 	} else {
 		yield { token_to_flag: token, warning: '\'{token}\' is not in the Ontology, or its form is not recognized. Consult the How-To document or consider using a different word.' }
 		yield { token_to_flag: token, warning: 'WARNING: Because this word is not recognized, errors and warnings within the same clause may not be accurate.' }
+		yield { token_to_flag: token, suggest: "Add '_noun', '_verb', '_adj', '_adv', or '_adp' after the unknown word if you want the editor to check the syntax more accurately." }
 	}
 }
 
