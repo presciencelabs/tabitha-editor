@@ -70,7 +70,7 @@ const lookup_rules_json = [
 	},
 	{
 		'name': 'because of becomes because-B',
-		'trigger': { 'token': 'because' },
+		'trigger': { 'token': 'Because|because' },
 		'context': { 'followedby': { 'token': 'of' } },
 		'lookup': 'because-B',
 		'combine': 1,
