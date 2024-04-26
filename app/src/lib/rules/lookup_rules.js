@@ -183,7 +183,7 @@ export function parse_lookup_rule(rule_json) {
 	 * @param {RuleTriggerContext} trigger_context 
 	 * @returns {number}
 	 */
-	function lookup_rule_action({ tokens, trigger_index, context_indexes }) {
+	function lookup_rule_action({ tokens, trigger_index, trigger_token, context_indexes }) {
 		const lookup_terms = lookup_term.split('|')
 
 		// specify the sense if given in the lookup value
@@ -191,10 +191,11 @@ export function parse_lookup_rule(rule_json) {
 		lookup_terms[0] = stem
 		
 		tokens[trigger_index] = {
-			...tokens[trigger_index],
+			...trigger_token,
 			type: TOKEN_TYPE.LOOKUP_WORD,
-			specified_sense: sense || tokens[trigger_index].specified_sense,
+			specified_sense: sense || trigger_token.specified_sense,
 			lookup_terms,
+			lookup_results: trigger_token.lookup_results.filter(result => lookup_terms.includes(result.stem)),
 		}
 
 		if (context_indexes.length === 0) {
@@ -210,7 +211,7 @@ export function parse_lookup_rule(rule_json) {
 		
 		// combine context tokens into one
 		const tokens_to_combine = tokens.splice(trigger_index, combine + 1)
-		const new_token_value = tokens_to_combine.map(token => token.token).join(' ')
+		const new_token_value = tokens_to_combine.map(({ token }) => token).join(' ')
 		tokens.splice(trigger_index, 0, { ...tokens_to_combine[0], token: new_token_value })
 		return trigger_index + combine + 1
 	}
