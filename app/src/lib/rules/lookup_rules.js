@@ -1,5 +1,5 @@
 import { apply_token_transforms, create_context_filter, create_token_filter, create_token_transforms } from '$lib/rules/rules_parser'
-import { TOKEN_TYPE } from '../parser/token'
+import { TOKEN_TYPE, split_stem_and_sense } from '../parser/token'
 
 /**
  * These words/phrases (and some others) are accepted by the Analyzer as alternates for
@@ -107,7 +107,7 @@ const lookup_rules_json = [
 		'name': 'lift up',
 		'trigger': { 'stem': 'lift' },
 		'context': { 'followedby': { 'token': 'up', 'skip': 'all' } },
-		'lookup': 'lift',
+		'lookup': 'lift',		// TODO make this a case frame rule
 		'context_transform': { 'type': TOKEN_TYPE.FUNCTION_WORD },
 	},
 	{
@@ -184,7 +184,18 @@ export function parse_lookup_rule(rule_json) {
 	 * @returns {number}
 	 */
 	function lookup_rule_action({ tokens, trigger_index, context_indexes }) {
-		tokens[trigger_index] = { ...tokens[trigger_index], type: TOKEN_TYPE.LOOKUP_WORD, lookup_terms: lookup_term.split('|') }
+		const lookup_terms = lookup_term.split('|')
+
+		// specify the sense if given in the lookup value
+		const { stem, sense } = split_stem_and_sense(lookup_terms[0])
+		lookup_terms[0] = stem
+		
+		tokens[trigger_index] = {
+			...tokens[trigger_index],
+			type: TOKEN_TYPE.LOOKUP_WORD,
+			specified_sense: sense || tokens[trigger_index].specified_sense,
+			lookup_terms,
+		}
 
 		if (context_indexes.length === 0) {
 			return trigger_index + 1
