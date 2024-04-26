@@ -242,7 +242,9 @@ const verb_case_frames = new Map([
 		}],
 		['become-J', { 'state': { 'directly_after_verb_with_adposition': 'like' } }],
 	]],
-	['cause', []],
+	['cause', [
+		['cause-A', { 'other_optional': 'patient' }],
+	]],
 	['come', []],
 	['give', [
 		['give-A', {
