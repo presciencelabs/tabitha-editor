@@ -104,11 +104,11 @@ const part_of_speech_rules_json = [
 		'comment': 'only for \'so\'. \'for\' might be the \'for each...\' sense',
 	},
 	{
-		'name': 'If "so" appears anywhere else in the sentence, remove Conjunction',
+		'name': 'If "so/for" appears anywhere else in the sentence, remove Conjunction',
 		'category': 'Adposition|Conjunction',
-		'trigger': { 'stem': 'so' },
+		'trigger': { 'token': 'so|for' },
 		'remove': 'Conjunction',
-		'comment': 'This relies on the previous rule to catch all uses of the conjunction',
+		'comment': 'This relies on the fact these conjunctions must be the first word and therefore capitalized',
 	},
 	{
 		'name': 'If Adverb-Adjective followed by Noun, remove Adverb',
