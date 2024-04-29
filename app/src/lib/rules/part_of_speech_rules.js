@@ -52,15 +52,6 @@ const part_of_speech_rules_json = [
 		'comment': 'Preceded by an Adjective: Daniel 1:7 The official gave new names(N/V) to the men... Preceded by a Conjunction: Because we don\'t allow coordinate VPs in these propositions, if there\'s a Conjunction preceding the Noun/Verb, the word must be a Noun. Daniel 2:37 God has given wealth and honor(N/V) to you.',
 	},
 	{
-		'name': 'If Noun-Verb preceded by Verb, delete the Verb',
-		'category': 'Noun|Verb',
-		'context': {
-			'precededby': { 'category': 'Verb' },
-		},
-		'remove': 'Verb',
-		'comment': 'Preceded by a Verb: Daniel 3:2 people that collect tax(N/V)... Sometimes wrongly selects Noun when preceded by "be": You(people) should be teaching(N/V) other people about those things. (not sure how to fix this without breaking other cases)',
-	},
-	{
 		'name': 'If Noun-Verb preceded by certain Adpositions, delete the Verb',
 		'category': 'Noun|Verb',
 		'context': {
@@ -95,6 +86,15 @@ const part_of_speech_rules_json = [
 		},
 		'remove': 'Noun',
 		'comment': '"The people [that are in the tribe named Levi] saw(N/V) Mary." This only works because cases like "the judge\'s(N/V) house" are handled earlier.',
+	},
+	{
+		'name': 'If Noun-Verb preceded by Verb, delete the Verb',
+		'category': 'Noun|Verb',
+		'context': {
+			'precededby': { 'category': 'Verb' },
+		},
+		'remove': 'Verb',
+		'comment': 'Preceded by a Verb: Daniel 3:2 people that collect tax(N/V)... Sometimes wrongly selects Noun when preceded by "be": You(people) should be teaching(N/V) other people about those things. (not sure how to fix this without breaking other cases)',
 	},
 	{
 		'name': 'If Adposition-Conjunction is the first word of a sentence, remove Adposition',
