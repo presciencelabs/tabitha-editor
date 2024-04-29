@@ -46,21 +46,19 @@ const part_of_speech_rules_json = [
 		'name': 'If Noun-Verb preceded by Adjective or Conjunction, delete the Verb',
 		'category': 'Noun|Verb',
 		'context': {
-			'precededby': { 'category': 'Verb|Adjective|Conjunction' },
-			'notprecededby': { 'stem': 'be', 'skip': 'vp_modifiers' },
+			'precededby': { 'category': 'Adjective|Conjunction' },
 		},
 		'remove': 'Verb',
 		'comment': 'Preceded by an Adjective: Daniel 1:7 The official gave new names(N/V) to the men... Preceded by a Conjunction: Because we don\'t allow coordinate VPs in these propositions, if there\'s a Conjunction preceding the Noun/Verb, the word must be a Noun. Daniel 2:37 God has given wealth and honor(N/V) to you.',
 	},
 	{
-		'name': 'If Noun-Verb preceded by Verb other than "be", delete the Verb',
+		'name': 'If Noun-Verb preceded by Verb, delete the Verb',
 		'category': 'Noun|Verb',
 		'context': {
 			'precededby': { 'category': 'Verb' },
-			'notprecededby': { 'stem': 'be' },
 		},
 		'remove': 'Verb',
-		'comment': 'Preceded by a Verb: Daniel 3:2 people that collect tax(N/V)... Preceded by "be": You(people) should be teaching(N/V) other people about those things.',
+		'comment': 'Preceded by a Verb: Daniel 3:2 people that collect tax(N/V)... Sometimes wrongly selects Noun when preceded by "be": You(people) should be teaching(N/V) other people about those things. (not sure how to fix this without breaking other cases)',
 	},
 	{
 		'name': 'If Noun-Verb preceded by certain Adpositions, delete the Verb',
