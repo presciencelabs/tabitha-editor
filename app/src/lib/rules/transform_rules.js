@@ -128,7 +128,7 @@ const transform_rules_json = [
 		'context': { 
 			'subtokens': { 'token': 'to', 'tag': { 'syntax': 'infinitive_same_subject' }, 'skip': 'all' },
 		},
-		'transform': { 'tag': { 'clause_type': 'patient_clause_same_participant' } },
+		'transform': { 'tag': { 'clause_type': 'patient_clause_same_participant', 'role': 'none' } },
 		'comment': 'eg John wanted [to sing]',
 	},
 	{
@@ -141,7 +141,7 @@ const transform_rules_json = [
 				'skip': [{ 'token': '[' }, { 'category': 'Conjunction' }],
 			},
 		},
-		'transform': { 'tag': { 'clause_type': 'patient_clause_same_participant' } },
+		'transform': { 'tag': { 'clause_type': 'patient_clause_same_participant', 'role': 'none' } },
 		'comment': 'eg John likes [singing]',
 	},
 	{
@@ -155,13 +155,13 @@ const transform_rules_json = [
 				'skip': 'all',
 			},
 		},
-		'transform': { 'tag': { 'clause_type': 'patient_clause_simultaneous|patient_clause_different_participant' } },
+		'transform': { 'tag': { 'clause_type': 'patient_clause_simultaneous|patient_clause_different_participant', 'role': 'none' } },
 		'comment': 'eg. "John saw [Mary walking]." This rule should apply before setting "be" as an auxilliary, but after setting the aspect verbs as auxilliaries',
 	},
 	{
 		'name': 'any remaining subordinate_clause is a \'different_participant\' patient clause by default',
 		'trigger': { 'tag': { 'clause_type': 'subordinate_clause' } },
-		'transform': { 'tag': { 'clause_type': 'patient_clause_different_participant' } },
+		'transform': { 'tag': { 'clause_type': 'patient_clause_different_participant', 'role': 'none' } },
 	},
 	{
 		'name': 'tag \'that\' at the beginning of a main clause as remove_demonstrative when followed by a noun',
@@ -262,13 +262,13 @@ const transform_rules_json = [
 		'comment': 'We have to keep this as a transform rule so we can handle the "there" properly.',
 	},
 	{
-		'name': '\'part\' after \'be\' becomes a function word',
-		'trigger': { 'token': 'part' },
+		'name': "'part/like' after 'be' becomes a function word",
+		'trigger': { 'token': 'part|like' },
 		'context': {
 			'precededby': { 'stem': 'be', 'skip': 'vp_modifiers' },
 		},
 		'transform': { 'function': {} },
-		'comment': 'Since \'part\' is also a noun, this ensures the right head noun is found for be-R',
+		'comment': "Since 'part' and 'like' are also existing words, this ensures the correct verb and arguments are identified",
 	},
 	{
 		'name': '\'made of\' after \'be\' becomes a function word',
@@ -357,38 +357,8 @@ const transform_rules_json = [
 				],
 			},
 		},
-		'transform': { 'tag': { 'syntax': 'head_np' } },
+		'transform': { 'tag': { 'syntax': 'head_np', 'role': 'none' } },
 		'comment': "can't use 'np_modifiers' in the 'notfollowedby' skip since we don't want to skip the genitive_norman 'of'",
-	},
-	{
-		// TODO handle this in adjective case frame rules
-		'name': 'handle certain adjectives with a patient NP with "to"',
-		'trigger': { 'stem': 'faithful|attracted|cruel|kind' },
-		'context': {
-			'followedby': [{ 'token': 'to' }, { 'tag': { 'syntax': 'head_np' }, 'skip': 'np_modifiers' }],
-		},
-		'context_transform': [{ 'function': '' }, { 'tag': { 'role': 'adjective_patient', 'syntax': 'nested_np' } }],
-		'comment': "eg 'faithful to X', 'attracted to X'. X should not be interpreted as a destination argument of a Verb",
-	},
-	{
-		// TODO handle this in adjective case frame rules
-		'name': 'handle certain adjectives with a patient NP with "from"',
-		'trigger': { 'stem': 'different|far' },
-		'context': {
-			'followedby': [{ 'token': 'from' }, { 'tag': { 'syntax': 'head_np' }, 'skip': 'np_modifiers' }],
-		},
-		'context_transform': [{ 'function': '' }, { 'tag': { 'role': 'adjective_patient', 'syntax': 'nested_np' } }],
-		'comment': "eg 'different from X'. X should not be interpreted as a source argument of a Verb",
-	},
-	{
-		// TODO handle this in adjective case frame rules
-		'name': 'handle unit arguments for measurement adjectives',
-		'trigger': { 'stem': 'long|wide|tall|deep' },
-		'context': {
-			'precededby': { 'category': 'Noun' },
-		},
-		'context_transform': { 'tag': { 'role': 'adjective_patient', 'syntax': 'nested_np' } },
-		'comment': "eg '20 meters tall'. A unit like this should not be interpreted as an argument of a Verb",
 	},
 	{
 		'name': 'handle noun argument for relationship with X',
@@ -418,16 +388,6 @@ const transform_rules_json = [
 			],
 		},
 		'transform': { 'tag': { 'role': 'addressee' } },
-	},
-	{
-		// TODO handle this in adjective case frame rules
-		'name': 'tag predicate adjectives',
-		'trigger': { 'category': 'Adjective' },
-		'context': {
-			'precededby': { 'category': 'Verb', 'skip': 'all' },
-			'notfollowedby': { 'category': 'Noun', 'skip': ['np_modifiers', 'adjp_modifiers_predicative'] },
-		},
-		'transform': { 'tag': { 'syntax': 'predicate_adjective' } },
 	},
 ]
 
