@@ -208,7 +208,7 @@ const transform_rules_json = [
 		'trigger': { 'token': 'named' },
 		'context': {
 			'precededby': { 'category': 'Verb', 'skip': 'all' },
-			'followedby': { 'category': 'Noun' },
+			'followedby': { 'category': 'Noun', 'skip': 'np_modifiers' },
 		},
 		'transform': { 'function': { 'relation': 'name' } },
 	},
@@ -216,7 +216,10 @@ const transform_rules_json = [
 		'name': '\'named\' before a name and before a Verb becomes a function word',
 		'trigger': { 'token': 'named' },
 		'context': {
-			'followedby': [{ 'category': 'Noun' }, { 'category': 'Verb', 'skip': 'all' }],
+			'followedby': [
+				{ 'category': 'Noun', 'skip': 'np_modifiers' },
+				{ 'category': 'Verb', 'skip': 'all' },
+			],
 		},
 		'transform': { 'function': { 'relation': 'name' } },
 	},
@@ -256,19 +259,19 @@ const transform_rules_json = [
 		'name': 'Tag \'there\' before \'be\' as existential',
 		'trigger': { 'token': 'There|there' },
 		'context': {
-			'followedby': { 'stem': 'be' },
+			'followedby': { 'stem': 'be', 'skip': 'vp_modifiers' },
 		},
 		'transform': { 'function': { 'syntax': 'existential' } },
 		'comment': 'We have to keep this as a transform rule so we can handle the "there" properly.',
 	},
 	{
-		'name': "'part/like' after 'be' becomes a function word",
+		'name': "'part' and 'like' after 'be' become function words",
 		'trigger': { 'token': 'part|like' },
 		'context': {
 			'precededby': { 'stem': 'be', 'skip': 'vp_modifiers' },
 		},
 		'transform': { 'function': {} },
-		'comment': "Since 'part' and 'like' are also existing words, this ensures the correct verb and arguments are identified",
+		'comment': "Since 'part' and 'like' are also words in the Ontology, this ensures the clause is interpreted correctly",
 	},
 	{
 		'name': '\'made of\' after \'be\' becomes a function word',
@@ -388,6 +391,17 @@ const transform_rules_json = [
 			],
 		},
 		'transform': { 'tag': { 'role': 'addressee' } },
+	},
+
+	{
+		'name': 'tag adjectives around verse references',
+		'trigger': { 'token': ':', 'stem': '-ReferenceMarker' },
+		'context': {
+			'precededby': { 'category': 'Adjective' },
+			'followedby': { 'category': 'Adjective' },
+		},
+		'context_transform': [{ 'tag': { 'syntax': '' } }, { 'tag': { 'syntax': '' } }],
+		'comment': 'remove the "predicate_adjective" tag from verse reference numbers',
 	},
 ]
 

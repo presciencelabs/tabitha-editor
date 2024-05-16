@@ -50,7 +50,7 @@ const checker_rules_json = [
 	{
 		'name': 'Suggest expanding \'there\' to \'at that place\' for clarity',
 		'trigger': { 'token': 'There|there' },
-		'context': { 'notfollowedby': { 'stem': 'be' } },	// TODO trigger on 'not tag existential' instead
+		'context': { 'notfollowedby': { 'stem': 'be', 'skip': 'vp_modifiers' } },	// TODO trigger on 'not tag existential' instead
 		'suggest': {
 			'message': 'Consider using \'at that place\' instead of \'there\', especially if a preposition other than \'at\' is wanted.',
 		},
@@ -659,7 +659,7 @@ const builtin_checker_rules = [
 			context: create_context_filter({}),
 			action: message_set_action(function* () {
 				yield { warning: 'The editor cannot determine which part of speech this word is, so some errors and warnings within the same clause may not be accurate.' }
-				yield { suggest: "Add '_noun', '_verb', '_adj', '_adv', or '_adp' after '{token}' if you want the editor to check the syntax more accurately." }
+				yield { suggest: "Add '_noun', '_verb', '_adj', '_adv', '_adp', or '_conj' after '{token}' if you want the editor to check the syntax more accurately." }
 			}),
 		},
 	},
@@ -849,7 +849,7 @@ function* check_lookup_results(token) {
 	} else {
 		yield { token_to_flag: token, warning: '\'{token}\' is not in the Ontology, or its form is not recognized. Consult the How-To document or consider using a different word.' }
 		yield { token_to_flag: token, warning: 'WARNING: Because this word is not recognized, errors and warnings within the same clause may not be accurate.' }
-		yield { token_to_flag: token, suggest: "Add '_noun', '_verb', '_adj', '_adv', or '_adp' after the unknown word if you want the editor to check the syntax more accurately." }
+		yield { token_to_flag: token, suggest: "Add '_noun', '_verb', '_adj', '_adv', '_adp', or '_conj' after the unknown word if you want the editor to check the syntax more accurately." }
 	}
 }
 
