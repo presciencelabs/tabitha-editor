@@ -1,4 +1,4 @@
-import { TOKEN_TYPE, is_one_part_of_speech } from '$lib/parser/token'
+import { TOKEN_TYPE, add_tag_to_token, is_one_part_of_speech, token_has_tag } from '$lib/parser/token'
 import { create_context_filter, create_token_filter, simple_rule_action } from '../rules_parser'
 import { select_sense } from './sense_selection'
 import { check_adjective_case_frames } from './adjectives'
@@ -22,7 +22,19 @@ const argument_and_sense_rules = [
 		rule: {
 			trigger: create_token_filter({ 'category': 'Adjective' }),
 			context: create_context_filter({}),
-			action: simple_rule_action(select_sense),
+			action: simple_rule_action(trigger_context => {
+				select_sense(trigger_context)
+
+				const token = trigger_context.trigger_token
+				const selected_result = token.lookup_results[0]
+
+				// An adjective being used predicatively should be tagged as such so the verb case frame rules can check it.
+				// A verse reference is another special case that should not interfere with Verb case frames.
+				if (!selected_result.case_frame.valid_arguments.map(arg => arg.role_tag).includes('modified_noun')
+						&& !token_has_tag(token, { 'role': 'verse_ref' })) {
+					add_tag_to_token(token, { 'syntax': 'predicate_adjective' })
+				}
+			}),
 		},
 	},
 	{

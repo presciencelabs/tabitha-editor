@@ -283,18 +283,8 @@ function select_word_sense(token, trigger_context) {
 	const sense_to_select = specified_sense ? specified_sense : default_matching_sense
 	set_token_concept(token, sense_to_select)
 
-	const selected_result = token.lookup_results[0]
-
-	// TODO find a better way?
-	// An adjective being used predicatively should be tagged as such so the verb case frame rules can check it
-	if (selected_result.part_of_speech === 'Adjective') {
-		if (!selected_result.case_frame.valid_arguments.map(arg => arg.role_tag).includes('modified_noun')) {
-			add_tag_to_token(token, { 'syntax': 'predicate_adjective' })
-		}
-	}
-
 	// apply the selected result's argument actions
-	for (const valid_argument of selected_result.case_frame.valid_arguments) {
+	for (const valid_argument of token.lookup_results[0].case_frame.valid_arguments) {
 		valid_argument.rule.trigger_rule.action(valid_argument.trigger_context)
 	}
 }
