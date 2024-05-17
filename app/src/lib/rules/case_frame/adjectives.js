@@ -61,7 +61,6 @@ const ROLE_RULE_PRESETS = [
 			'precededby': { 'category': 'Noun' },
 		},
 		'transform': { 'tag': { 'role': 'adjective_nominal_argument', 'syntax': 'nested_np' } },
-		// 'context_transform': { 'function': { 'syntax': '', 'relation': '' } },	// make the adposition a function word and clear other tag values
 		'missing_message': `{sense} must be in the format 'N X {stem}' where N is a number/quantity and X is a unit of ${preset_value}.`,
 	})],
 	['by_relative_context', preset_value => ({

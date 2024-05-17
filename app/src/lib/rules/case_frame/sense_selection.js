@@ -1,4 +1,4 @@
-import { add_tag_to_token, find_result_index, set_message, set_token_concept } from '$lib/parser/token'
+import { find_result_index, set_message, set_token_concept } from '$lib/parser/token'
 import { create_context_filter, create_token_filter } from '../rules_parser'
 
 /** @typedef {[string, any]} SenseRules */
@@ -149,6 +149,7 @@ const adjective_sense_rules = [
 	['cruel', [['cruel-B', { }]]],
 	['faithful', [
 		['faithful-B', { }],
+		// When faithful-C has a nominal argument, it should be prioritized over -A
 		['faithful-C', { 'nominal_argument': { } }],
 	]],
 	['gentle', [['gentle-B', { }]]],
@@ -161,6 +162,7 @@ const adjective_sense_rules = [
 	['old', [['old-B', { }]]],
 	['patient', [['patient-B', { }]]],
 	['sad', [
+		// Only when sad-B has a nominal argument should it be prioritized over sad-A
 		['sad-B', { 'nominal_argument': { } }],
 	]],
 	['upset', [
@@ -272,7 +274,7 @@ function select_word_sense(token, trigger_context) {
 	// Use the matching valid sense, or else the first valid sense, or else sense A.
 	// The lookups should already be ordered alphabetically so the first valid sense is the lowest letter
 	const default_matching_sense = find_matching_sense(token)
-		|| `${stem}-${valid_lookups.at(0)?.concept?.sense || 'A'}`
+		|| `${stem}-${valid_lookups.at(0)?.concept?.sense ?? 'A'}`
 
 	const specified_sense = token.specified_sense ? `${stem}-${token.specified_sense}` : ''
 

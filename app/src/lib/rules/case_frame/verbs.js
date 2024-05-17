@@ -265,7 +265,7 @@ const verb_case_frames = new Map([
 		}],
 		['be-S', {
 			'predicate_adjective': {
-				'trigger': { 'stem': 'old', },
+				'trigger': { 'stem': 'old' },
 				'context': { 'precededby': [{ 'category': 'Adjective' }, { 'stem': 'year|month|day' }] },
 				'missing_message': 'be-S requires the format \'be X years//months//etc old(-B)\'.',
 			},

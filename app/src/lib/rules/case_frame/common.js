@@ -118,8 +118,7 @@ export function parse_sense_rules(rule_json, defaults, { sense_presets=null, rol
 
 			const role_rules = defaults.flatMap(rule => rule.role_tag in rules_json
 				? parse_case_frame_rule([rule.role_tag, rules_json[rule.role_tag]], role_presets)
-				: [rule]
-			)
+				: [rule])
 
 			const other_rules = 'other_rules' in rules_json
 				? Object.entries(rules_json['other_rules']).flatMap(rule => parse_case_frame_rule(rule, role_presets))
