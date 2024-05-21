@@ -3125,7 +3125,6 @@ INSERT INTO Inflections VALUES('Zorah','Noun','|Zorahs|');
 INSERT INTO Inflections VALUES('Zuph','Noun','|Zuphs|');
 INSERT INTO Inflections VALUES('Zur','Noun','|Zurs|');
 INSERT INTO Inflections VALUES('Zuzite','Noun','|Zuzites|');
-INSERT INTO Inflections VALUES('result','Noun','|results|');
 INSERT INTO Inflections VALUES('abandon','Verb','|abandoned|abandoned|abandoning|abandons|');
 INSERT INTO Inflections VALUES('accept','Verb','|accepted|accepted|accepting|accepts|');
 INSERT INTO Inflections VALUES('accuse','Verb','|accused|accused|accusing|accuses|');
@@ -3732,5 +3731,4 @@ INSERT INTO Inflections VALUES('wrestle','Verb','|wrestled|wrestled|wrestling|wr
 INSERT INTO Inflections VALUES('write','Verb','|wrote|written|writing|writes|');
 INSERT INTO Inflections VALUES('goodbye','Verb','|goodbied|goodbied|goodbying|goodbyes|');
 INSERT INTO Inflections VALUES('pity','Verb','|pitied|pitied|pitying|pities|');
-INSERT INTO Inflections VALUES('prophesy','Verb','|prophesied|prophesied|prophesying|prophesies|');
 INSERT INTO Inflections VALUES('sex','Verb','|sexed|sexed|sexing|sexes|');
