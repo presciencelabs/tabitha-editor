@@ -28,5 +28,7 @@
 
 `wrangler d1 execute <DB_NAME> --file=./Editor.sqlite.sql`
 
+> NOTE: ⚠️ There are some manual steps when trying to import to remote ⚠️, check https://developers.cloudflare.com/d1/build-with-d1/import-data/#convert-sqlite-database-files for the latest instructions.
+
 `wrangler d1 execute <DB_NAME> --command="select * from sqlite_master"`
 

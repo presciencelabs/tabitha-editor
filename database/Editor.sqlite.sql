@@ -1,5 +1,3 @@
-PRAGMA foreign_keys=OFF;
-BEGIN TRANSACTION;
 CREATE TABLE Inflections (
 	'stem'				TEXT,
 	'part_of_speech'	TEXT,
@@ -3736,4 +3734,3 @@ INSERT INTO Inflections VALUES('goodbye','Verb','|goodbied|goodbied|goodbying|go
 INSERT INTO Inflections VALUES('pity','Verb','|pitied|pitied|pitying|pities|');
 INSERT INTO Inflections VALUES('prophesy','Verb','|prophesied|prophesied|prophesying|prophesies|');
 INSERT INTO Inflections VALUES('sex','Verb','|sexed|sexed|sexing|sexes|');
-COMMIT;
