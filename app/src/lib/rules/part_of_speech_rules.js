@@ -43,6 +43,15 @@ const part_of_speech_rules_json = [
 		'comment': 'I will judge(N/V). I do not judge(N/V). I should judge(N/V). etc',
 	},
 	{
+		'name': 'If Noun-Verb preceded by an aspectual auxiliary, remove Adjective',
+		'category': 'Noun|Verb',
+		'context': {
+			'precededby': { 'stem': 'start|begin|stop|continue|finish', 'skip': { 'token': 'to' } },
+		},
+		'remove': 'Noun',
+		'comment': 'People will continue to hope(N/V) in Christ Jesus.',
+	},
+	{
 		'name': 'If Noun-Verb preceded by Adjective or Conjunction, delete the Verb',
 		'category': 'Noun|Verb',
 		'context': {
@@ -50,6 +59,16 @@ const part_of_speech_rules_json = [
 		},
 		'remove': 'Verb',
 		'comment': 'Preceded by an Adjective: Daniel 1:7 The official gave new names(N/V) to the men... Preceded by a Conjunction: Because we don\'t allow coordinate VPs in these propositions, if there\'s a Conjunction preceding the Noun/Verb, the word must be a Noun. Daniel 2:37 God has given wealth and honor(N/V) to you.',
+	},
+	{
+		'name': 'If certain Noun/Verbs are preceded by chief, remove the Verb',
+		'category': 'Noun|Verb',
+		'trigger': { 'stem': 'stone|guard|judge' },
+		'context': {
+			'precededby': { 'stem': 'chief' },
+		},
+		'remove': 'Verb',
+		'comment': 'Jesus is-X the chief(N/Adj) stone(N/V). stone, judge, guard, etc will not be disambiguated properly otherwise',
 	},
 	{
 		'name': 'If Noun-Verb preceded by certain Adpositions, delete the Verb',
