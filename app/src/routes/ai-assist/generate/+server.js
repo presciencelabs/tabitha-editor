@@ -21,8 +21,6 @@ export async function POST({ request,  }) {
 		presence_penalty,
 	})
 
-	console.log(chat_response)
-
 	return response({
 		finish_reason: chat_response.choices[0].finish_reason,
 		message: chat_response.choices[0].message.content ?? '',
