@@ -303,7 +303,7 @@ const part_of_speech_rules_json = [
 			'followedby': { 'category': 'Noun' },
 		},
 		'remove': 'Adjective',
-		'comment': "Daniel 2:1 'Nebuchadnezzar worried about(Adj/Adp) this dream.' The Adjective 'about' means 'approximately' which can't be followed by a Noun.",
+		'comment': "Daniel 2:1 'Nebuchadnezzar worried about(Adj/Adp) this dream.'  The Adjective 'about' means 'approximately' which can't be followed by a Noun.",
 	},
 	{
 		'name': 'If Adjective-Adverb followed by Noun, remove the Adverb',
