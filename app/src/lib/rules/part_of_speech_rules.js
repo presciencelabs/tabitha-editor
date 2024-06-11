@@ -293,7 +293,7 @@ const part_of_speech_rules_json = [
 			'notfollowedby': { 'stem': 'all|many|each' },
 		},
 		'remove': 'Adposition',
-		'comment': "Daniel 2:1  \"for about(Adj/Adp) two years\"  This rule applies specifically to the word \"about\" because in general, both Adjectives and Adpositions can precede Adjectives.  Exclude the word 'all' as in Ruth 3:16 \"Ruth told Naomi about(Adj/Adp) all(Adj) the things that Boaz did.\" Exclude 'many' as in Kande's Story 5:9 \"They talked about many things.\"  This rule really should specify that when 'about' is followed by a numeric Adjective, delete the Adposition.",
+		'comment': "Daniel 2:1 'for about(Adj/Adp) two years.'  This rule applies specifically to the word 'about' because in general, both Adjectives and Adpositions can precede Adjectives.  Exclude the word 'all' as in Ruth 3:16 'Ruth told Naomi about(Adj/Adp) all(Adj) the things that Boaz did.' Exclude 'many' as in Kande's Story 5:9 'They talked about many things.' This rule really should specify that when 'about' is followed by a numeric Adjective, delete the Adposition.",
 	},
 	{
 		'name': 'If Adjective-Adposition followed by a Noun, delete the Adjective',
@@ -303,7 +303,7 @@ const part_of_speech_rules_json = [
 			'followedby': { 'category': 'Noun' },
 		},
 		'remove': 'Adjective',
-		'comment': "Daniel 2:1 \"Nebuchadnezzar worried about(Adj/Adp) this dream.\"  The Adjective 'about' means 'approximately' which can't be followed by a Noun.",
+		'comment': "Daniel 2:1 'Nebuchadnezzar worried about(Adj/Adp) this dream.' The Adjective 'about' means 'approximately' which can't be followed by a Noun.",
 	},
 	{
 		'name': 'If Adjective-Adverb followed by Noun, remove the Adverb',
