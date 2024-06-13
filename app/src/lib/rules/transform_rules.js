@@ -253,6 +253,13 @@ const transform_rules_json = [
 		'transform': { 'function': { 'relation': 'group' } },
 	},
 	{
+		'name': 'certain Noun-Noun combinations are "made_of"',
+		'trigger': { 'category': 'Noun', 'stem': 'bamboo|bronze|gold|iron|leather|marble|metal|plastic|silver|wood' },
+		'context': { 'followedby': { 'category': 'Noun' } },
+		'transform': { 'tag': { 'relation': 'made_of' } },
+		'comment': 'eg. a gold statue; a bamboo chair. The Nouns are always right next to each other',
+	},
+	{
 		'name': '\'that\' followed by the Adposition \'so\' does not have any function',
 		'trigger': { 'token': 'that' },
 		'context': {
@@ -271,6 +278,7 @@ const transform_rules_json = [
 		'comment': '"who/what" becomes "which person-A/thing-A" respectively when in a question',
 	},
 	{
+		// TODO replace with adposition sense-selection
 		'name': 'Adposition \'so\' followed by \'would\' becomes so-C',
 		'trigger': { 'stem': 'so', 'category': 'Adposition' },
 		'context': {
@@ -375,16 +383,16 @@ const transform_rules_json = [
 		'trigger': { 'category': 'Noun' },
 		'context': {
 			'notprecededby': [{ 'category': 'Noun' }, { 'token': 'of', 'skip': 'np_modifiers' }],
-			'notfollowedby': {
-				'category': 'Noun',
-				'skip': [
-					{ 'tag': [{ 'relation': 'genitive_saxon' }, { 'clause_type': 'relative_clause' }, 'determiner'] },
-					'adjp_attributive',
-				],
-			},
 		},
 		'transform': { 'tag': { 'syntax': 'head_np', 'role': 'none' } },
 		'comment': "can't use 'np_modifiers' in the 'notfollowedby' skip since we don't want to skip the genitive_norman 'of'",
+	},
+	{
+		'name': 'remove head_np tag from saxon genitives and made_of relations',
+		'trigger': { 'tag': { 'relation': 'genitive_saxon|made_of' } },
+		'context': { },
+		'transform': { 'tag': { 'syntax': '', 'role': '' } },
+		'comment': '',
 	},
 	{
 		'name': 'handle noun argument for relationship with X',

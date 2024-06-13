@@ -13,10 +13,21 @@ import { create_context_filter, create_token_filter } from '../rules_parser'
  * @type {[WordStem, SenseRules[]][]}
  */
 const verb_sense_rules = [
+	['answer', [
+		['answer-B', { 'patient': { 'stem': 'prayer' } }],
+		['answer-C', { 'patient': { 'stem': 'question' } }],
+	]],
+	['appear', [
+		['appear-B', { }],	// prioritize appear-B over appear-A
+	]],
 	['ask', [
 		['ask-B', { }],	// prioritize ask-B over ask-A
 		['ask-D', { }],	// prioritize ask-D over ask-A
 		['ask-F', { }],	// prioritize ask-F over ask-A
+	]],
+	['attack', [
+		['attack-B', { 'agent': { 'stem': 'goat|lion|sheep' } }],
+		['attack-C', { 'agent': { 'stem': 'child|person' } }],
 	]],
 	['be', [
 		// 'be' is very particular and so each sense is specified to make the priority clear. Not all verbs will need this.
@@ -68,6 +79,29 @@ const verb_sense_rules = [
 		['become-J', { }],	// metaphorical
 		['become-A', { }],	// predicative
 	]],
+	['believe', [
+		['believe-B', { 'patient': { 'stem': 'Christ|God|Jesus' } }],
+	]],
+	['bring', [
+		// TODO use a lexicon feature for bring-B to check for any person.
+		['bring-B', { 'patient': { 'stem': 'baby|brother|child|girl|man|person|son|woman' } }],
+		['bring-C', { 'patient': { 'stem': 'animal|cattle|chicken|cow|horse|goat' } }],
+	]],
+	['call', [
+		// prioritize call-B and call-C over call-A
+		['call-B', { }],
+		['call-C', { }],
+	]],
+	['change', [
+		['change-B', { 'patient': { } }],
+	]],
+	['cover', [
+		['cover-C', { 'agent': { 'stem': 'cloud' } }],
+	]],
+	['dream', [
+		['dream-A', { 'patient': { } }],	// when dream-A has a patient, prioritize it over dream-B
+		['dream-B', { }],
+	]],
 	['give', [
 		['give-B', { 'patient': { 'stem': 'ring|vaccine' } }],
 		// TODO add another give-B entry to use a lexicon feature to check for any person.
@@ -75,6 +109,10 @@ const verb_sense_rules = [
 	]],
 	['go', [
 		['go-B', { 'agent': { 'stem': 'border' } }],
+	]],
+	['grow', [
+		['grow-B', { 'up': {  } }],	// if 'up' is present, select grow-B
+		['grow-D', { 'patient': { 'stem': 'food|crop' } }],
 	]],
 	['have', [
 		['have-H', { 'state': { 'stem': 'eunuch|man|servant|slave' } }],
@@ -90,6 +128,9 @@ const verb_sense_rules = [
 	['know', [
 		['know-C', { 'patient': { 'stem': 'law|meaning|name|secret|thing' } }],
 	]],
+	['laugh', [
+		['laugh-B', { }],	// prioritize laugh-B over laugh-A
+	]],
 	['leave', [
 		['leave-B', { 'patient': { 'stem': 'father|king|man|Mary|Naomi|person|woman|Simon|Jesus|boy' } }],	// TODO use lexicon rules. these values were copied from the analyzer
 	]],
@@ -101,12 +142,18 @@ const verb_sense_rules = [
 		['make-C', { 'patient': { 'stem': 'command|fire|god|peace|promise|wave|covenant' } }],
 		['make-E', { 'patient': { 'stem': 'bread|food' } }],
 	]],
+	['pray', [
+		['pray-D', { }],	// prioritize pray-D over pray-A
+	]],
+	['return', [
+		['return-D', { 'destination': { 'stem': 'king|person' } }],
+	]],
 	['say', [
 		['say-D', { 'agent': { 'stem': 'law' } }],
 	]],
 	['see', [
 		['see-D', { 'patient': { 'stem': 'dream|vision' } }],
-		['see-C', { }],	// prioritize see-C over see-B gets selected
+		['see-C', { }],	// prioritize see-C over see-B
 	]],
 	['send', [
 		['send-B', { 'patient': { 'stem': 'letter|message' } }],
@@ -121,6 +168,11 @@ const verb_sense_rules = [
 		['take-D', { 'source': { 'stem': 'person|man|woman|child|son|daughter' } }], // TODO use a lexicon feature to check for any person.
 		['take-E', { 'destination': { 'stem': 'person|man|woman|child|son|daughter' } }], // TODO use a lexicon feature to check for any person.
 	]],
+	['teach', [
+		['teach-A', { 'patient': { } }],	// when teach-A has a patient, prioritize it over teach-B
+		['teach-B', { 'patient': { 'stem': 'lesson|message|thing|law'} }],
+		['teach-C', { }],
+	]],
 	['tell', [
 		// prioritize tell-C over tell-A due to the presence of the 'about'. tell-A may count as valid if there is a relative clause on its patient.
 		['tell-C', { }],
@@ -132,6 +184,9 @@ const verb_sense_rules = [
 	]],
 	['want', [
 		['want-D', { 'patient': { 'stem': 'peace|health|life' } }],
+	]],
+	['worry', [
+		['worry-B', { }],	// prioritize worry-B over worry-A
 	]],
 ]
 
