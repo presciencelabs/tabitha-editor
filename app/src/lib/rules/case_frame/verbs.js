@@ -329,7 +329,7 @@ const verb_case_frames = new Map([
 		}],
 	]],
 	['believe', [
-		['believe-B', { 'patient': { 'directly_after_verb_with_adposition': 'in',  } }],
+		['believe-B', { 'patient': { 'directly_after_verb_with_adposition': 'in' } }],
 	]],
 	['bring', []],
 	['call', [
@@ -362,7 +362,7 @@ const verb_case_frames = new Map([
 				},
 			},
 			'other_required': 'mind',
-			'comment': "'mind' ban be included in the phase 1 (eg. Pharoah changed Pharoah's mind) but it is not included in the semantic representation."
+			'comment': "'mind' ban be included in the phase 1 (eg. Pharoah changed Pharoah's mind) but it is not included in the semantic representation.",
 		}],
 		['change-C', { 'destination': { 'by_adposition': 'to|into' } }],
 		['change-E', { 'destination': { 'by_adposition': 'to|into' } }],

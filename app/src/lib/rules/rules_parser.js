@@ -390,7 +390,7 @@ export function create_token_transform(transform_json) {
 		const result = { ...old_tag, ...new_values }
 		// completely remove tags that are being set as empty
 		Object.entries(new_values)
-			.filter(([_,v]) => v === '')
+			.filter(([, v]) => v === '')
 			.forEach(([k]) => delete result[k])
 		return result
 	}

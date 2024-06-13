@@ -174,7 +174,7 @@ const verb_sense_rules = [
 	]],
 	['teach', [
 		['teach-A', { 'patient': { } }],	// when teach-A has a patient, prioritize it over teach-B
-		['teach-B', { 'patient': { 'stem': 'lesson|message|thing|law'} }],
+		['teach-B', { 'patient': { 'stem': 'lesson|message|thing|law' } }],
 		['teach-C', { }],
 	]],
 	['tell', [
