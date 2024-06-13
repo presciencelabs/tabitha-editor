@@ -145,6 +145,10 @@ const verb_sense_rules = [
 	['pray', [
 		['pray-D', { }],	// prioritize pray-D over pray-A
 	]],
+	['prepare', [
+		['prepare-B', { 'patient': { 'stem': 'feast|food|meal' } }],
+		['prepare-C', { }],
+	]],
 	['return', [
 		['return-D', { 'destination': { 'stem': 'king|person' } }],
 	]],

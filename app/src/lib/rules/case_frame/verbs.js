@@ -506,6 +506,14 @@ const verb_case_frames = new Map([
 		['pray-A', { 'patient': { 'by_adposition': 'about' } }],
 		['pray-C', { 'patient_clause_type': 'patient_clause_quote_begin' }],
 	]],
+	['prepare', []],
+	['promise', [
+		['promise-A', { 'instrument': { 'by_adposition': 'with' } }],
+		['promise-B', {
+			'instrument': { 'by_adposition': 'with' },
+			'patient_clause_type': 'patient_clause_quote_begin',
+		}],
+	]],
 	['return', []],
 	['say', [
 		['say-A', { 'patient_clause_type': 'patient_clause_quote_begin' }],
