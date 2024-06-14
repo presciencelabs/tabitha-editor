@@ -214,7 +214,7 @@ const verb_case_frames = new Map([
 				},
 				'missing_message': 'be-E requires the format \'there be X\'.',
 			},
-			'state': { },
+			'state': { 'trigger': 'none' },
 		}],
 		['be-F', {
 			'state': {
@@ -224,7 +224,7 @@ const verb_case_frames = new Map([
 		}],
 		['be-G', {
 			'state': { 'directly_after_verb_with_adposition': 'for' },
-			'beneficiary': { },
+			'beneficiary': { 'trigger': 'none' },
 		}],
 		['be-H', {
 			'state': {
@@ -287,7 +287,7 @@ const verb_case_frames = new Map([
 		}],
 		['be-T', {
 			'state': { 'directly_after_verb_with_adposition': 'from' },
-			'source': { },
+			'source': { 'trigger': 'none' },
 		}],
 		['be-U', { 'state': { 'directly_after_verb_with_adposition': 'like' } }],
 		['be-V', { 'other_required': 'predicate_adjective' }],
@@ -582,7 +582,7 @@ const verb_case_frames = new Map([
 		['tell-D', { 'instrument': { 'by_adposition': 'with' } }],
 		['tell-E', {
 			'destination': { 'directly_after_verb': { } },
-			'patient': { },		// clear the patient so it doesn't get confused with the destination
+			'patient': { 'trigger': 'none' },		// clear the patient so it doesn't get confused with the destination
 			'patient_clause_type': 'patient_clause_quote_begin',
 		}],
 	]],

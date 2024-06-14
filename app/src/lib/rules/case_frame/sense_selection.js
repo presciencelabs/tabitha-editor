@@ -1,29 +1,36 @@
 import { find_result_index, set_message, set_token_concept } from '$lib/parser/token'
 import { create_context_filter, create_token_filter } from '../rules_parser'
 
-/** @typedef {[string, any]} SenseRules */
+/** @typedef {[string, any]} PriorityOverrideRules */
 
 /**
- * These rules help decide which sense to select from the ones that match the argument structure.
- * They are ordered by priority, and can provide additional filtering of the verb or arguments to
- * narrow down the match.
- * A sense can also have multiple rows in case there are multiple incompatible filters to check.
+ * By default, senses with valid case frames are prioritized by letter (eg. -A is selected over -B).
+ * These rules allow overriding that priority based on filters applied to the verb arguments.
+ * They are ordered by priority, where the first entry in the array has the most priority.
+ * Note that not all senses have a rule, only those that are different from the default letter-based priority.
+ * 
+ * An empty filter means that sense will always apply as long as its case frame is valid.
+ * A sense can also have multiple rows in case there are multiple incompatible filters to check. (see take-B)
+ * 
+ * The order of the priorities mostly makes sense when referring to the theta-grids in the Ontology,
+ * as overlapping and compatible argument structures need to be considered.
+ * 
  * TODO store these in the db
  * 
- * @type {[WordStem, SenseRules[]][]}
+ * @type {[WordStem, PriorityOverrideRules[]][]}
  */
-const verb_sense_rules = [
+const verb_sense_priority_overrides = [
 	['answer', [
 		['answer-B', { 'patient': { 'stem': 'prayer' } }],
 		['answer-C', { 'patient': { 'stem': 'question' } }],
 	]],
 	['appear', [
-		['appear-B', { }],	// prioritize appear-B over appear-A
+		['appear-B', { }],
 	]],
 	['ask', [
-		['ask-B', { }],	// prioritize ask-B over ask-A
-		['ask-D', { }],	// prioritize ask-D over ask-A
-		['ask-F', { }],	// prioritize ask-F over ask-A
+		['ask-B', { }],	
+		['ask-D', { }],	
+		['ask-F', { }],	
 	]],
 	['attack', [
 		['attack-B', { 'agent': { 'stem': 'goat|lion|sheep' } }],
@@ -88,7 +95,6 @@ const verb_sense_rules = [
 		['bring-C', { 'patient': { 'stem': 'animal|cattle|chicken|cow|horse|goat' } }],
 	]],
 	['call', [
-		// prioritize call-B and call-C over call-A
 		['call-B', { }],
 		['call-C', { }],
 	]],
@@ -129,7 +135,7 @@ const verb_sense_rules = [
 		['know-C', { 'patient': { 'stem': 'law|meaning|name|secret|thing' } }],
 	]],
 	['laugh', [
-		['laugh-B', { }],	// prioritize laugh-B over laugh-A
+		['laugh-B', { }],
 	]],
 	['leave', [
 		['leave-B', { 'patient': { 'stem': 'father|king|man|Mary|Naomi|person|woman|Simon|Jesus|boy' } }],	// TODO use lexicon rules. these values were copied from the analyzer
@@ -143,7 +149,7 @@ const verb_sense_rules = [
 		['make-E', { 'patient': { 'stem': 'bread|food' } }],
 	]],
 	['pray', [
-		['pray-D', { }],	// prioritize pray-D over pray-A
+		['pray-D', { }],
 	]],
 	['prepare', [
 		['prepare-B', { 'patient': { 'stem': 'feast|food|meal' } }],
@@ -157,13 +163,13 @@ const verb_sense_rules = [
 	]],
 	['see', [
 		['see-D', { 'patient': { 'stem': 'dream|vision' } }],
-		['see-C', { }],	// prioritize see-C over see-B
+		['see-C', { }],
 	]],
 	['send', [
 		['send-B', { 'patient': { 'stem': 'letter|message' } }],
 	]],
 	['speak', [
-		['speak-B', { }],	// prioritize speak-B over speak-A
+		['speak-B', { }],
 	]],
 	['take', [
 		['take-B', { 'patient': { 'level': '4' } }], // TODO use a lexicon feature to check for any person.
@@ -190,21 +196,24 @@ const verb_sense_rules = [
 		['want-D', { 'patient': { 'stem': 'peace|health|life' } }],
 	]],
 	['worry', [
-		['worry-B', { }],	// prioritize worry-B over worry-A
+		['worry-B', { }],
 	]],
 ]
 
 /**
- * These rules help decide which sense to select from the ones that match the argument structure.
- * They are ordered by priority, and can provide additional filtering of the verb or arguments to
- * narrow down the match.
- * A sense can also have multiple rows in case there are multiple incompatible filters to check.
+ * By default, senses with valid case frames are prioritized by letter (eg. -A is selected over -B).
+ * These rules allow overriding that priority based on filters applied to the verb arguments.
+ * They are ordered by priority, where the first entry in the array has the most priority.
+ * Note that not all senses have a rule, only those that are different from the default letter-based priority.
+ * 
+ * An empty filter means that sense will always apply as long as its case frame is valid.
+ * 
  * Many adjective sense B's have a nominal argument where sense A does not, so if sense B has a
  * valid argument, it needs to be entered here in order to prioritize it over sense A.
  * 
- * @type {[WordStem, SenseRules[]][]}
+ * @type {[WordStem, PriorityOverrideRules[]][]}
  */
-const adjective_sense_rules = [
+const adjective_sense_priority_overrides = [
 	['afraid', [['afraid-B', { }]]],
 	['amazed', [['amazed-B', { }]]],
 	['angry', [['angry-B', { }]]],
@@ -238,7 +247,7 @@ const adjective_sense_rules = [
 ]
 
 /**
- * @param {SenseRules} sense_rules 
+ * @param {PriorityOverrideRules} sense_rules 
  * @returns {[WordSense, ArgumentMatchFilter]}
  */
 function parse_sense_rule([sense, sense_rule_json]) {
@@ -267,8 +276,8 @@ function parse_sense_rule([sense, sense_rule_json]) {
 }
 
 /** @type {Map<WordStem, [WordSense, ArgumentMatchFilter][]>} */
-const VERB_SENSE_FILTER_RULES = new Map(verb_sense_rules.map(([stem, sense_rules]) => [stem, sense_rules.map(parse_sense_rule)]))
-const ADJECTIVE_SENSE_FILTER_RULES = new Map(adjective_sense_rules.map(([stem, sense_rules]) => [stem, sense_rules.map(parse_sense_rule)]))
+const VERB_SENSE_FILTER_RULES = new Map(verb_sense_priority_overrides.map(([stem, sense_rules]) => [stem, sense_rules.map(parse_sense_rule)]))
+const ADJECTIVE_SENSE_FILTER_RULES = new Map(adjective_sense_priority_overrides.map(([stem, sense_rules]) => [stem, sense_rules.map(parse_sense_rule)]))
 
 const SENSE_FILTER_RULES = new Map([
 	['Verb', VERB_SENSE_FILTER_RULES],
