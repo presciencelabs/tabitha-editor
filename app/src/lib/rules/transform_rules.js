@@ -77,7 +77,7 @@ const transform_rules_json = [
 			},
 		},
 		'transform': { 'tag': { 'clause_type': 'relative_clause' } },
-		'subtoken_transform': { 'tag': { 'determiner': '' } },
+		'subtoken_transform': { 'remove_tag': 'determiner' },
 		'comment': 'removes extra tags for words like "who" and "which". clear the determiner tag but keep the syntax one. This also handles coordinate relative clauses.',
 	},
 	{
@@ -102,7 +102,7 @@ const transform_rules_json = [
 				'skip': [{ 'token': '[' }, { 'category': 'Conjunction' }],
 			},
 		},
-		'subtoken_transform': { 'tag': { 'syntax': '' } },
+		'subtoken_transform': { 'remove_tag': 'syntax' },
 		'comment': '"that" should only be a demonstrative in this case. clear the syntax tag but keep the determiner one',
 	},
 	{
@@ -131,7 +131,7 @@ const transform_rules_json = [
 		'comment': 'It is true that John read that book',
 	},
 	{
-		'name': 'tag \'that\' relative clauses that occur with \'it\' as agent clauses',
+		'name': "tag 'that' relative clauses that occur with 'it' as agent clauses",
 		'trigger': { 'tag': { 'clause_type': 'relative_clause_that' } },
 		'context': {
 			'precededby': { 'tag': { 'syntax': 'agent_proposition_subject' }, 'skip': ['np', 'vp'] },
@@ -140,7 +140,7 @@ const transform_rules_json = [
 		'comment': 'It please Mary [that John read this book]. - this was originally tagged as a relative clause but the \'it\' takes priority',
 	},
 	{
-		'name': 'tag subordinate clauses starting with the infinitive \'to\' as \'same_participant\'',
+		'name': "tag subordinate clauses starting with the infinitive 'to' as 'same_participant'",
 		'trigger': { 'tag': { 'clause_type': 'subordinate_clause' } },
 		'context': { 
 			'subtokens': { 'token': 'to', 'tag': { 'syntax': 'infinitive_same_subject' }, 'skip': 'all' },
@@ -149,7 +149,7 @@ const transform_rules_json = [
 		'comment': 'eg John wanted [to sing]',
 	},
 	{
-		'name': 'tag subordinate clauses starting with a participle Verb as \'same_participant\'',
+		'name': "tag subordinate clauses starting with a participle Verb as 'same_participant'",
 		'trigger': { 'tag': { 'clause_type': 'subordinate_clause' } },
 		'context': {
 			'subtokens': {
@@ -193,7 +193,7 @@ const transform_rules_json = [
 			'notprecededby': { 'token': '[', 'skip': { 'category': 'Conjunction' } },
 			'followedby': { 'category': 'Noun', 'skip': 'np_modifiers' },
 		},
-		'transform': { 'tag': { 'syntax': '' } },
+		'transform': { 'remove_tag': 'syntax' },
 		'comment': 'this clears the relativizer tag but keeps the determiner tag',
 	},
 	{
@@ -265,7 +265,7 @@ const transform_rules_json = [
 		'context': {
 			'precededby': { 'stem': 'so', 'category': 'Adposition' },
 		},
-		'transform': { 'tag': { 'syntax': '', 'determiner' : '' } },
+		'transform': { 'remove_tag': ['syntax', 'determiner'] },
 		'comment': 'both "so that" and "so-that" are supported and map to the Adposition "so"',
 	},
 	{
@@ -274,7 +274,7 @@ const transform_rules_json = [
 		'context': {
 			'followedby': { 'token': '?', 'skip': 'all' },
 		},
-		'transform': { 'tag': { 'determiner': 'interrogative', 'syntax': '' } },
+		'transform': { 'tag': { 'determiner': 'interrogative' }, 'remove_tag': 'syntax' },
 		'comment': '"who/what" becomes "which person-A/thing-A" respectively when in a question',
 	},
 	{
@@ -391,8 +391,7 @@ const transform_rules_json = [
 		'name': 'remove head_np tag from saxon genitives and made_of relations',
 		'trigger': { 'tag': { 'relation': 'genitive_saxon|made_of' } },
 		'context': { },
-		'transform': { 'tag': { 'syntax': '', 'role': '' } },
-		'comment': '',
+		'transform': { 'remove_tag': ['syntax', 'role'] },
 	},
 	{
 		'name': 'handle noun argument for relationship with X',
@@ -400,7 +399,7 @@ const transform_rules_json = [
 		'context': {
 			'followedby': [{ 'token': 'with' }, { 'category': 'Noun', 'skip': 'np_modifiers' }],
 		},
-		'context_transform': [{ 'function': '' }, { 'tag': { 'syntax': 'nested_np' } }],
+		'context_transform': [{ 'function': {} }, { 'tag': { 'syntax': 'nested_np' } }],
 		'comment': "eg 'relationship with X'. X should not be interpreted as an argument of a Verb",
 	},
 	{
@@ -409,7 +408,7 @@ const transform_rules_json = [
 		'context': {
 			'followedby': [{ 'token': 'in' }, { 'category': 'Noun', 'skip': 'np_modifiers' }],
 		},
-		'context_transform': [{ 'function': '' }, { 'tag': { 'syntax': 'nested_np' } }],
+		'context_transform': [{ 'function': {} }, { 'tag': { 'syntax': 'nested_np' } }],
 		'comment': "eg 'faith in X'. X should not be interpreted as an argument of a Verb",
 	},
 	{

@@ -496,7 +496,7 @@ const verb_case_frames = new Map([
 				{
 					'trigger': { 'tag': { 'syntax': 'head_np' } },
 					'context': { 'precededby': [{ 'stem': 'covenant' }, { 'token': 'with', 'skip': 'np_modifiers' }] },
-					'context_transform': [{}, { 'function': '' }],
+					'context_transform': [{}, { 'function': {} }],
 				},
 			],
 		}],
@@ -595,7 +595,7 @@ const verb_case_frames = new Map([
 				'context': {
 					'precededby': { 'token': 'about' },
 				},
-				'context_transform': { 'function': '' },
+				'context_transform': { 'function': {} },
 				'missing_message': "think-D should be written in the format 'think about [Verb-ing]'",
 			},
 			'patient_clause_different_participant': {
@@ -617,7 +617,7 @@ const verb_case_frames = new Map([
 						{ 'token': 'of', 'skip': 'np_modifiers' },
 					],
 				},
-				'context_transform': [{ 'function': {} }, { 'relation': '' }],
+				'context_transform': [{ 'function': {} }, { 'remove_tag': 'relation' }],
 			},
 		}],
 		['throw-E', { 'destination': { 'by_adposition': 'into' } }],
