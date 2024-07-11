@@ -6,15 +6,14 @@ import { RULES, rules_applier } from '$lib/rules'
 
 /**
  * @param {string} text
- * @param {import('@cloudflare/workers-types').D1Database} db
  * @returns {Promise<Sentence[]>}
  */
-export async function parse(text, db) {
+export async function parse(text) {
 	return await pipe_async(
 		tokenize_input,
 		clausify,
 		rules_applier(RULES.SYNTAX),
-		perform_form_lookups(db),
+		perform_form_lookups,
 		rules_applier(RULES.LOOKUP),
 		perform_ontology_lookups,
 		rules_applier(RULES.PART_OF_SPEECH),

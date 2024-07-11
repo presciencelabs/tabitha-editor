@@ -343,12 +343,12 @@ const transform_rules_json = [
 		'comment': 'skip all because it may be a question (eg. "Are those people going?"). We\'ll have to assume it\'s not an error.',
 	},
 	{
-		'name': 'be before a past participle Verb indicates passive',
+		'name': 'be before a perfect Verb indicates passive',
 		'trigger': { 'stem': 'be' },
 		'context': {
 			'followedby': {
 				'category': 'Verb',
-				'form': 'past participle',
+				'form': 'perfect',
 				'skip': 'all',
 			},
 		},
@@ -390,7 +390,7 @@ const transform_rules_json = [
 		'context': {
 			'followedby': { 'tag': { 'modal': 'conditional_would' }, 'skip': 'all' },
 		},
-		'transform': { 'concept': 'so-C' },
+		'transform': { 'sense': 'C' },
 	},
 	{
 		// TODO make this a case frame/sense selection rule

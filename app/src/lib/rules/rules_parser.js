@@ -1,4 +1,4 @@
-import { TOKEN_TYPE, set_message, set_token_concept, token_has_tag } from '$lib/parser/token'
+import { TOKEN_TYPE, set_message, token_has_tag } from '$lib/parser/token'
 
 /**
  *
@@ -35,7 +35,7 @@ export function create_token_filter(filter_json) {
 	})
 	add_lookup_filter('level', filter_value => {
 		const value_checker = get_value_checker(filter_value)
-		return lookup => value_checker(`${lookup.concept?.level}`)
+		return lookup => value_checker(`${lookup.level}`)
 	})
 
 	// only support single character usages right now
@@ -74,12 +74,7 @@ export function create_token_filter(filter_json) {
 		const property_json = filter_json[property_name]
 		if (property_json !== undefined) {
 			const lookup_filter = lookup_filter_getter(property_json)
-			filters.push(token => {
-				if (token.lookup_results.length === 0) {
-					return false
-				}
-				return token.lookup_results.every(lookup_filter)
-			})
+			filters.push(token => token.lookup_results.length > 0 && token.lookup_results.every(lookup_filter))
 		}
 	}
 
@@ -354,9 +349,10 @@ export function create_token_transform(transform_json) {
 		}))
 	}
 
-	const concept = transform_json['concept']
-	if (concept !== undefined) {
-		transforms.push(token => set_token_concept(token, concept))
+	const sense = transform_json['sense']
+	if (sense !== undefined) {
+		// Don't let the transform rule overwrite an existing specified sense
+		transforms.push(token => ({ ...token, specified_sense: token.specified_sense || sense }))
 	}
 
 	// TODO remove this and use the case frame/sense selection rules instead
@@ -415,7 +411,7 @@ export function create_token_transform(transform_json) {
  * @returns {LookupFilter}
  */
 function has_usage(char) {
-	return ({ concept }) => !!concept?.categorization.includes(char)
+	return lookup => lookup.categorization.includes(char)
 }
 
 /**
@@ -424,7 +420,7 @@ function has_usage(char) {
  * @returns {LookupFilter}
  */
 function may_have_usage(char) {
-	return ({ concept }) => !!(concept?.categorization.length === 0 || concept?.categorization.includes(char))
+	return lookup => lookup.categorization.length === 0 || lookup.categorization.includes(char)
 }
 
 /**
