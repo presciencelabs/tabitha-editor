@@ -44,10 +44,11 @@ function create_sentence(tokens) {
  * @param {string} [data.sense='A'] 
  * @param {string} [data.part_of_speech='Noun'] 
  * @param {number} [data.level=1] 
+ * @param {number} [data.ontology_id=1] 
  * @returns {LookupResult}
  */
-function lookup_result(stem, { sense='A', part_of_speech='Noun', level=1 }={}) {
-	return create_lookup_result({ stem, part_of_speech }, { sense, level })
+function lookup_result(stem, { sense='A', part_of_speech='Noun', level=1, ontology_id=1 }={}) {
+	return create_lookup_result({ stem, part_of_speech }, { sense, level, ontology_id })
 }
 
 describe('built-in checker rules', () => {
@@ -91,7 +92,7 @@ describe('built-in checker rules', () => {
 	})
 
 	describe('complexity level check', () => {
-		const LEVEL_CHECK_RULES = CHECKER_RULES.slice(1, 4)
+		const LEVEL_CHECK_RULES = CHECKER_RULES.slice(2, 5)
 
 		test('different levels', () => {
 			const test_tokens = [create_sentence([
@@ -198,27 +199,27 @@ describe('built-in checker rules', () => {
 	})
 	
 	describe('ambiguous level check', () => {
-		const AMBIGUOUS_LEVEL_CHECK = CHECKER_RULES.slice(4, 5)
+		const AMBIGUOUS_LEVEL_CHECK = [CHECKER_RULES[5]]
 
 		test('main token level check', () => {
 			const test_tokens = [create_sentence([
 				create_lookup_token('token', { lookup_results: [] }),
 				create_lookup_token('token', { lookup_results: [
-					lookup_result('token', { level: 1 }),
-					lookup_result('token2', { level: 2 }),
+					lookup_result('token', { level: 1, ontology_id: 1 }),
+					lookup_result('token2', { level: 2, ontology_id: 2 }),
 				] }),
 				create_lookup_token('token', { lookup_results: [
-					lookup_result('token', { level: 1 }),
-					lookup_result('token4', { level: 4 }),
+					lookup_result('token', { level: 1, ontology_id: 3 }),
+					lookup_result('token4', { level: 4, ontology_id: 4 }),
 				] }),
 				create_lookup_token('token', { lookup_results: [
-					lookup_result('token', { level: 2 }),
-					lookup_result('token1', { level: 1 }),
+					lookup_result('token', { level: 2, ontology_id: 5 }),
+					lookup_result('token1', { level: 1, ontology_id: 6 }),
 				] }),
 			])]
-	
+
 			const checked_tokens = apply_rules(test_tokens, AMBIGUOUS_LEVEL_CHECK).flatMap(flatten_sentence)
-	
+
 			expect_no_message(checked_tokens[0])
 			expect_no_message(checked_tokens[1])
 			expect_no_message(checked_tokens[2])
@@ -263,7 +264,7 @@ describe('built-in checker rules', () => {
 	})
 	
 	describe('no lookup check', () => {
-		const NO_LOOKUP_CHECK = CHECKER_RULES.slice(5, 6)
+		const NO_LOOKUP_CHECK = CHECKER_RULES.slice(6, 7)
 
 		test('no results, lookup error', () => {
 			const test_tokens = [create_sentence([

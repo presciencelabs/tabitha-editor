@@ -55,7 +55,7 @@ export function create_token_filter(filter_json) {
 	/**
 	 *
 	 * @param {string} property_name
-	 * @param {(token: Token) => string?} value_getter
+	 * @param {(token: Token) => string} value_getter
 	 */
 	function add_value_filter(property_name, value_getter) {
 		const property_json = filter_json[property_name]
@@ -81,12 +81,12 @@ export function create_token_filter(filter_json) {
 	/**
 	 *
 	 * @param {string} filter_value
-	 * @returns {(value: string?) => boolean}
+	 * @returns {(value: string) => boolean}
 	 */
 	function get_value_checker(filter_value) {
 		const filter_values = filter_value.split('|')
 		if (filter_values.length > 1) {
-			return value => value !== null && filter_values.includes(value)
+			return value => filter_values.includes(value)
 		}
 		return value => value === filter_value
 	}
@@ -340,7 +340,6 @@ export function create_token_transform(transform_json) {
 
 	const function_tag = transform_json['function']
 	if (function_tag !== undefined) {
-		// TODO keep form name value from lookup somehow
 		transforms.push(token => ({
 			...token,
 			type: TOKEN_TYPE.FUNCTION_WORD,

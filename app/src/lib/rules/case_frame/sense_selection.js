@@ -335,7 +335,7 @@ function find_matching_sense(token) {
  * @param {RuleTriggerContext} trigger_context
  */
 function select_word_sense(token, trigger_context) {
-	if (token.lookup_results.length === 0) {
+	if (!token.lookup_results.some(LOOKUP_FILTERS.IS_IN_ONTOLOGY)) {
 		return
 	}
 
@@ -350,7 +350,7 @@ function select_word_sense(token, trigger_context) {
 	// The lookups should already be ordered alphabetically so the first valid sense is the lowest letter
 	const default_matching_sense = find_matching_sense(token) ?? valid_lookups.at(0)?.sense ?? 'A'
 
-	if (token.specified_sense === default_matching_sense) {
+	if (token.specified_sense && token.specified_sense === default_matching_sense) {
 		set_message(trigger_context, { token_to_flag: token, suggest: 'Consider removing the sense, as it would be selected by default.', plain: true })
 	}
 

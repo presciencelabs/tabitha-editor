@@ -578,6 +578,15 @@ const builtin_checker_rules = [
 		},
 	},
 	{
+		name: 'Check argument structure/case frame',
+		comment: 'case frame rules can eventually be used for verbs, adjectives, adverbs, adpositions, and even conjunctions',
+		rule: {
+			trigger: token => token.lookup_results.length > 0,
+			context: create_context_filter({ }),
+			action: message_set_action(validate_case_frame),
+		},
+	},
+	{
 		name: 'Check that level 3 words are within a (complex) alternate',
 		comment: 'The complex word may be in a nested clause within the clause that has the (complex) tag',
 		rule: {
@@ -665,15 +674,6 @@ const builtin_checker_rules = [
 				yield { warning: 'The editor cannot determine which part of speech this word is, so some errors and warnings within the same clause may not be accurate.' }
 				yield { suggest: "Add '_noun', '_verb', '_adj', '_adv', '_adp', or '_conj' after '{token}' if you want the editor to check the syntax more accurately." }
 			}),
-		},
-	},
-	{
-		name: 'Check argument structure/case frame',
-		comment: 'case frame rules can eventually be used for verbs, adjectives, adverbs, adpositions, and even conjunctions',
-		rule: {
-			trigger: token => token.lookup_results.length > 0,
-			context: create_context_filter({ }),
-			action: message_set_action(validate_case_frame),
 		},
 	},
 	{
@@ -828,7 +828,7 @@ function check_ambiguous_level(level_check) {
 		return token.specified_sense.length === 0
 			&& token.lookup_results.length > 0
 			&& level_check(token.lookup_results[0])
-			&& token.lookup_results.filter(LOOKUP_FILTERS.IS_IN_ONTOLOGY).some(result => !level_check(result))
+			&& token.lookup_results.some(result => !level_check(result))
 	}
 }
 

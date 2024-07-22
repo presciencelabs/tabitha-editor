@@ -10,8 +10,8 @@ export async function check_forms(lookup_token) {
 	// The term is expected to have no sense attached to it
 	const term = lookup_token.lookup_terms[0]
 
-	const form_results = await get_matches_from_form_lookup(term)
-	const lookup_results = form_results.filter(result => !result.stem.includes(' '))
+	const lookup_results = (await get_matches_from_form_lookup(term))
+		.filter(result => !result.stem.includes(' '))
 		.reduce(transform_results, [])
 
 	add_missing_forms(lookup_results, term)
@@ -98,15 +98,15 @@ const MISSING_FORMS = new Map([
 	['are', { stem: 'be', part_of_speech: 'Verb', forms: 'present' }],
 	['were', { stem: 'be', part_of_speech: 'Verb', forms: 'past' }],
 	['goodbye', { stem: 'goodbye', part_of_speech: 'Verb', forms: 'stem' }],
-	['goodbied', { stem: 'goodbye', part_of_speech: 'Verb', forms: 'past|past participle' }],
+	['goodbied', { stem: 'goodbye', part_of_speech: 'Verb', forms: 'past|perfect' }],
 	['goodbying', { stem: 'goodbye', part_of_speech: 'Verb', forms: 'participle' }],
 	['goodbyes', { stem: 'goodbye', part_of_speech: 'Verb', forms: 'present' }],
 	['pity', { stem: 'pity', part_of_speech: 'Verb', forms: 'stem' }],
-	['pitied', { stem: 'pity', part_of_speech: 'Verb', forms: 'past|past participle' }],
+	['pitied', { stem: 'pity', part_of_speech: 'Verb', forms: 'past|perfect' }],
 	['pitying', { stem: 'pity', part_of_speech: 'Verb', forms: 'participle' }],
 	['pities', { stem: 'pity', part_of_speech: 'Verb', forms: 'present' }],
 	['sex', { stem: 'sex', part_of_speech: 'Verb', forms: 'stem' }],
-	['sexed', { stem: 'sex', part_of_speech: 'Verb', forms: 'past|past participle' }],
+	['sexed', { stem: 'sex', part_of_speech: 'Verb', forms: 'past|perfect' }],
 	['sexing', { stem: 'sex', part_of_speech: 'Verb', forms: 'participle' }],
 	['sexes', { stem: 'sex', part_of_speech: 'Verb', forms: 'present' }],
 ])
