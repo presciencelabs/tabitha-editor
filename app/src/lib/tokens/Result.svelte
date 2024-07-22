@@ -18,10 +18,10 @@
 
 	<Table slot="popup_content" entries={token.lookup_results} classes="my-2">
 		<svelte:fragment slot="entry_row" let:entry>
-			{@const show_hints = !LOOKUP_FILTERS.IS_IN_ONTOLOGY(entry) || LOOKUP_FILTERS.IS_LEVEL_COMPLEX(entry)}
+			{@const show_hints = !LOOKUP_FILTERS.IS_OR_WILL_BE_IN_ONTOLOGY(entry) || LOOKUP_FILTERS.IS_LEVEL_COMPLEX(entry)}
 			{@const concept = `${entry.stem}-${entry.sense}`}
 	
-			{#if LOOKUP_FILTERS.IS_IN_ONTOLOGY(entry)}
+			{#if LOOKUP_FILTERS.IS_OR_WILL_BE_IN_ONTOLOGY(entry)}
 				<tr>
 					<td class="whitespace-nowrap">
 						<span>

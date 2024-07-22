@@ -7,6 +7,14 @@ function IS_IN_ONTOLOGY(lookup) {
 }
 
 /**
+ * @param {{ ontology_id: number, level: number }} lookup 
+ * @returns {boolean}
+ */
+function IS_OR_WILL_BE_IN_ONTOLOGY(lookup) {
+	return lookup.ontology_id > 0 || lookup.level > -1
+}
+
+/**
  * @param {string} part_of_speech 
  * @returns {(lookup: { part_of_speech: string }) => boolean}
  */
@@ -76,6 +84,7 @@ function HAS_EXTRA_ARGUMENT(argument) {
 
 export const LOOKUP_FILTERS = {
 	IS_IN_ONTOLOGY,
+	IS_OR_WILL_BE_IN_ONTOLOGY,
 	IS_PART_OF_SPEECH,
 	IS_LEVEL,
 	IS_LEVEL_SIMPLE,

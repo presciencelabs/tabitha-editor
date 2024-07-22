@@ -8,7 +8,7 @@
 	export let classes = ''
 </script>
 
-{#if token.lookup_results.some(LOOKUP_FILTERS.IS_IN_ONTOLOGY)}
+{#if token.lookup_results.some(LOOKUP_FILTERS.IS_OR_WILL_BE_IN_ONTOLOGY)}
 	<Result {token} {classes} />
 {:else}
 	<NotFound {token} {classes} />

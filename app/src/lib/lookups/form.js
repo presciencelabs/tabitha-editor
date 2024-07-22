@@ -49,7 +49,7 @@ export async function check_forms(lookup_token) {
 			const new_result = create_lookup_result(form_result, { lexicon_id: form_result.id, form: form_result.form })
 			transformed_results.push(new_result)
 
-		} else if (existing_result && existing_result.lexicon_id === form_result.id) {
+		} else if (existing_result.lexicon_id === form_result.id) {
 			// The lexical entry is the same as a previous one, but it has a different form. Include the new form
 			existing_result.form = `${existing_result.form}|${form_result.form.toLowerCase()}`
 

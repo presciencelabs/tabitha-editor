@@ -175,7 +175,8 @@ export function token_has_message(token, type_to_check=null) {
  * @returns {boolean}
  */
 export function is_one_part_of_speech(token) {
-	return token.lookup_results.every(LOOKUP_FILTERS.IS_PART_OF_SPEECH(token.lookup_results[0].part_of_speech))
+	const part_of_speech_0 = token.lookup_results.at(0)?.part_of_speech ?? ''
+	return token.lookup_results.every(LOOKUP_FILTERS.IS_PART_OF_SPEECH(part_of_speech_0))
 }
 
 /**
