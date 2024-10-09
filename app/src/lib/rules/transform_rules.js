@@ -239,7 +239,7 @@ const transform_rules_json = [
 		'name': '"as" in "as Adj/Adv as..." becomes a function word',
 		'trigger': { 'stem': 'as' },
 		'context': {
-			'followedby': [{ 'category': 'Adjective|Adverb' }, { 'stem': 'as }],
+			'followedby': [{ 'category': 'Adjective|Adverb' }, { 'stem': 'as' }],
 		},
 		'transform': { 'function': { 'degree': 'equality' } },
 		'context_transform': [{ }, { 'function': { 'syntax': 'comparative_as' } }],
