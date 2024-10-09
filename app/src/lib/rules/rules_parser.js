@@ -517,7 +517,6 @@ const SKIP_GROUPS = new Map([
 	]],
 	['vp', [
 		'vp_modifiers',
-		'coordination',
 		{ 'category': 'Verb' },
 	]],
 ])
