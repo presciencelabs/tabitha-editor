@@ -629,8 +629,8 @@ const verb_case_frames = new Map([
 					],
 				},
 				'context_transform': [
-					{ 'function': { 'pre_np_adposition': 'verb_argument' } },
-					{ 'remove_tag': 'relation', 'tag': { 'pre_np_adposition': 'verb_argument' } },
+					{ 'function': { 'syntax': 'verbal_adposition' } },
+					{ 'tag': { 'pre_np_adposition': 'verb_argument' }, 'remove_tag': 'relation' },
 				],
 			},
 		}],

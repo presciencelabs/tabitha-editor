@@ -242,7 +242,7 @@ const transform_rules_json = [
 			'followedby': [{ 'category': 'Adjective|Adverb' }, { 'stem': 'as' }],
 		},
 		'transform': { 'function': { 'degree': 'equality' } },
-		'context_transform': [{ }, { 'function': { 'syntax': 'comparative_as' } }],
+		'context_transform': [{ }, { 'function': { 'pre_np_adposition': 'comparative_as' } }],
 		'comment': "eg 'as valuable as X', etc ",
 	},
 	{
@@ -290,10 +290,13 @@ const transform_rules_json = [
 	},
 	{
 		'name': 'certain Noun-Noun combinations are "title"',
-		'trigger': { 'category': 'Noun', 'stem': 'king|queen|Christ|Caesar|Lord' },
-		'context': { 'followedby': { 'category': 'Noun', 'tag': { 'syntax': 'head_np' } } },
-		'transform': { 'tag': { 'relation': 'title' } },
-		'comment': 'eg. King Herod, Lord Jesus',
+		'trigger': { 'category': 'Noun' },
+		'context': {
+			'precededby': { 'category': 'Noun', 'stem': 'king|queen|Christ|Caesar|Lord' },
+			'notprecededby': { 'tag': 'relation' },
+		},
+		'context_transform': { 'tag': { 'relation': 'title' } },
+		'comment': "eg. King Herod, Lord Jesus, but NOT 'the king's army'",
 	},
 	// Senses of 'be'
 	{
@@ -453,7 +456,7 @@ const transform_rules_json = [
 	},
 	{
 		'name': 'handle comparative noun arguments',
-		'trigger': { 'tag': { 'pre_np_adposition': 'comparative_than' } },
+		'trigger': { 'tag': { 'pre_np_adposition': 'comparative_than|comparative_as' } },
 		'context': {
 			'followedby': { 'category': 'Noun', 'tag': { 'syntax': 'head_np' }, 'skip': 'np_modifiers' },
 		},

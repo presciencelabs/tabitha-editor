@@ -156,6 +156,10 @@ export function phrasify_tokens(tokens) {
 	}
 
 	/**
+	 * Create a phrase based on the part-of-speech of the given token, and copy the tags
+	 * from the head onto the phrase itself. This will make it easier to check the function
+	 * of the phrase.
+	 * 
 	 * @param {Token} head_token 
 	 * @returns {Phrase}
 	 */
@@ -181,6 +185,9 @@ export function phrasify_tokens(tokens) {
 	}
 
 	/**
+	 * Using subtokens was helpful for creating the phrases. But for the sake of the structural rules,
+	 * it's easier if phrases don't have subtokens and instead are simple opening and closing tokens
+	 * surrounding its words, just like in the semantic representation.
 	 * 
 	 * @param {Token} token 
 	 * @returns {Token[]}
@@ -197,14 +204,16 @@ export function phrasify_tokens(tokens) {
 	}
 }
 
-// Below are filters used to determine the scope/boundary of each phrase within a clause.
-// The first filter in each row describes the phrase that the other token filters apply to.
-// 	- These are ordered by priority - if a filter matches, none of the others after it are checked.
-// The other token filters describe the possible surrounding tokens that should be included within the associated phrase.
-// 	- These are ordered by position, from closest to the head word to furthest.
-// 	- A filter will try to match as many tokens as possible. When there is no more match, it goes to the next filter.
-// 	- When all filters have been applied, all tokens that were matched are to be included in the phrase.
-// 	- The order matters because of how English phrases are structured. For example, you say 'the red balloon' NOT 'red the balloon'
+/**
+ * Below are filters used to determine the scope/boundary of each phrase within a clause.
+ * The first filter in each row describes the phrase that the other token filters apply to.
+ * 	- These are ordered by priority - if a filter matches, none of the others after it are checked.
+ * The other token filters describe the possible surrounding tokens that should be included within the associated phrase.
+ * 	- These are ordered by position, from closest to the head word to furthest.
+ * 	- A filter will try to match as many tokens as possible. When there is no more match, it goes to the next filter.
+ * 	- When all filters have been applied, all tokens that were matched are to be included in the phrase.
+ * 	- The order matters because of how English phrases are structured. For example, you say 'the red balloon' NOT 'red the balloon'
+ */
 
 // Filters for tokens that come before the head word of the phrase
 /** @type {[phrase_filter: TokenFilter, token_filters: TokenFilter[]][]} */
