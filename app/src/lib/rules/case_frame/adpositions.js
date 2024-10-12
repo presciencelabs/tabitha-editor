@@ -6,14 +6,14 @@ const default_adposition_usage_json = {
 			'precededby': { 'token': '[', 'skip': { 'tag': 'coord_clause' } },
 		},
 		'tag_role': false,
-		'main_word_tag': { 'syntax': 'adverbial_clause_adposition' }
+		'main_word_tag': { 'syntax': 'adverbial_clause_adposition' },
 	},
 	'in_noun_phrase': {
 		'by_relative_context': {
 			'followedby': { 'tag': { 'syntax': 'head_np' }, 'skip': 'np_modifiers' },
 		},
 		'tag_role': false,
-		'main_word_tag': { 'pre_np_adposition': 'oblique' }
+		'main_word_tag': { 'pre_np_adposition': 'oblique' },
 	},
 }
 
@@ -46,7 +46,7 @@ const adposition_case_frames = new Map([
 			},
 			'other_required': 'would',
 		}],
-	]]
+	]],
 ])
 
 /**

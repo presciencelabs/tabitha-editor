@@ -2,61 +2,6 @@ import { TOKEN_TYPE, create_token } from '$lib/parser/token'
 import { create_token_filter } from '$lib/rules/rules_parser'
 
 /**
- * Below are some example sentences and their expected phrase structure
- * 
-Daniel prayed to God many times.
-[NP Daniel] [VP prayed] [NP to God] [NP [AdjP many] times].
-
-John should quickly go to the house of the tall man.
-[NP John] should [AdvP quickly] [VP go] [NP to the house [NP of the [AdjP tall] man]].
-
-The man [who John knows] wants [to see the king's wood table].
-[NP The man [C who [NP John] [VP knows]]] [VP wants] [C [VP to see] [NP [NP the king's] [NP wood] table]].
-
-The top of John's big house is red.
-[NP The top [NP of [NP John's] [AdjP big] house]] [VP is] [AdjP red].
-
-Some of those students' books are heavier than John's books.
-[NP [AdjP Some of] [NP those students'] books] [VP are] [AdjP heavy].
-
-That snake was thrown by Michael and by Michael's servants out of heaven.
-[NP That snake] [VP was thrown] [NP by Michael] [NP and by [NP Michael's] servants] [NP out of heaven].
-
-John has faith in God named Yahweh.
-[NP John] [VP has] [NP faith [NP in God [NP named Yahweh]]].
-
-John is kind to Mary.
-[NP John] [VP is] [AdjP kind [NP to Mary]].
-
-Paul's books are heavier than John's books.
-[NP [NP Paul's] books] [VP are] [AdjP heavier] [NP than [NP John's] books].
-
-The house is 10 meters tall.
-[NP The house] [VP is] [AdjP [NP [AdjP 10] meters] tall].
-
-Those 10 people's books are big.
-[NP [NP Those [AdjP 10] people's] books] [VP are] [AdjP big].
-
-John read all of John's big book's words.
-[NP John read [NP [AdjP all of] [NP [NP John's] [AdjP big] book's] words].
-
-John's black wood table's legs are tall.
-[NP [NP [NP John's] [AdjP black] [NP wood] table's] legs] [VP are] [AdjP tall].
-
-John should not have been going to Jerusalem.
-[NP John] [VP should not have been going] [NP to Jerusalem].
-
-John did not start to go to Jerusalem.
-[NP John] [VP did not start to go] [NP to Jerusalem].
-
-John was not happy.
-[NP John] [VP was not] [AdjP happy].
-
-John did not want [to leave].
-[NP John] [VP did not want] [C [VP to leave]].
- */
-
-/**
  * 
  * @param {Sentence[]} sentences 
  * @returns {Sentence[]}
@@ -69,7 +14,7 @@ export function phrasify(sentences) {
  * @param {Token[]} tokens
  * @returns {Token[]}
  */
-export function phrasify_tokens(tokens) {
+function phrasify_tokens(tokens) {
 	if (tokens.length === 0) {
 		return []
 	}
@@ -102,7 +47,9 @@ export function phrasify_tokens(tokens) {
 	function expand_phrases(direction) {
 		const i_start = direction < 0 ? tokens.length-1 : 0
 		/** @type {(i: number) => boolean} */
-		const i_condition = direction < 0 ? (i => i >= 0) : (i => i < tokens.length)
+		const i_condition = direction < 0
+			? i => i >= 0
+			: i => i < tokens.length
 
 		for (let i = i_start; i_condition(i); i += direction) {
 			const token = tokens[i]
