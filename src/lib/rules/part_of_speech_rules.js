@@ -8,6 +8,8 @@ import { LOOKUP_FILTERS } from '$lib/lookup_filters'
  * E.g. guard(N/V), command(N/V), pleased(V/Adj), well(N/Adj/Adv)
  * The Analyzer has many of these, but this is just a few for now.
  * TODO add more rules
+ * 
+ * @type {PartOfSpeechRuleJson[]}
  */
 const part_of_speech_rules_json = [
 	{
@@ -500,7 +502,7 @@ const builtin_part_of_speech_rules = [
 
 /**
  *
- * @param {any} rule_json
+ * @param {PartOfSpeechRuleJson} rule_json
  * @returns {TokenRule}
  */
 export function parse_part_of_speech_rule(rule_json) {

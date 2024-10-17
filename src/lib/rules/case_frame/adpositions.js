@@ -1,12 +1,12 @@
 import { check_case_frames, parse_case_frame_rule, parse_sense_rules } from './common'
 
+/** @type {RoleRuleJson} */
 const default_adposition_usage_json = {
 	'opening_subordinate_clause': { 'opening_subordinate_clause': { } },
 	'in_noun_phrase': { 'head_noun': { } },
 }
 
 /** @type {RoleRulePreset[]} */
-// @ts-ignore the map initializer array doesn't like the different object structures
 const ROLE_RULE_PRESETS = [
 	['opening_subordinate_clause', () => ({
 		'by_relative_context': {
@@ -35,7 +35,7 @@ const ROLE_RULE_PRESETS = [
  * These rules allow each adposition sense to specify rules for each argument that is different from the default.
  * Only senses that differ from the default structure need to be included here.
  * 
- * @type {Map<WordStem, [WordSense, any][]>}
+ * @type {Map<WordStem, [WordSense, SenseRuleJson][]>}
  */
 const adposition_case_frames = new Map([
 	['because', [
@@ -97,7 +97,7 @@ function create_adposition_argument_rules() {
 
 	/**
 	 * 
-	 * @param {[WordStem, [WordSense, any][]]} stem_rules 
+	 * @param {[WordStem, [WordSense, SenseRuleJson][]]} stem_rules 
 	 * @returns {[WordStem, ArgumentRulesForSense[]]}
 	 */
 	function create_rules_for_stem([stem, sense_rules_json]) {

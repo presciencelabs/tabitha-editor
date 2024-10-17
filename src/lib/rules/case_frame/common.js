@@ -60,7 +60,7 @@ const ALL_HAVE_EXTRA_ARGUMENT_MESSAGES = [
 
 /**
  * 
- * @param {[RoleTag, any]} rule_json 
+ * @param {[RoleTag, CaseFrameRuleJson]} rule_json 
  * @param {RoleRulePreset[]} [presets=[]] 
  * @returns {ArgumentRoleRule[]}
  */
@@ -134,7 +134,6 @@ export function parse_sense_rules(rule_json, defaults, { sense_presets=null, rol
 				other_optional: rules_json['other_optional']?.split('|') ?? [],
 				other_required: rules_json['other_required']?.split('|') ?? [],
 				patient_clause_type: rules_json['patient_clause_type'] ?? '',
-				transform: create_token_transform(rules_json['transform']),
 			}
 		}
 	}

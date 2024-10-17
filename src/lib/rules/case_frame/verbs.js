@@ -1,6 +1,7 @@
 import { TOKEN_TYPE } from '$lib/parser/token'
 import { check_case_frames, parse_case_frame_rule, parse_sense_rules } from './common'
 
+/** @type {RoleRuleJson} */
 const default_verb_case_frame_json = {
 	'agent': {
 		'directly_before_verb': { },
@@ -29,7 +30,7 @@ const default_verb_case_frame_json = {
 		// For now only accept proper names. Not a big deal because the beneficiary is rarely required (only provide-A requires it)
 		'trigger': { 'tag': { 'syntax': 'head_np' }, 'level': '4' },	
 		'context': { 'precededby': { 'token': 'for', 'skip': 'np_modifiers' } },
-		'context_transform': { 'function': '' },
+		'context_transform': { 'function': { } },
 		'comment': '"for" could mean other things as well. TODO These should be set in the transform rules',
 	},
 	'agent_clause': {
@@ -54,7 +55,7 @@ const default_verb_case_frame_json = {
 	},
 }
 
-/** @type {Map<string, any>} */
+/** @type {Map<SensePresetKey, SenseRuleJson>} */
 const SENSE_RULE_PRESETS = new Map([
 	['patient_from_subordinate_clause', {
 		'patient': {
@@ -72,7 +73,6 @@ const SENSE_RULE_PRESETS = new Map([
 ])
 
 /** @type {RoleRulePreset[]} */
-// @ts-ignore the map initializer array doesn't like the different object structures
 const ROLE_RULE_PRESETS = [
 	['by_adposition', (preset_value, role_tag) => ({
 		'trigger': { 'tag': { 'syntax': 'head_np' } },
@@ -133,7 +133,7 @@ const ROLE_RULE_PRESETS = [
  * These rules allow each verb sense to specify rules for each argument that is different from the default.
  * Only senses that differ from the default structure need to be included here.
  * 
- * @type {Map<WordStem, [WordSense, any][]>}
+ * @type {Map<WordStem, [WordSense, SenseRuleJson][]>}
  */
 const verb_case_frames = new Map([
 	['agree', [
@@ -663,7 +663,7 @@ function create_verb_argument_rules() {
 
 	/**
 	 * 
-	 * @param {[WordStem, [WordSense, any][]]} stem_rules 
+	 * @param {[WordStem, [WordSense, SenseRuleJson][]]} stem_rules 
 	 * @returns {[WordStem, ArgumentRulesForSense[]]}
 	 */
 	function create_rules_for_stem([stem, sense_rules_json]) {

@@ -1,6 +1,7 @@
 import { TOKEN_TYPE } from '$lib/parser/token'
 import { check_case_frames, parse_case_frame_rule, parse_sense_rules } from './common'
 
+/** @type {RoleRuleJson} */
 const default_adjective_case_frame_json = {
 	'modified_noun': {
 		'modified_noun_of_adjective': { },
@@ -16,7 +17,7 @@ const default_adjective_case_frame_json = {
 	},
 }
 
-/** @type {Map<string, any>} */
+/** @type {Map<string, SenseRuleJson>} */
 const SENSE_RULE_PRESETS = new Map([
 	['subgroup_with_optional_of', {
 		'modified_noun': [
@@ -39,7 +40,6 @@ const SENSE_RULE_PRESETS = new Map([
 ])
 
 /** @type {RoleRulePreset[]} */
-// @ts-ignore the map initializer array doesn't like the different object structures
 const ROLE_RULE_PRESETS = [
 	['by_adposition', preset_value => ({
 		'by_relative_context': {
@@ -88,7 +88,7 @@ const ROLE_RULE_PRESETS = [
  * These rules allow each adjective sense to specify rules for each argument that is different from the default.
  * Only senses that differ from the default structure need to be included here.
  * 
- * @type {Map<WordStem, [WordSense, any][]>}
+ * @type {Map<WordStem, [WordSense, SenseRuleJson][]>}
  */
 const adjective_case_frames = new Map([
 	['afraid', [
@@ -215,7 +215,7 @@ function create_adjective_argument_rules() {
 
 	/**
 	 * 
-	 * @param {[WordStem, [WordSense, any][]]} stem_rules 
+	 * @param {[WordStem, [WordSense, SenseRuleJson][]]} stem_rules 
 	 * @returns {[WordStem, ArgumentRulesForSense[]]}
 	 */
 	function create_rules_for_stem([stem, sense_rules_json]) {
