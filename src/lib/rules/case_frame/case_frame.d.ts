@@ -42,27 +42,32 @@ type CaseFrameResult = {
 	missing_arguments: ArgumentRoleRule[]
 }
 
-type SensePresetKey = string
-type RolePresetKey = string
-
-// this has to remain 'any' because it's used to set values. see https://stackoverflow.com/questions/57774361/typescript-interface-key-string#answer-57775405
-type RolePresetValue = any
-
-type RoleRulePreset = [RolePresetKey, (preset_value: RolePresetValue, role_tag: RoleTag) => CaseFrameRuleJson]
-
 type CaseFrameRuleJson = TransformRuleJson & {
 	tag_role?: boolean
 	main_word_tag?: Tag
 	argument_context_index?: number
 	missing_message?: string
 	extra_message?: string
-	argument_context_index?: number
-} & {
-	[preset: RolePresetKey]: RolePresetValue
 }
 
-type RoleRuleJson = {
-	[role_tag: RoleTag | RolePresetKey]: CaseFrameRuleJson | RolePresetValue
+type RoleRuleValueJson = CaseFrameRuleJson | CaseFrameRuleJson[]
+
+type VerbRoleTag = 'agent' | 'patient' | 'state' | 'source' | 'destination' | 'instrument' | 'beneficiary' | 'predicate_adjective'
+	| 'agent_clause' | 'patient_clause_different_participant' | 'patient_clause_same_participant' | 'patient_clause_simultaneous' | 'patient_clause_quote_begin'
+type AdjectiveRoleTag = 'modified_noun' | 'nominal_argument' | 'patient_clause_different_participant' | 'patient_clause_same_participant'
+type AdpositionRoleTag = 'opening_subordinate_clause' | 'in_noun_phrase'
+type OtherRoleTag = RoleTag
+
+type SenseRuleJsonBase = {
+	patient_clause_type?: string
+	other_rules?: { [other_tag: OtherRoleTag]: RoleRuleValueJson }
+	other_required?: RoleTag
+	other_optional?: RoleTag
+	comment?: string
 }
 
-type SenseRuleJson = RoleRuleJson | SensePresetKey
+type RoleRuleJson<K> = {
+	[key in K]?: RoleRuleValueJson
+}
+
+type SenseRuleJson<K> = SenseRuleJsonBase & RoleRuleJson<K>
