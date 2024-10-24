@@ -1,4 +1,4 @@
-import { TOKEN_TYPE } from "$lib/parser/token"
+import { TOKEN_TYPE } from '$lib/token'
 
 /**
  * 
@@ -36,7 +36,7 @@ export function by_adposition(adposition) {
 			'followedby': [
 				{ 'token': adposition },
 				{ 'tag': { 'syntax': 'head_np' }, 'skip': 'np_modifiers' },
-			]
+			],
 		}),
 		'argument_context_index': 1,
 		'transform': { 'tag': { 'role': 'adjective_nominal_argument', 'syntax': 'nested_np' } },

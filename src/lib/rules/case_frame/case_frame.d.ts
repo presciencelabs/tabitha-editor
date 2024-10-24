@@ -21,11 +21,9 @@ type ArgumentRulesForSense = {
 }
 
 type RoleUsageInfo = {
-	possible_roles: string[]
-	required_roles: string[]
+	possible_roles: RoleTag[]
+	required_roles: RoleTag[]
 }
-
-type ArgumentMatchFilter = (role_matches: RoleMatchResult[]) => boolean
 
 type RoleMatchResult = {
 	role_tag: RoleTag

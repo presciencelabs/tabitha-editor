@@ -1,6 +1,6 @@
 import { LOOKUP_FILTERS } from '$lib/lookup_filters'
 import { ERRORS } from '$lib/parser/error_messages'
-import { MESSAGE_TYPE, TOKEN_TYPE, create_added_token, format_token_message, get_message_type, is_one_part_of_speech, set_message_plain } from '$lib/parser/token'
+import { MESSAGE_TYPE, TOKEN_TYPE, create_added_token, format_token_message, is_one_part_of_speech, set_message_plain } from '$lib/token'
 import { REGEXES } from '$lib/regexes'
 import { validate_case_frame } from './case_frame'
 import { create_context_filter, create_token_filter, message_set_action } from './rules_parser'

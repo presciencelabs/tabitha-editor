@@ -1,5 +1,5 @@
 import { LOOKUP_FILTERS } from '$lib/lookup_filters'
-import { TOKEN_TYPE, stem_with_sense, create_case_frame, create_token, format_token_message } from '$lib/parser/token'
+import { TOKEN_TYPE, stem_with_sense, create_case_frame, create_token, format_token_message } from '$lib/token'
 import { pipe } from '$lib/pipeline'
 import { parse_transform_rule } from '../transform_rules'
 
@@ -16,7 +16,7 @@ function missing_argument_message(role_tag) {
 		['patient_clause_same_participant', "The patient clause for {sense} should be written like '{stem} [to sing]')."],
 		['patient_clause_simultaneous', "A simultaneous perception clause is required (e.g. 'John {token} [Mary singing]')."],
 	])
-	return messages.get(role_tag) ?? `Couldn't find the {role} for this {category}.`
+	return messages.get(role_tag) ?? "Couldn't find the {role} for this {category}."
 }
 
 /**
@@ -29,8 +29,8 @@ function extra_argument_message(role_tag) {
 		['patient', `Unexpected {role} for {sense}. ${consult_message}`],
 		['source', `Unexpected {role} for {sense}. ${consult_message}`],
 		['destination', `Unexpected {role} for {sense}. ${consult_message}`],
-		['beneficiary', `{sense} does not usually take a {role}. Check to make sure its usage is acceptable.`],
-		['instrument', `{sense} does not usually take a {role}. Check to make sure its usage is acceptable.`],
+		['beneficiary', '{sense} does not usually take a {role}. Check to make sure its usage is acceptable.'],
+		['instrument', '{sense} does not usually take a {role}. Check to make sure its usage is acceptable.'],
 		['agent_clause', `{sense} cannot be used with an agent clause. ${consult_message}`],
 		['patient_clause_different_participant', `{sense} cannot be used with a different-participant patient clause. ${consult_message}`],
 		['patient_clause_same_participant', `{sense} cannot be used with a same-participant patient clause. ${consult_message}`],
@@ -39,7 +39,7 @@ function extra_argument_message(role_tag) {
 		['predicate_adjective', `{sense} cannot be used with a predicate Adjective. ${consult_message}`],
 		['modified_noun', `{sense} cannot be used attributively. ${consult_message}`],
 	])
-	return messages.get(role_tag) ?? `Unexpected {role} for {sense}. Consult its usage in the Ontology.`
+	return messages.get(role_tag) ?? 'Unexpected {role} for {sense}. Consult its usage in the Ontology.'
 }
 
 /** @type {[RoleTag, string][]} */

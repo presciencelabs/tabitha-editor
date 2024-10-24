@@ -1,4 +1,4 @@
-import { TOKEN_TYPE, set_message, token_has_tag } from '$lib/parser/token'
+import { TOKEN_TYPE, set_message, token_has_tag } from '$lib/token'
 
 /**
  *
