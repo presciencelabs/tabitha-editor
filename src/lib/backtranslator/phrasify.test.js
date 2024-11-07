@@ -13,7 +13,7 @@ async function test_phrasify({ input_text='', expected_text='' }) {
 	const expected_tokens = expected_text.split(' ')
 
 	const result_tokens = flatten_sentences(phrasify(test_sentences))
-	expect(result_tokens.length).toEqual(expected_tokens.length)
+	expect(result_tokens).toHaveLength(expected_tokens.length)
 	for (let i = 0; i < result_tokens.length; i++) {
 		expect(result_tokens[i].token).toBe(expected_tokens[i])
 	}

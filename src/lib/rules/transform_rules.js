@@ -203,7 +203,16 @@ const transform_rules_json = [
 			},
 		},
 		'transform': { 'tag': { 'clause_type': 'patient_clause_simultaneous|patient_clause_different_participant' } },
-		'comment': 'eg. "John saw [Mary walking]." This rule should apply before setting "be" as an auxilliary, but after setting the aspect verbs as auxilliaries',
+		'comment': 'eg. "John saw [Mary walking]." This rule should apply before setting "be" as an auxiliary, but after setting the aspect verbs as auxiliaries',
+	},
+	{
+		'name': 'revert patient_clause_simultaneous clauses with "be"',
+		'trigger': { 'tag': { 'clause_type': 'patient_clause_simultaneous' } },
+		'context': {
+			'subtokens': { 'category': 'Verb', 'stem': 'be', 'skip': 'all' },
+		},
+		'transform': { 'tag': { 'clause_type': 'patient_clause_different_participant' } },
+		'comment': 'eg. "John saw [Mary was walking]." should not be simultaneous. And "John saw [Mary being happy]." does not make sense'
 	},
 	{
 		'name': 'any remaining subordinate_clause is a \'different_participant\' patient clause by default',

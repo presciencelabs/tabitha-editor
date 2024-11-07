@@ -43,7 +43,6 @@ const structural_rules_json = [
 
 				function get_index_for_that() {
 					// Put the 'that' after a conjunction, if present. eg 'X knows that Y and that Z.'
-
 					const first_word_index = trigger_token.sub_tokens.findIndex(create_token_filter({ 'type': TOKEN_TYPE.LOOKUP_WORD }))
 					if (first_word_index !== -1 && create_token_filter({ 'category': 'Conjunction' })(trigger_token.sub_tokens[first_word_index])) {
 						return first_word_index + 1
@@ -113,7 +112,7 @@ const structural_rules_json = [
 		},
 	},
 	{
-		name: 'Change "tribe//region//city//town//country//place named Y" -> "X of Y"',
+		name: 'Change "tribe//region//city//town//country named Y" -> "X of Y"',
 		comment: '',
 		rule: {
 			trigger: create_token_filter({ 'tag': { 'relation': 'name' } }),
@@ -290,7 +289,10 @@ const structural_rules_json = [
 					create_token('the', TOKEN_TYPE.FUNCTION_WORD),
 					create_token('Scriptures', TOKEN_TYPE.LOOKUP_WORD),
 				]
+
 				const inner_phrase_start = find_phrase_start(tokens, context_indexes[0])
+				fix_capitalization(tokens.slice(inner_phrase_start), new_tokens)
+
 				tokens.splice(inner_phrase_start, trigger_index - inner_phrase_start + 1, ...new_tokens)
 
 				// If the next word is a verb, change it from singular to plural
