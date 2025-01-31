@@ -41,7 +41,7 @@ export function by_adposition(adposition) {
 		'argument_context_index': 1,
 		'transform': { 'tag': { 'role': 'adjective_nominal_argument', 'syntax': 'nested_np' } },
 		'context_transform': { 'function': { 'pre_np_adposition': 'adjective_argument', 'relation': '' } },	// make the adposition a function word and clear other tag values
-		'missing_message': `Couldn't find the nominal argument, which in this case should have '${adposition}' before it.`,
+		'missing_message': `{sense} expects a nominal argument, i.e. '{stem} ${adposition} N'.`,
 	}
 }
 
@@ -57,6 +57,22 @@ export function by_clause_tag(clause_type) {
 		}),
 		'transform': { 'tag': { 'role': 'adjective_clausal_argument' } },
 		'comment': 'the clause should immediately follow the adjective',	// TODO is this true?
+	}
+}
+
+/**
+ * 
+ * @param {string} complementizer 
+ * @returns {CaseFrameRuleJson}
+ */
+export function by_complementizer(complementizer) {
+	return {
+		'trigger': { 'type': TOKEN_TYPE.CLAUSE, 'tag': { 'clause_type': 'adverbial_clause' } },
+		'context': {
+			'subtokens': { 'token': complementizer, 'skip': 'clause_start' },
+		},
+		'transform': { 'tag': { 'clause_type': 'patient_clause_different_participant', 'role': 'adjective_clausal_argument' } },
+		'subtoken_transform': { 'function': { 'syntax': 'complementizer' } },
 	}
 }
 
