@@ -272,11 +272,20 @@ const adjective_sense_priority_overrides = [
 		// When faithful-C has a nominal argument, it should be prioritized over -A
 		['faithful-C', { 'nominal_argument': { } }],
 	]],
+	['full', [['full-B', { }]]],
 	['gentle', [['gentle-B', { }]]],
+	['hard', [
+		// Only when hard-B has a nominal argument should it be prioritized over hard-A
+		['hard-B', { 'nominal_argument': { } }],
+	]],
 	['kind', [['kind-B', { }]]],
 	['long', [
 		['long-C', { }],
 		['long-B', { 'nominal_argument': { 'stem': 'time' } }],
+	]],
+	['loyal', [
+		// Only when loyal-B has a nominal argument should it be prioritized over loyal-A
+		['loyal-B', { 'nominal_argument': { } }],
 	]],
 	['merciful', [['merciful-B', { }]]],
 	['old', [['old-B', { }]]],
