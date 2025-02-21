@@ -74,6 +74,7 @@ const adjective_case_frames = new Map([
 		['few-A', {
 			'modified_noun_with_subgroup': modified_noun_with_subgroup(),
 			'other_optional': 'modified_noun_with_subgroup',
+			'comment': 'TODO remove when few is marked as a Quantity',
 		}],
 	]],
 	['full', [
@@ -95,20 +96,6 @@ const adjective_case_frames = new Map([
 	]],
 	['happy', [
 		['happy-A', { 'nominal_argument': by_adposition('with') }],
-	]],
-	['hard', [
-		['hard-B', {
-			'nominal_argument': by_adposition('for'),
-			'other_optional': 'nominal_argument',
-			'comment': 'TODO remove the "other_optional" when the Ontology gets updated'
-		}],
-	]],
-	['high', [
-		['high-A', {
-			'nominal_argument': unit_with_measure('length'),
-			'other_optional': 'nominal_argument',
-			'comment': 'TODO remove the "other_optional" when the Ontology gets updated'
-		}],
 	]],
 	['honest', [
 		['honest-A', { 'nominal_argument': by_adposition('with') }],
@@ -164,6 +151,7 @@ const adjective_case_frames = new Map([
 		['most-A', {
 			'modified_noun_with_subgroup': modified_noun_with_subgroup(),
 			'other_optional': 'modified_noun_with_subgroup',
+			'comment': 'TODO remove when most is marked as a Quantity',
 		}],
 	]],
 	['old', [
@@ -238,13 +226,14 @@ const adjective_case_frames = new Map([
 		}],
 	]],
 	['surprised', [
-		['surprised-A', {
+		['surprised-C', {
 			'nominal_argument': by_adposition('by'),
 			'other_optional': 'nominal_argument',
 			'comment': 'TODO remove the "other_optional" when the Ontology gets updated'
 		}],
 	]],
 	['tall', [
+		// TODO change to tall-B when added to the Ontology
 		['tall-A', { 'nominal_argument': unit_with_measure('length') }],
 	]],
 	['upset', [

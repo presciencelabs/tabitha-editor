@@ -274,10 +274,6 @@ const adjective_sense_priority_overrides = [
 	]],
 	['full', [['full-B', { }]]],
 	['gentle', [['gentle-B', { }]]],
-	['hard', [
-		// Only when hard-B has a nominal argument should it be prioritized over hard-A
-		['hard-B', { 'nominal_argument': { } }],
-	]],
 	['kind', [['kind-B', { }]]],
 	['long', [
 		['long-C', { }],
@@ -296,6 +292,7 @@ const adjective_sense_priority_overrides = [
 		// Only when sad-B has a nominal argument should it be prioritized over sad-A
 		['sad-B', { 'nominal_argument': { } }],
 	]],
+	['surprised', [['surprised-C', { }]]],
 	['upset', [
 		['upset-B', { }],
 		['upset-C', { }],
