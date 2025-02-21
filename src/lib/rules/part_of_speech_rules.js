@@ -143,14 +143,24 @@ const part_of_speech_rules_json = [
 		'comment': 'Dan. 1:12 Please give only(Adj/Adv) vegetables ...  Paul like most(Adj/Adv) books.',
 	},
 	{
-		'name': 'If Adverb-Adjective "hard" preceded by "be", remove Adverb',
+		'name': 'If Adverb-Adjective "hard" is preceded by "be/become", remove Adverb',
 		'category': 'Adverb|Adjective',
 		'trigger': { 'stem': 'hard' },
 		'context': {
-			'precededby': { 'stem': 'be', 'skip': 'adjp_modifiers_attributive' },
+			'precededby': { 'stem': 'be|become', 'skip': 'adjp_modifiers_attributive' },
 		},
 		'remove': 'Adverb',
 		'comment': 'Those things are hard(Adv/Adj) for John.',
+	},
+	{
+		'name': 'If Adverb-Adjective "hard" is directly preceded by any other verb, remove Adjective',
+		'category': 'Adverb|Adjective',
+		'trigger': { 'stem': 'hard' },
+		'context': {
+			'precededby': { 'category': 'Verb' },
+		},
+		'remove': 'Adjective',
+		'comment': 'John worked hard(Adv/Adj).',
 	},
 	{
 		'name': 'If Adverb-Adjective followed by a Verb or Adposition, remove Adjective',
