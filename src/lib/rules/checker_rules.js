@@ -457,13 +457,6 @@ const checker_rules_json = [
 		'comment': "The 'have' verb is already a function token, and so we can't use 'stem'",
 	},
 	{
-		'name': "Warn that 'come' cannot be used for events, only things that move",
-		'trigger': { 'stem': 'come' },
-		'warning': {
-			'message': "Note that 'come' can only be used for things that move, NOT for events.",
-		},
-	},
-	{
 		'name': 'Cannot have two conjunctions to begin a sentence',
 		'trigger': { 'category': 'Conjunction' },
 		'context': {
