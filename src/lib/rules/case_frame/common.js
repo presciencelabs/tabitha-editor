@@ -304,15 +304,18 @@ export function* validate_case_frame(trigger_context) {
 	if (no_matches_and_ambiguous_sense(token)) {
 		yield { error: "This use of '{stem}' does not match any sense in the Ontology. Check other errors and warnings for more information." }
 
-		// show the invalid arguments for all lookup results
-		for (const result of token.lookup_results) {
-			yield show_invalid_roles(result)
-		}
-
+		// flag any extra roles common to all lookup results
 		const extra_roles_for_all = token.lookup_results[0].case_frame.extra_arguments.filter(({ role_tag }) => role_is_extra_for_all(role_tag, token))
 		for (const extra_argument of extra_roles_for_all) {
 			const extra_message = ALL_HAVE_EXTRA_ARGUMENT_MESSAGES.find(([role]) => role === extra_argument.role_tag)?.[1] || extra_argument.rule.extra_message
+			// put the error message on both the trigger token AND the argument token
+			yield { error: extra_message }
 			yield flag_extra_argument(trigger_context, extra_message)(extra_argument)
+		}
+
+		// show the invalid arguments for each lookup result
+		for (const result of token.lookup_results) {
+			yield show_invalid_roles(result)
 		}
 
 		return
@@ -353,7 +356,7 @@ function show_invalid_roles(lookup) {
 
 	const joiner = missing_message.length && extra_message.length ? '; ' : ''
 	
-	return { error: `${lookup.stem}-${lookup.sense}: ${missing_message}${joiner}${extra_message}` }
+	return { info: `${lookup.stem}-${lookup.sense}: ${missing_message}${joiner}${extra_message}` }
 }
 
 /**
