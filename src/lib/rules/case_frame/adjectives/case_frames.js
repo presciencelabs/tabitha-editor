@@ -113,8 +113,8 @@ const adjective_case_frames = new Map([
 	['interested', [
 		['interested-A', {
 			'patient_clause_same_participant': [
-				by_clause_tag('patient_clause_same_participant'),
 				by_same_participant_complementizer('in'),
+				by_clause_tag('patient_clause_same_participant'),
 			],
 			'patient_clause_different_participant': { 'trigger': 'none' },
 		}],
