@@ -557,6 +557,18 @@ const checker_rules_json = [
 			'message': "For literal/dynamic expansions, write 'X of Y {token}' instead of 'X Y of {token}'.",
 		},
 	},
+	{
+		'name': 'Check for negation on Adjectives',
+		'trigger': { 'tag': { 'verb_polarity': 'negative' } },
+		'context': {
+			'followedby': { 'category': 'Adjective', 'skip': 'adjp_modifiers_attributive' },
+			'notprecededby': { 'stem': 'be', 'skip': 'all' },
+		},
+		'error': {
+			'message': "Adjectives cannot be negated. Negate the Verb instead or find another way to word it.",
+		},
+		'comment': 'eg. "Not all of the people of Israel are true people of God." But something like "John is not happy" is still valid.'
+	},
 ]
 
 /** @type {BuiltInRule[]} */
