@@ -546,6 +546,17 @@ const checker_rules_json = [
 		},
 		'comment': "See Phase 1 Checklist section 27. eg 'John did not go [in-order-to buy food].' - does this mean he didn't go at all or he went for a different reason?",
 	},
+	{
+		'name': "Check for if 'of' is in the wrong place before a _literalExpansion/_dynamicExpansion token",
+		'trigger': { 'token': '_literalExpansion|_dynamicExpansion' },
+		'context': {
+			'precededby': { 'token': 'of' },
+		},
+		'error': {
+			'on': 'context:0',
+			'message': "For literal/dynamic expansions, write 'X of Y {token}' instead of 'X Y of {token}'.",
+		},
+	},
 ]
 
 /** @type {BuiltInRule[]} */

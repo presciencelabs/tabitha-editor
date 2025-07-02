@@ -238,6 +238,12 @@ const structural_rules_json = [
 				// move 'of' to the end of the inner phrase and add the implicit markers
 				const inner_phrase_start = find_phrase_start(tokens, of_index)
 				const inner_phrase_end = find_phrase_end(tokens, of_index)
+
+				if (inner_phrase_start === -1 || inner_phrase_end === -1) {
+					// the 'of' was found outside an NP, and continuing may cause errors
+					return trigger_index + 1
+				}
+
 				const new_inner_phrase = [
 					...is_literal ? [] : [create_token('<<', TOKEN_TYPE.PUNCTUATION)],
 					...tokens.slice(inner_phrase_start, of_index),
