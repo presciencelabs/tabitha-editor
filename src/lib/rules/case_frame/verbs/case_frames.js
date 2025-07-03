@@ -298,7 +298,7 @@ const verb_case_frames = new Map([
 	]],
 	['blow', []],
 	['born', [
-		['born-A', with_be_auxiliary()]
+		['born-A', with_be_auxiliary()],
 	]],
 	['break', [
 		['break-A', { 'destination': by_adposition('to|into') }],

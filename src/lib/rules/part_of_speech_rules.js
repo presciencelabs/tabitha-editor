@@ -444,14 +444,14 @@ const part_of_speech_rules_json = [
 			'followedby': { 'category': 'Noun', 'skip': 'np_modifiers' },
 		},
 		'remove': 'Noun',
-		'comment': 'eg. On that day...'
+		'comment': 'eg. On that day...',
 	},
 	{
 		'name': 'If Noun-Adposition "On" is followed by anything else, remove Adposition',
 		'category': 'Noun|Adposition',
 		'trigger': { 'token': 'On' },
 		'remove': 'Adposition',
-		'comment': 'eg. On saw a lion.'
+		'comment': 'eg. On saw a lion.',
 	},
 ]
 

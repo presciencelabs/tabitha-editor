@@ -348,7 +348,7 @@ const checker_rules_json = [
 		'comment': 'See section 0.41 of the Phase 1 checklist',
 	},
 	{
-		'name': "Don\'t allow 'where' as a relativizer",
+		'name': "Don't allow 'where' as a relativizer",
 		'trigger': { 'token': 'where' },
 		'context': {
 			'precededby': { 'token': '[' },
@@ -360,7 +360,7 @@ const checker_rules_json = [
 		'comment': 'See section 0.8 of the Phase 1 checklist',
 	},
 	{
-		'name': "Don\'t allow 'when' as a relativizer",
+		'name': "Don't allow 'when' as a relativizer",
 		'trigger': { 'type': TOKEN_TYPE.CLAUSE },
 		'context': {
 			'precededby': { 'token': 'time' },
@@ -565,9 +565,9 @@ const checker_rules_json = [
 			'notprecededby': { 'stem': 'be', 'skip': 'all' },
 		},
 		'error': {
-			'message': "Adjectives cannot be negated. Negate the Verb instead or find another way to word it.",
+			'message': 'Adjectives cannot be negated. Negate the Verb instead or find another way to word it.',
 		},
-		'comment': 'eg. "Not all of the people of Israel are true people of God." But something like "John is not happy" is still valid.'
+		'comment': 'eg. "Not all of the people of Israel are true people of God." But something like "John is not happy" is still valid.',
 	},
 ]
 
