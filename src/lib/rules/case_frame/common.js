@@ -145,6 +145,10 @@ export function initialize_case_frame_rules({ trigger_token }, rule_info_getter)
 	 */
 	function initialize_rules(token) {
 		const { rules_by_sense, default_rule_getter, role_info_getter } = rule_info_getter(token)
+		if (rules_by_sense.length === 0) {
+			// No rules for this word, so nothing to initialize
+			return
+		}
 		for (const lookup of token.lookup_results.filter(LOOKUP_FILTERS.IS_IN_ONTOLOGY)) {
 			const rules_for_sense = get_rules_for_sense(rules_by_sense, default_rule_getter)(lookup)
 			lookup.case_frame = {
@@ -160,7 +164,11 @@ export function initialize_case_frame_rules({ trigger_token }, rule_info_getter)
  * @param {RuleTriggerContext} trigger_context
  */
 export function check_case_frames(trigger_context) {
-	for (const lookup of trigger_context.trigger_token.lookup_results.filter(LOOKUP_FILTERS.IS_IN_ONTOLOGY)) {
+	const lookups_to_check = trigger_context.trigger_token.lookup_results
+		.filter(LOOKUP_FILTERS.IS_IN_ONTOLOGY)
+		.filter(lookup => lookup.case_frame?.rules.length > 0)
+
+	for (const lookup of lookups_to_check) {
 		const match_results = match_sense_rules(trigger_context, lookup)
 		lookup.case_frame.result = check_usage(lookup, match_results)
 	}
@@ -172,10 +180,13 @@ export function check_case_frames(trigger_context) {
 export function check_pairing_case_frames({ trigger_token }) {
 	// check the usage of the complex pairing against the matched arguments of the selected result
 	const selected_result = trigger_token.lookup_results[0]
-	const pairing_results = trigger_token.complex_pairing?.lookup_results ?? []
+	const lookups_to_check = trigger_token.complex_pairing?.lookup_results
+		.filter(LOOKUP_FILTERS.IS_IN_ONTOLOGY)
+		.filter(lookup => lookup.case_frame?.rules.length > 0)
+		?? []
 
-	for (const pairing_result of pairing_results) {
-		pairing_result.case_frame.result = check_usage(pairing_result, selected_result.case_frame.result.valid_arguments)
+	for (const lookup of lookups_to_check) {
+		lookup.case_frame.result = check_usage(lookup, selected_result.case_frame.result.valid_arguments)
 	}
 }
 
