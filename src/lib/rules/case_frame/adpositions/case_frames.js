@@ -124,6 +124,7 @@ const ADPOSITION_USAGE_RULES = create_adposition_argument_rules()
 /**
  * 
  * @param {Token} token
+ * @returns {CaseFrameRuleInfo}
  */
 export function get_adposition_case_frame_rules(token) {
 	const stem = token.lookup_results[0].stem
@@ -131,6 +132,7 @@ export function get_adposition_case_frame_rules(token) {
 		rules_by_sense: ADPOSITION_USAGE_RULES.get(stem) ?? [],
 		default_rule_getter: get_default_usage_rules,
 		role_info_getter: get_adposition_usage_info,
+		should_check: true,
 	}
 }
 

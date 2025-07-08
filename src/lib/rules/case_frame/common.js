@@ -62,9 +62,9 @@ function extra_argument_message(role_tag) {
 
 /** @type {Map<RoleTag, string>} */
 const ALL_HAVE_EXTRA_ARGUMENT_MESSAGES = new Map([
-	['patient_clause_same_participant', '\'{stem}\' cannot be used with a same-participant patient clause. This likely should be \'[in-order-to...]\' or \'[so-that...]\' instead.'],
-	['patient_clause_quote_begin', '\'{stem}\' can never be used with direct speech. Consult its usage in the Ontology.'],
-	['predicate_adjective', '\'{stem}\' can never be used with a predicate adjective. Consider using something like \'cause [X to be...]\'. Consult its usage in the Ontology.'],
+	['patient_clause_same_participant', "'{stem}' cannot be used with a same-participant patient clause. This likely should be '[in-order-to...]' or '[so-that...]' instead."],
+	['patient_clause_quote_begin', "'{stem}' can never be used with direct speech. Consult its usage in the Ontology."],
+	['predicate_adjective', "'{stem}' can never be used with a predicate adjective. Consider using something like 'cause [X to be...]'. Consult its usage in the Ontology."],
 ])
 
 /**
@@ -144,9 +144,8 @@ export function initialize_case_frame_rules({ trigger_token }, rule_info_getter)
 	 * @param {Token} token 
 	 */
 	function initialize_rules(token) {
-		const { rules_by_sense, default_rule_getter, role_info_getter } = rule_info_getter(token)
-		if (rules_by_sense.length === 0) {
-			// No rules for this word, so nothing to initialize
+		const { rules_by_sense, default_rule_getter, role_info_getter, should_check } = rule_info_getter(token)
+		if (!should_check) {
 			return
 		}
 		for (const lookup of token.lookup_results.filter(LOOKUP_FILTERS.IS_IN_ONTOLOGY)) {
@@ -346,7 +345,7 @@ export function* validate_case_frame(trigger_context) {
 		// flag any extra roles common to all lookup results
 		const extra_roles_for_all = selected_result.case_frame.result.extra_arguments.filter(({ role_tag }) => role_is_extra_for_all(role_tag, token))
 		for (const extra_argument of extra_roles_for_all) {
-			const extra_message = ALL_HAVE_EXTRA_ARGUMENT_MESSAGES.get(extra_argument.role_tag)?.[1] || extra_argument.rule.extra_message
+			const extra_message = ALL_HAVE_EXTRA_ARGUMENT_MESSAGES.get(extra_argument.role_tag) || extra_argument.rule.extra_message
 			// put the error message on both the trigger token AND the argument token
 			yield { error: extra_message }
 			yield flag_extra_argument(trigger_context, extra_message)(extra_argument)

@@ -832,6 +832,7 @@ export function get_verb_case_frame_rules(token) {
 			rules_by_sense: [],
 			default_rule_getter: () => [],
 			role_info_getter: () => ({ possible_roles: [], required_roles: [] }),
+			should_check: false,
 		}
 	}
 
@@ -839,6 +840,7 @@ export function get_verb_case_frame_rules(token) {
 		rules_by_sense: argument_rules_by_sense,
 		default_rule_getter: () => get_default_rules_for_stem(stem),
 		role_info_getter: get_verb_usage_info,
+		should_check: true,
 	}
 }
 
@@ -861,6 +863,7 @@ export function get_passive_verb_case_frame_rules(token) {
 			.map(rules_for_sense => ({ ...rules_for_sense, rules: replace_passive_rules(rules_for_sense.role_rules) })),
 		default_rule_getter: lookup => replace_passive_rules(active_rules.default_rule_getter(lookup)),
 		role_info_getter: active_rules.role_info_getter,
+		should_check: true,
 	}
 
 	/**

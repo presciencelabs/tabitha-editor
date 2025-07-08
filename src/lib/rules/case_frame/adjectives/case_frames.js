@@ -278,6 +278,7 @@ const SUBGROUPABLE_CASE_FRAME_RULE = parse_case_frame_rule(['modified_noun_with_
 
 /**
  * @param {Token} token
+ * @returns {CaseFrameRuleInfo}
  */
 export function get_adjective_case_frame_rules(token) {
 	const stem = token.lookup_results[0].stem
@@ -285,6 +286,7 @@ export function get_adjective_case_frame_rules(token) {
 		rules_by_sense: ADJECTIVE_CASE_FRAME_RULES.get(stem) ?? [],
 		default_rule_getter: get_adjective_default_rules,
 		role_info_getter: get_adjective_usage_info,
+		should_check: true,
 	}
 }
 

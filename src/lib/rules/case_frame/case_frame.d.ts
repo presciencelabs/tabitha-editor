@@ -25,6 +25,7 @@ type CaseFrameRuleInfo = {
 	rules_by_sense: ArgumentRulesForSense[]
 	default_rule_getter: DefaultRuleGetter
 	role_info_getter: RoleInfoGetter
+	should_check: boolean
 }
 
 type CaseFrame = {
