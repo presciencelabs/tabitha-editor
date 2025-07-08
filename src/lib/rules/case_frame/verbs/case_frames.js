@@ -902,7 +902,7 @@ function get_verb_usage_info(categorization, { other_optional, other_required, p
 	// also accept any values specified in a role rule
 	if (role_letters.length === 0) {
 		return {
-			possible_roles: [...VERB_LETTER_TO_ROLE.values(), patient_clause_type],
+			possible_roles: [...Object.keys(default_verb_case_frame_json)],
 			required_roles: other_required,
 		}
 	}
