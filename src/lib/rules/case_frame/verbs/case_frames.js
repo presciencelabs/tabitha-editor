@@ -28,10 +28,15 @@ const default_verb_case_frame_json = {
 	},
 	'beneficiary': {
 		// TODO check feature on lexicon word like the Analyzer does. beneficiaries have to be animate, not things.
-		// For now only accept proper names. Not a big deal because the beneficiary is rarely required (only provide-A requires it)
-		'trigger': { 'tag': { 'syntax': 'head_np' }, 'level': '4' },	
-		'context': { 'precededby': { 'token': 'for', 'skip': 'np_modifiers' } },
-		'context_transform': { 'function': { } },
+		// For now only accept proper names. Not a big deal because the beneficiary is never required, and could be used for most verbs.
+		...by_relative_context({
+			'followedby': [
+				{ 'token': 'for', 'skip': 'all' },
+				{ 'tag': { 'syntax': 'head_np' }, 'level': '4', 'skip': 'np_modifiers' },
+			],
+		}),
+		'argument_context_index': 1,
+		'context_transform': { 'function': { 'pre_np_adposition': 'verb_argument' } },
 		'comment': '"for" could mean other things as well. TODO These should be set in the transform rules',
 	},
 	'agent_clause': by_clause_tag('agent_clause'),
@@ -915,7 +920,7 @@ function get_verb_usage_info(categorization, { other_optional, other_required, p
 	const possible_roles = role_letters
 		.map(c => VERB_LETTER_TO_ROLE.get(c.toUpperCase()))
 		.map(role => role === 'patient_clause' ? patient_clause_type : role)
-		.concat([...other_optional, ...other_required])
+		.concat([...other_optional, ...other_required, 'beneficiary'])	// beneficiaries are always possible
 		.filter(role => role)
 
 	/** @type {string[]} */
