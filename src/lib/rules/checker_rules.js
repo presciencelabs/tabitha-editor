@@ -613,6 +613,9 @@ const builtin_checker_rules = [
 				 * @return {MessageInfo}
 				 */
 				function check_for_empty_theta_grid(token) {
+					if (token.lookup_results.length === 0) {
+						return {}
+					}
 					if (token.lookup_results.every(lookup => lookup.categorization.length === 0)) {
 						return { token_to_flag: token, warning: "'{stem}' has no theta grid information to check with. Double check the expected arguments with a colleague." }
 					} else if (token.lookup_results[0].categorization.length === 0) {
