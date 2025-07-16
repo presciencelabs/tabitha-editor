@@ -1,6 +1,6 @@
 import { TOKEN_TYPE } from '$lib/token'
 import { parse_case_frame_rule, parse_sense_rules } from '../common'
-import { by_adposition, by_clause_tag, by_complementizer, by_relative_context, directly_after_verb, directly_after_verb_with_adposition, directly_before_verb, patient_from_subordinate_clause, predicate_adjective, with_be_auxiliary, with_no_double_patient } from './presets'
+import { by_adposition, by_clause_tag, by_complementizer, by_adposition_concept, by_relative_context, directly_after_verb, directly_after_verb_with_adposition, directly_before_verb, patient_from_subordinate_clause, predicate_adjective, with_be_auxiliary, with_no_double_patient } from './presets'
 
 /** @type {RoleRuleJson<VerbRoleTag>} */
 const default_verb_case_frame_json = {
@@ -290,6 +290,10 @@ const verb_case_frames = new Map([
 			],
 		}],
 	]],
+	['beg', [
+		['beg-C', { 'patient_clause_type': 'patient_clause_quote_begin' }],
+	]],
+	['begin', []],
 	['believe', [
 		['believe-B', { 'patient': directly_after_verb_with_adposition('in') }],
 	]],
@@ -304,10 +308,20 @@ const verb_case_frames = new Map([
 			'destination': { },	// clear the rule so the 'to' doesn't trigger it
 		}],
 	]],
+	['blame', [
+		['blame-A', patient_from_subordinate_clause()],
+		['blame-C', {
+			'patient_clause_different_participant': [
+				by_complementizer('for'),
+				by_clause_tag('patient_clause_different_participant'),
+			],
+		}],
+	]],
 	['blow', []],
 	['born', [
 		['born-A', with_be_auxiliary()],
 	]],
+	['borrow', []],
 	['break', [
 		['break-A', { 'destination': by_adposition('to|into') }],
 	]],
@@ -315,8 +329,12 @@ const verb_case_frames = new Map([
 		['breathe-B', { 'destination': by_adposition('to|into') }],
 	]],
 	['bring', []],
+	['build', []],
 	['burn', [
 		['burn-A', { 'instrument': by_adposition('with') }],
+	]],
+	['bury', [
+		['bury-A', { 'destination': by_adposition('in') }],
 	]],
 	['buy', [
 		['buy-A', { 'instrument': by_adposition('with|for') }],
@@ -354,6 +372,10 @@ const verb_case_frames = new Map([
 		['carry-C', { 'instrument': by_adposition('with') }],
 		['carry-E', { 'instrument': by_adposition('with') }],
 	]],
+	['catch', [
+		['catch-B', { 'instrument': by_adposition('with') }],
+		['catch-C', { 'instrument': by_adposition('with') }],
+	]],
 	['cause', []],
 	['celebrate', [
 		['celebrate-A', { 'instrument': by_adposition('with') }],
@@ -379,6 +401,8 @@ const verb_case_frames = new Map([
 		['change-C', { 'destination': by_adposition('to|into') }],
 		['change-E', { 'destination': by_adposition('to|into') }],
 	]],
+	['chase', []],
+	['chase-away', []],
 	['choose', [
 		['choose-B', patient_from_subordinate_clause()],
 		['choose-C', { 'patient_clause_type': 'patient_clause_same_participant' }],
@@ -438,7 +462,7 @@ const verb_case_frames = new Map([
 	]],
 	['doubt', []],
 	['drop', [
-		['drop-A', { 'destination': by_adposition('to|on|into') }],
+		['drop-A', { 'destination': by_adposition_concept('to|on|into') }],
 	]],
 	['eat', [
 		['eat-A', { 'instrument': by_adposition('with') }],
@@ -462,10 +486,10 @@ const verb_case_frames = new Map([
 		['fail-B', { 'patient_clause_type': 'patient_clause_same_participant' }],
 	]],
 	['fall', [
-		['fall-A', { 'destination': by_adposition('to|on|into') }],
-		['fall-B', { 'destination': by_adposition('to|on|into') }],
-		['fall-D', { 'destination': by_adposition('to|on|into') }],
-		['fall-E', { 'destination': by_adposition('to|on|into') }],
+		['fall-A', { 'destination': by_adposition_concept('to|on|into') }],
+		['fall-B', { 'destination': by_adposition_concept('to|on|into') }],
+		['fall-D', { 'destination': by_adposition_concept('to|on|into') }],
+		['fall-E', { 'destination': by_adposition_concept('to|on|into') }],
 	]],
 	['fight', [
 		['fight-A', {
@@ -522,6 +546,13 @@ const verb_case_frames = new Map([
 			'comment': 'The boys grew up. OR The boys grew-B.',
 		}],
 	]],
+	['hang', [
+		['hang-B', { 'destination': by_adposition('on') }],
+		['hang-C', { 'destination': by_adposition('on') }],
+	]],
+	['hate', [
+		['hate-B', { 'patient_clause_type': 'patient_clause_same_participant' }],
+	]],
 	['have', [
 		['have-J', { 'instrument': by_adposition('with') }],
 	]],
@@ -534,24 +565,52 @@ const verb_case_frames = new Map([
 	['help', [
 		['help-B', patient_from_subordinate_clause()],
 	]],
+	['hide', [
+		['hide-A', { 'destination': by_adposition_concept() }],
+	]],
+	['hope', [
+		['hope-B', { 'patient_clause_type': 'patient_clause_same_participant' }],
+	]],
 	['hurt', [
 		['hurt-C', with_be_auxiliary()],
+	]],
+	['increase', []],
+	['invite', [
+		['invite-A', patient_from_subordinate_clause()],
+	]],
+	['join', []],
+	['keep', [
+		['keep-A', { 'destination': by_adposition_concept('in') }],
+		['keep-C', { 'destination': by_adposition('in') }],
 	]],
 	['kill', []],
 	['know', [
 		['know-D', { 'patient': directly_after_verb_with_adposition('about') }],
 		['know-B', { 'instrument': by_adposition('with') }],
 	]],
+	['know-how', [
+		['know-how-A', { 'patient_clause_type': 'patient_clause_same_participant' }],
+	]],
 	['laugh', [
 		['laugh-B', { 'patient': directly_after_verb_with_adposition('at') }],
 	]],
+	['lead', []],
 	['learn', [
 		['learn-C', { 'patient': directly_after_verb_with_adposition('about') }],
 	]],
+	['learn-how', [
+		['learn-how-A', { 'patient_clause_type': 'patient_clause_same_participant' }],
+	]],
 	['leave', []],
+	['let', []],
+	['lie', []],
 	['lift', []],
 	['like', [
 		['like-B', { 'patient_clause_type': 'patient_clause_same_participant' }],
+	]],
+	['listen', [
+		['listen-A', { 'patient': directly_after_verb_with_adposition('to') }],
+		['listen-B', { 'patient': directly_after_verb_with_adposition('to') }],
 	]],
 	['live', [
 		['live-A', {
@@ -630,11 +689,65 @@ const verb_case_frames = new Map([
 	['marry', [
 		['marry-B', with_be_auxiliary()],
 	]],
+	['mean', [
+		['mean-A', { 'other_optional': 'predicate_adjective' }],
+		['mean-D', {
+			'patient_clause_type': 'patient_clause_same_participant',
+			'comment': "'X means [to go]' - technically just an infinitive verb, but looks like a 'same participant' clause",
+		}],
+		['mean-E', { 'other_optional': 'patient_clause_different_participant' }],
+	]],
+	['move', []],
+	['need', [
+		['need-C', { 'patient_clause_type': 'patient_clause_same_participant' }],
+	]],
+	['notice', [
+		['notice-A', { 'other_optional': 'patient_clause_simultaneous' }],
+	]],
+	['offer', [
+		['offer-B', { 'patient_clause_type': 'patient_clause_same_participant' }],
+	]],
+	['open', []],
+	['order', [
+		['order-A', patient_from_subordinate_clause()],
+	]],
+	['pass', []],
+	['pay', []],
+	['persuade', [
+		['persuade-A', patient_from_subordinate_clause()],
+	]],
+	['plan', [
+		['plan-A', { 'patient_clause_type': 'patient_clause_same_participant' }],
+		['plan-C', {
+			'patient_clause_different_participant': [
+				by_clause_tag('patient_clause_different_participant'),
+				by_complementizer('for'),	// 'John planned [for Mary to come].'
+			],
+			'comment': "eg. 'John planned [for Mary to come].'"
+		}],
+	]],
+	['please', []],
+	['point', [
+		['point-A', {
+			'patient': directly_after_verb_with_adposition('to'),
+			'destination': { },	// clear the destination so it doesn't get confused with the patient
+		}],
+		['point-B', { 'patient': directly_after_verb_with_adposition('at') }],
+		['point-C', { 'destination': by_adposition('to|at') }],
+	]],
+	['pour', [
+		['pour-A', { 'destination': by_adposition_concept('in|into|on') }],
+	]],
+	['pour-out', [
+		['pour-out-B', { 'destination': by_adposition('on|onto') }],
+	]],
+	['praise', []],
 	['pray', [
 		['pray-A', { 'patient': by_adposition('about') }],
 		['pray-C', { 'patient_clause_type': 'patient_clause_quote_begin' }],
 	]],
 	['prepare', []],
+	['prevent', []],
 	['promise', [
 		['promise-A', { 'instrument': by_adposition('with') }],
 		['promise-B', {
@@ -642,7 +755,45 @@ const verb_case_frames = new Map([
 			'patient_clause_type': 'patient_clause_quote_begin',
 		}],
 	]],
+	['protect', [
+		['protect-B', patient_from_subordinate_clause()],
+	]],
+	['pull', [
+		['pull-B', { 'destination': by_adposition('in|into|onto') }],
+	]],
+	['put', [
+		['put-A', { 'destination': by_adposition_concept() }],
+	]],
+	['read', [
+		['read-B', { 'patient': by_adposition('about') }],
+	]],
 	['return', []],
+	['refuse', [
+		['refuse-A', { 'patient_clause_type': 'patient_clause_same_participant' }],
+	]],
+	['remember', [
+		['remember-E', { 'patient_clause_type': 'patient_clause_same_participant' }],
+	]],
+	['remind', [
+		['remind-A', {
+			'destination': directly_after_verb(),
+			'patient': { },
+		}],
+		['remind-B', patient_from_subordinate_clause()],
+		['remind-C', { 'destination': by_adposition('about') }],
+	]],
+	['reply', [
+		['reply-A', {
+			'patient': by_adposition('to'),
+			'destination': { },
+			'patient_clause_type': 'patient_clause_quote_begin',
+		}],
+		['reply-B', {
+			'patient': by_adposition('to'),
+			'destination': { },
+		}],
+	]],
+	['run', []],
 	['save', []],
 	['say', [
 		['say-A', {
@@ -657,6 +808,7 @@ const verb_case_frames = new Map([
 		['say-E', { 'patient_clause_type': 'patient_clause_quote_begin' }],
 		['say-F', { 'patient_clause_type': 'patient_clause_quote_begin' }],
 	]],
+	['scream', []],
 	['search', [
 		['search-A', {
 			'patient': directly_after_verb_with_adposition('for'),
@@ -667,10 +819,52 @@ const verb_case_frames = new Map([
 	['see', [
 		['see-B', { 'other_optional': 'patient_clause_simultaneous' }],
 	]],
+	['seem', [
+		['seem-A', { 'patient_clause_type': 'patient_clause_same_participant' }],
+		['seem-C', { 'patient': directly_after_verb_with_adposition('like') }],
+	]],
+	['sell', [
+		['sell-A', {
+			'instrument': {
+				...by_adposition('for'),
+				'trigger': { 'tag': { 'syntax': 'head_np' }, 'level': '0|1' },
+				'comment': "don't confuse the instrument with a beneficiary, which currently must be level 4",
+			},
+		}],
+	]],
 	['send', [
 		['send-A', with_no_double_patient()],
 		['send-B', with_no_double_patient()],
 		['send-C', with_no_double_patient()],
+	]],
+	['separate', []],
+	['shine', [
+		['shine-B', { 'destination': by_adposition('on|onto') }],
+	]],
+	['shoot', [
+		['shoot-B', { 'destination': by_adposition('to|at') }],
+	]],
+	['shout', [
+		['shout-A', {
+			'patient': by_adposition('to'),
+			'destination': { },
+			'patient_clause_type': 'patient_clause_quote_begin',
+		}],
+		['shout-B', { 'destination': by_adposition('to|at') }],
+		['shout-C', { 'destination': by_adposition('to|at') }],
+	]],
+	['show', []],
+	['show-how', [
+		['show-how-A', {
+			'patient': [
+				directly_after_verb(),
+				by_clause_tag('patient_clause_different_participant'),
+			],
+			'comment': "support both 'show-how [Y V]' or 'show-how Y [Y V]'",
+		}],
+	]],
+	['sing', [
+		['sing-A', { 'patient_clause_type': 'patient_clause_quote_begin' }],
 	]],
 	['speak', [
 		['speak-A', {
@@ -684,13 +878,65 @@ const verb_case_frames = new Map([
 			},
 		}],
 	]],
+	['smell', [
+		['smell-B', { 'other_optional': 'predicate_adjective' }],
+		['smell-C', { 'patient': directly_after_verb_with_adposition('like') }],
+	]],
+	['sound-like', [
+		['sound-like-A', { 'destination': by_adposition('in') }],
+		['sound-like-B', { 'destination': by_adposition('in') }],
+	]],
+	['spill', [
+		['spill-A', { 'destination': by_adposition('on') }],
+	]],
+	['sprinkle', [
+		['sprinkle-A', { 'destination': by_adposition('on') }],
+	]],
+	['start', []],
+	['struggle', [
+		['struggle-A', { 'patient': by_adposition('with|against') }],
+	]],
+	['suggest', []],
 	['take', []],
+	['take-away', []],
+	['talk', [
+		['talk-A', { 'patient': by_adposition('about') }],
+		['talk-B', {
+			'patient_clause_different_participant': [
+				by_clause_tag('patient_clause_different_participant'),
+				by_complementizer('about'),
+			],
+			'comment': "eg. 'John talked about Mary dancing.'",
+		}],
+	]],
+	['taste', [
+		['taste-B', {
+			'patient': by_adposition('like'),
+			'other_optional': 'predicate_adjective',
+			'comment': 'eg. "The soup tastes like chicken" or "The soup tastes bitter"',
+		}],
+	]],
 	['teach', [
 		['teach-A', {
 			'destination': directly_after_verb(),
 			'patient': by_adposition('about'),
 		}],
 		['teach-D', patient_from_subordinate_clause()],
+	]],
+	['teach-how', [
+		['teach-how-A', {
+			'patient': [
+				directly_after_verb(),
+				by_clause_tag('patient_clause_different_participant'),
+			],
+			'comment': "support both 'teach-how [Y V]' or 'teach-how Y [Y V]'",
+		}],
+	]],
+	['tear', [
+		['tear-A', { 'destination': by_adposition('to|into') }],
+	]],
+	['thank', [
+		['thank-A', { 'destination': by_adposition('for') }],
 	]],
 	['tell', [
 		['tell-A', {
@@ -707,8 +953,9 @@ const verb_case_frames = new Map([
 		['tell-D', { 'instrument': by_adposition('with') }],
 		['tell-E', {
 			'destination': directly_after_verb(),
-			'patient': { 'trigger': 'none' },		// clear the patient so it doesn't get confused with the destination
+			'patient': { 'trigger': 'none' },		
 			'patient_clause_type': 'patient_clause_quote_begin',
+			'comment': "clear the patient so it doesn't get confused with the destination",
 		}],
 	]],
 	['think', [
@@ -758,6 +1005,38 @@ const verb_case_frames = new Map([
 		}],
 		['tie-C', { 'instrument': by_adposition('with') }],
 	]],
+	['trust', [
+		['trust-A', {
+			'patient': by_adposition('in'),
+			'instrument': by_adposition('with'),
+		}],
+		['trust-B', { 'instrument': by_adposition('with') }],
+		['trust-C', { 'instrument': by_adposition('with') }],
+		['trust-D', patient_from_subordinate_clause()],
+	]],
+	['try', [
+		['try-A', { 'patient_clause_type': 'patient_clause_same_participant' }],
+	]],
+	['turn', []],
+	['understand', [
+		['understand-C', {
+			'patient_clause_type': 'patient_clause_same_participant',
+			'patient_clause_same_participant': [
+				by_clause_tag('patient_clause_same_participant'),
+				{
+					'trigger': { 'type': TOKEN_TYPE.CLAUSE, 'tag': { 'clause_type': 'patient_clause_different_participant|adverbial_clause' } },
+					'context': {
+						'subtokens': [{ 'token': 'how', 'skip': 'clause_start' }, { 'token': 'to' }],
+					},
+					'transform': { 'tag': { 'clause_type': 'patient_clause_same_participant', 'role': 'patient_clause_same_participant' } },
+					'subtoken_transform': { 'function': { 'syntax': 'complementizer' } },
+					'missing_message': `'[(how) to...]'`,
+				},
+			],
+			'patient_clause_different_participant': {},
+			'comment': "'John understood [how to dance].' OR 'John understood [to dance].'",
+		}],
+	]],
 	['unite', [
 		['unite-B', { 'destination': by_adposition('to|with') }],
 		['unite-C', {
@@ -765,9 +1044,45 @@ const verb_case_frames = new Map([
 			'destination': { },
 		}],
 	]],
+	['wait', [
+		['wait-B', {
+			'patient_clause_same_participant': [
+				by_clause_tag('patient_clause_same_participant'),
+				by_complementizer('for'),
+			],
+			'comment': "'John waited [for Mary to come].' OR 'John waited [Mary to come].'",
+		}],
+		['wait-C', {
+			'patient': {
+				...by_adposition('for'),
+				'trigger': { 'tag': { 'syntax': 'head_np' }, 'level': '4' },
+			},
+			'beneficiary': { },
+		}],
+		['wait-D', { 'patient_clause_type': 'patient_clause_same_participant' }],
+	]],
 	['want', [
 		['want-B', { 'patient_clause_type': 'patient_clause_same_participant' }],
 	]],
+	['walk', []],
+	['warn', [
+		['warn-A', {
+			'patient': [
+				directly_after_verb(),
+				by_clause_tag('patient_clause_different_participant'),
+			],
+			'comment': "support both 'warn [Y V]' or 'warn Y [Y V]'",
+		}],
+		['warn-C', { 'destination': by_adposition('about') }],
+		['warn-D', { 'patient_clause_type': 'patient_clause_quote_begin' }],
+	]],
+	['watch', [
+		['watch-A', { 'other_optional': 'patient_clause_simultaneous' }],
+	]],
+	['watch-out', [
+		['watch-out-A', { 'patient': by_adposition('for') }],
+	]],
+	['weigh', []],
 	['work', [
 		['work-A', { 'instrument': by_adposition('with') }],
 	]],
@@ -777,6 +1092,24 @@ const verb_case_frames = new Map([
 			'patient': directly_after_verb_with_adposition('about'),
 		}],
 		['worry-B', with_be_auxiliary()],
+	]],
+	['wrap', [
+		['wrap-A', { 'instrument': by_adposition('with') }],
+	]],
+	['write', [
+		['write-A', { 'instrument': by_adposition('with') }],
+		['write-B', { 'instrument': by_adposition('with') }],
+		['write-C', {
+			'patient': by_adposition('about'),
+			'patient_clause_type': 'patient_clause_quote_begin',
+		}],
+		['write-D', {
+			'patient': by_adposition('about'),
+		}],
+		['write-E', {
+			'patient_clause_different_participant': by_clause_tag('patient_clause_different_participant|relative_clause_that'),
+			'comment': 'the patient clause may have been interpreted as a relative clause if \'that\' was present',
+		}],
 	]],
 ])
 
