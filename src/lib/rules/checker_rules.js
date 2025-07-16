@@ -612,10 +612,21 @@ const builtin_checker_rules = [
 		},
 	},
 	{
+		name: 'Check Verb argument structure/case frame',
+		comment: "Don't validate Verbs that are in the same clause as another Verb, since there is already an error that will show for that",
+		rule: {
+			trigger: create_token_filter({ 'category': 'Verb' }),
+			context: create_context_filter({
+				'notprecededby': { 'category': 'Verb', 'skip': 'all' },
+			}),
+			action: message_set_action(validate_case_frame),
+		},
+	},
+	{
 		name: 'Check argument structure/case frame',
 		comment: 'case frame rules can eventually be used for verbs, adjectives, adverbs, adpositions, and even conjunctions',
 		rule: {
-			trigger: token => token.lookup_results.length > 0,
+			trigger: create_token_filter({ 'category': 'Adjective|Adposition' }),
 			context: create_context_filter({ }),
 			action: message_set_action(validate_case_frame),
 		},
