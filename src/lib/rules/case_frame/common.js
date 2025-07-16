@@ -349,7 +349,8 @@ export function* validate_case_frame(trigger_context) {
 		// flag any extra roles common to all lookup results
 		const extra_roles_for_all = selected_result.case_frame.result.extra_arguments.filter(({ role_tag }) => role_is_extra_for_all(role_tag, token))
 		for (const extra_argument of extra_roles_for_all) {
-			const extra_message = ALL_HAVE_EXTRA_ARGUMENT_MESSAGES.get(extra_argument.role_tag) || extra_argument.rule.extra_message
+			const extra_message_template = ALL_HAVE_EXTRA_ARGUMENT_MESSAGES.get(extra_argument.role_tag) || extra_argument.rule.extra_message
+			const extra_message = extra_message_template.replaceAll('{sense}', '{stem}')
 			// put the error message on both the trigger token AND the argument token
 			yield { error: extra_message }
 			yield flag_extra_argument(trigger_context, extra_argument, extra_message)

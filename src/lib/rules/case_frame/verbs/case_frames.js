@@ -721,9 +721,9 @@ const verb_case_frames = new Map([
 		['plan-C', {
 			'patient_clause_different_participant': [
 				by_clause_tag('patient_clause_different_participant'),
-				by_complementizer('for'),	// 'John planned [for Mary to come].'
+				by_complementizer('for'),
 			],
-			'comment': "eg. 'John planned [for Mary to come].'"
+			'comment': "eg. 'John planned [for Mary to come].'",
 		}],
 	]],
 	['please', []],
@@ -1030,7 +1030,7 @@ const verb_case_frames = new Map([
 					},
 					'transform': { 'tag': { 'clause_type': 'patient_clause_same_participant', 'role': 'patient_clause_same_participant' } },
 					'subtoken_transform': { 'function': { 'syntax': 'complementizer' } },
-					'missing_message': `'[(how) to...]'`,
+					'missing_message': "'[(how) to...]'",
 				},
 			],
 			'patient_clause_different_participant': {},
