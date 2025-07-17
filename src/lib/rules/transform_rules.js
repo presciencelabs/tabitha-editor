@@ -17,14 +17,6 @@ const transform_rules_json = [
 		'transform': { 'function': { 'syntax': 'infinitive' } },
 	},
 	{
-		'name': 'infinitive "to" as the first word of a subordinate should be tagged as "same subject"',
-		'trigger': { 'tag': { 'syntax': 'infinitive' } },
-		'context': {
-			'precededby': { 'token': '[', 'skip': { 'category': 'Conjunction' } },
-		},
-		'transform': { 'function': { 'syntax': 'infinitive|infinitive_same_subject' } },
-	},
-	{
 		'name': '"from" or "for" before a verb gets tagged as gerundifier',
 		'trigger': { 'token': 'from|for' },
 		'context': {
@@ -36,14 +28,6 @@ const transform_rules_json = [
 		},
 		'transform': { 'function': { 'syntax': 'gerundifier' } },
 		'comment': '"prevent [X from Ving]", "forgive [X for Ving]". May be needed for other verbs as well',
-	},
-	{
-		'name': 'tag "in-order-to/by/without" as "same subject"',
-		'trigger': { 'stem': 'in-order-to|by|without' },
-		'context': {
-			'precededby': { 'token': '[', 'skip': { 'category': 'Conjunction' } },
-		},
-		'transform': { 'tag': { 'syntax': 'infinitive_same_subject' } },
 	},
 	{
 		'name': 'Mark a Verb with the present form as present',
@@ -147,6 +131,14 @@ const transform_rules_json = [
 		'transform': { 'tag': { 'clause_type': 'adverbial_clause' } },
 	},
 	{
+		'name': 'tag "in-order-to/by/without" clauses as "same subject" adverbial',
+		'trigger': { 'tag': { 'clause_type': 'adverbial_clause' } },
+		'context': {
+			'subtokens': { 'stem': 'in-order-to|by|without', 'skip': [{ 'token': '[' }, { 'category': 'Conjunction' }] },
+		},
+		'transform': { 'tag': { 'clause_type': 'adverbial_clause|adverbial_clause_same_subject' } },
+	},
+	{
 		'name': 'tag subordinate clauses along with \'it\' as agent clauses',
 		'trigger': { 'tag': { 'clause_type': 'subordinate_clause' } },
 		'context': { 'precededby': { 'tag': { 'syntax': 'agent_proposition_subject' }, 'skip': 'all' } },
@@ -173,7 +165,7 @@ const transform_rules_json = [
 		'name': "tag subordinate clauses starting with the infinitive 'to' as 'same_participant'",
 		'trigger': { 'tag': { 'clause_type': 'subordinate_clause' } },
 		'context': { 
-			'subtokens': { 'token': 'to', 'tag': { 'syntax': 'infinitive_same_subject' }, 'skip': 'all' },
+			'subtokens': { 'tag': { 'syntax': 'infinitive' }, 'skip': [{ 'token': '[' }, { 'category': 'Conjunction' }] },
 		},
 		'transform': { 'tag': { 'clause_type': 'patient_clause_same_participant' } },
 		'comment': 'eg John wanted [to sing]',
@@ -362,7 +354,7 @@ const transform_rules_json = [
 		'context': {
 			'followedby': { 'category': 'Verb', 'skip': 'all' },
 		},
-		'transform': { 'function': { 'auxiliary': 'yes_no_interrogative' } },
+		'transform': { 'function': { 'auxiliary': 'interrogative' } },
 		'comment': 'removed the question mark from the context, because the punctuation may be outside the closing clause bracket',
 	},
 	{

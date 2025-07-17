@@ -3,7 +3,7 @@ import { create_context_filter, create_token_filter, simple_rule_action } from '
 import { LOOKUP_FILTERS } from '$lib/lookup_filters'
 import { select_pairing_sense, select_sense } from './sense_selection'
 import { get_adjective_case_frame_rules } from './adjectives/case_frames'
-import { get_verb_case_frame_rules, get_passive_verb_case_frame_rules } from './verbs/case_frames'
+import { get_verb_case_frame_rules, get_passive_verb_case_frame_rules, get_same_subject_verb_case_frame_rules } from './verbs/case_frames'
 import { get_adposition_case_frame_rules } from './adpositions/case_frames'
 import { initialize_case_frame_rules, check_case_frames, check_pairing_case_frames } from './common'
 
@@ -68,8 +68,8 @@ const argument_and_sense_rules = [
 		rule: {
 			trigger: create_token_filter({ 'category': 'Verb' }),
 			context: create_context_filter({
-				'notprecededby': { 'tag': [{ 'syntax': 'relativizer|infinitive_same_subject' }], 'skip': 'all' },
-				'notfollowedby': { 'tag': [{ 'syntax': 'question' }, { 'pre_np_adposition': 'agent_of_passive' }], 'skip': 'all' },
+				// 'notprecededby': { 'tag': [{ 'syntax': 'relativizer|infinitive_same_subject' }], 'skip': 'all' },
+				// 'notfollowedby': { 'tag': [{ 'syntax': 'question' }, { 'pre_np_adposition': 'agent_of_passive' }], 'skip': 'all' },
 			}),
 			action: simple_rule_action(check_case_frames),
 		},
@@ -82,12 +82,35 @@ const argument_and_sense_rules = [
 					&& token.lookup_results.every(LOOKUP_FILTERS.HAS_INVALID_CASE_FRAME()),
 			context: create_context_filter({
 				'precededby': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
-				'notprecededby': { 'tag': { 'syntax': 'relativizer|infinitive_same_subject' }, 'skip': 'all' },
-				'notfollowedby': { 'token': '?', 'skip': 'all' },
+				// 'notprecededby': { 'tag': { 'syntax': 'relativizer|infinitive_same_subject' }, 'skip': 'all' },
+				// 'notfollowedby': { 'token': '?', 'skip': 'all' },
 			}),
 			action: simple_rule_action(trigger_context => {
 				initialize_case_frame_rules(trigger_context, get_passive_verb_case_frame_rules)
 				check_case_frames(trigger_context)
+			}),
+		},
+	},
+	{
+		name: 'Verb case frame, same-participant patient clauses',
+		comment: '',
+		rule: {
+			trigger: create_token_filter({ 'tag': { 'clause_type': 'patient_clause_same_participant|adverbial_clause_same_subject' } }),
+			context: create_context_filter({
+				'subtokens': { 'category': 'Verb', 'skip': 'all' },
+			}),
+			action: simple_rule_action(({ trigger_token, subtoken_indexes }) => {
+				const verb_trigger_context = {
+					tokens: trigger_token.sub_tokens,
+					trigger_token: trigger_token.sub_tokens[subtoken_indexes[0]],
+					trigger_index: subtoken_indexes[0],
+					context_indexes: [],
+					subtoken_indexes: [],
+				}
+
+				// TODO insert a 'placeholder' token as the agent
+				initialize_case_frame_rules(verb_trigger_context, get_same_subject_verb_case_frame_rules)
+				check_case_frames(verb_trigger_context)
 			}),
 		},
 	},
@@ -102,7 +125,7 @@ const argument_and_sense_rules = [
 	},
 	{
 		name: 'Adposition case frames',
-		comment: `Need to do this after Adjectives and Verbs so that no argument-related adpositions don't get checked.
+		comment: `Need to do this after Adjectives and Verbs so that argument-related adpositions don't get checked.
 			Also skip relative clauses because there may be a dangling adposition (eg. 'place [that John lived at]'`,
 		rule: {
 			trigger: create_token_filter({ 'category': 'Adposition' }),
