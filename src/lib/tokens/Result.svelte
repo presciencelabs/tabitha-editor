@@ -19,7 +19,7 @@
 	<Table slot="popup_content" entries={token.lookup_results} classes="my-2">
 		<svelte:fragment slot="entry_row" let:entry>
 			{@const show_hints = !LOOKUP_FILTERS.IS_OR_WILL_BE_IN_ONTOLOGY(entry) || LOOKUP_FILTERS.IS_LEVEL_COMPLEX(entry)}
-	
+
 			{#if LOOKUP_FILTERS.IS_OR_WILL_BE_IN_ONTOLOGY(entry)}
 				{@const concept = `${entry.stem}-${entry.sense}`}
 				<tr>
@@ -49,13 +49,13 @@
 					<td>Not in Ontology.</td>
 				</tr>
 			{/if}
-			
+
 			{#if show_hints}
 				{@const has_structure = entry.how_to_entries.some(how_to => how_to.structure)}
 				{@const has_pairing = entry.how_to_entries.some(how_to => how_to.pairing)}
 				{@const has_explication = entry.how_to_entries.some(how_to => how_to.explication)}
 				{@const has_any_hint = has_structure || has_pairing || has_explication}
-	
+
 				<tr class="border-none">
 					<td></td>
 					<td colspan="3" class="pb-2" class:ps-0={has_any_hint}>
@@ -82,9 +82,9 @@
 					</td>
 				</tr>
 			{/if}
-			
+
 			<style lang="postcss">
-				/** TODO I don't think we want this to apply to the inner table, but it currently does */
+				/** TODO: I don't think we want this to apply to the inner table, but it currently does */
 				/* .table-xs :where(th,td) {
 					@apply py-2;
 				} */
@@ -95,4 +95,3 @@
 		</svelte:fragment>
 	</Table>
 </PopupMenu>
-
