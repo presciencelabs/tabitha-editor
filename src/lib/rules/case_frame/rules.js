@@ -153,7 +153,7 @@ const argument_and_sense_rules = [
 			trigger: token => token.complex_pairing !== null,
 			context: create_context_filter({}),
 			action: simple_rule_action(trigger_context => {
-				if (trigger_context.trigger_token.lookup_results.at(0)?.case_frame.result.is_valid) {
+				if (trigger_context.trigger_token.lookup_results.at(0)?.case_frame.result.status === 'valid') {
 					check_pairing_case_frames(trigger_context)
 				}
 				select_pairing_sense(trigger_context)
