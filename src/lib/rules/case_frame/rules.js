@@ -68,8 +68,7 @@ const argument_and_sense_rules = [
 		rule: {
 			trigger: create_token_filter({ 'category': 'Verb' }),
 			context: create_context_filter({
-				// 'notprecededby': { 'tag': [{ 'syntax': 'relativizer|infinitive_same_subject' }], 'skip': 'all' },
-				// 'notfollowedby': { 'tag': [{ 'syntax': 'question' }, { 'pre_np_adposition': 'agent_of_passive' }], 'skip': 'all' },
+				'notprecededby': { 'tag': ['in_relative_clause', 'in_interrogative'], 'skip': 'all' },
 			}),
 			action: simple_rule_action(check_case_frames),
 		},
@@ -79,11 +78,10 @@ const argument_and_sense_rules = [
 		comment: 'For now, only trigger when not within a relative clause or a question since arguments get moved around or are missing',
 		rule: {
 			trigger: token => create_token_filter({ 'category': 'Verb' })(token)
-					&& token.lookup_results.every(LOOKUP_FILTERS.HAS_INVALID_CASE_FRAME()),
+					&& token.lookup_results.every(({ case_frame }) => case_frame.result.status === 'invalid'),
 			context: create_context_filter({
 				'precededby': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
-				// 'notprecededby': { 'tag': { 'syntax': 'relativizer|infinitive_same_subject' }, 'skip': 'all' },
-				// 'notfollowedby': { 'token': '?', 'skip': 'all' },
+				'notprecededby': { 'tag': ['in_relative_clause', 'in_interrogative'], 'skip': 'all' },
 			}),
 			action: simple_rule_action(trigger_context => {
 				initialize_case_frame_rules(trigger_context, get_passive_verb_case_frame_rules)
@@ -97,6 +95,7 @@ const argument_and_sense_rules = [
 		rule: {
 			trigger: create_token_filter({ 'tag': { 'clause_type': 'patient_clause_same_participant|adverbial_clause_same_subject' } }),
 			context: create_context_filter({
+				'notprecededby': { 'tag': ['in_relative_clause', 'in_interrogative'], 'skip': 'all' },
 				'subtokens': { 'category': 'Verb', 'skip': 'all' },
 			}),
 			action: simple_rule_action(({ trigger_token, subtoken_indexes }) => {
