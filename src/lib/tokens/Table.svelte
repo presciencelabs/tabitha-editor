@@ -2,7 +2,7 @@
 	export let entries: T[]
 </script>
 
-<table class="table table-xs">
+<table class="table table-xs not-prose">
 	<thead>
 		<slot name="header_row" />
 	</thead>
