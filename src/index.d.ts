@@ -17,7 +17,7 @@ type Token = TokenBase & {
 	sub_tokens: Token[]
 }
 
-type PairingType = 'none' | 'complex' | 'dynamic'
+type PairingType = 'none' | 'complex' | 'literal'
 
 type Tag = { [tag: string]: string }
 

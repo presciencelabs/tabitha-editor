@@ -427,52 +427,52 @@ describe('tokenize_input', () => {
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
 	})
 
-	test('valid dynamic pairing', () => {
-		const INPUT = "literal\\dynamic literal's\\dynamic's literals'\\dynamics' literals'-A\\dynamics' literal-A\\dynamic-B. [literal\\dynamic]"
+	test('valid literal pairing', () => {
+		const INPUT = "dynamic\\literal dynamic's\\literal's dynamics'\\literals' dynamics'-A\\literals' dynamic-A\\literal-B. [dynamic\\literal]"
 
 		const EXPECTED_OUTPUT = [
-			create_pairing(create_word_token('literal'), create_word_token('dynamic'), 'dynamic'),
+			create_pairing(create_word_token('dynamic'), create_word_token('literal'), 'literal'),
 			create_pairing(
-				create_word_token("literal's", { lookup_term: 'literal' }),
 				create_word_token("dynamic's", { lookup_term: 'dynamic' }),
-				'dynamic',
+				create_word_token("literal's", { lookup_term: 'literal' }),
+				'literal',
 			),
 			create_pairing(
+				create_word_token("dynamics'", { lookup_term: 'dynamics' }),
 				create_word_token("literals'", { lookup_term: 'literals' }),
-				create_word_token("dynamics'", { lookup_term: 'dynamics' }),
-				'dynamic',
+				'literal',
 			),
 			create_pairing(
-				create_word_token("literals'-A", { lookup_term: 'literals', sense: 'A' }),
-				create_word_token("dynamics'", { lookup_term: 'dynamics' }),
-				'dynamic',
+				create_word_token("dynamics'-A", { lookup_term: 'dynamics', sense: 'A' }),
+				create_word_token("literals'", { lookup_term: 'literals' }),
+				'literal',
 			),
 			create_pairing(
-				create_word_token('literal-A', { lookup_term: 'literal', sense: 'A' }),
-				create_word_token('dynamic-B', { lookup_term: 'dynamic', sense: 'B' }),
-				'dynamic',
+				create_word_token('dynamic-A', { lookup_term: 'dynamic', sense: 'A' }),
+				create_word_token('literal-B', { lookup_term: 'literal', sense: 'B' }),
+				'literal',
 			),
 			create_token('.', TOKEN_TYPE.PUNCTUATION),
 			create_token('[', TOKEN_TYPE.PUNCTUATION),
-			create_pairing(create_word_token('literal'), create_word_token('dynamic'), 'dynamic'),
+			create_pairing(create_word_token('dynamic'), create_word_token('literal'), 'literal'),
 			create_token(']', TOKEN_TYPE.PUNCTUATION),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
 	})
 
-	test('invalid dynamic pairing', () => {
-		const INPUT = '\\dynamic literal\\ \\ literal\\\\dynamic literal\\.dynamic literal.\\dynamic'
+	test('invalid literal pairing', () => {
+		const INPUT = '\\literal dynamic\\ \\ dynamic\\\\literal dynamic\\.literal dynamic.\\literal'
 
 		const EXPECTED_OUTPUT = [
-			create_error_token('\\dynamic', ERRORS.INVALID_DYNAMIC_PAIRING_SYNTAX),
-			create_error_token('literal\\', ERRORS.INVALID_DYNAMIC_PAIRING_SYNTAX),
-			create_error_token('\\', ERRORS.INVALID_DYNAMIC_PAIRING_SYNTAX),
-			create_error_token('literal\\\\dynamic', ERRORS.INVALID_DYNAMIC_PAIRING_SYNTAX),
-			create_error_token('literal\\', ERRORS.INVALID_DYNAMIC_PAIRING_SYNTAX),
-			create_error_token('.dynamic', ERRORS.INVALID_TOKEN_END('.')),
-			create_word_token('literal'),
-			create_error_token('.\\dynamic', ERRORS.INVALID_TOKEN_END('.')),
+			create_error_token('\\literal', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
+			create_error_token('dynamic\\', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
+			create_error_token('\\', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
+			create_error_token('dynamic\\\\literal', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
+			create_error_token('dynamic\\', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
+			create_error_token('.literal', ERRORS.INVALID_TOKEN_END('.')),
+			create_word_token('dynamic'),
+			create_error_token('.\\literal', ERRORS.INVALID_TOKEN_END('.')),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)

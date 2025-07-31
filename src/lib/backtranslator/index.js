@@ -46,8 +46,8 @@ export function textify(sentences) {
 		} else if (token.pairing && token.pairing_type === 'complex') {
 			// Only show the complex word
 			return textify_lookup_word(token.pairing)
-		} else if (token.pairing && token.pairing_type === 'dynamic') {
-			// We want to show both the literal and dynamic words for now
+		} else if (token.pairing && token.pairing_type === 'literal') {
+			// We want to show both the dynamic and literal words for now
 			return `${textify_lookup_word(token)}\\${textify_lookup_word(token.pairing)}`
 		} else if (token.pronoun) {
 			return textify_token(token.pronoun)

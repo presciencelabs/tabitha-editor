@@ -128,7 +128,7 @@ describe('built-in checker rules', () => {
 				create_pairing_token(
 					create_lookup_token('first', { lookup_results: [lookup_result('first', { level: 1 })] }),
 					create_lookup_token('second', { lookup_results: [lookup_result('second', { level: 1 })] }),
-					'dynamic',
+					'literal',
 				),
 			])]
 	
@@ -161,7 +161,7 @@ describe('built-in checker rules', () => {
 				create_pairing_token(
 					create_lookup_token('first', { lookup_results: [lookup_result('first', { level: 3 })] }),
 					create_lookup_token('second', { lookup_results: [lookup_result('second', { level: 1 })] }),
-					'dynamic',
+					'literal',
 				),
 			])]
 	
@@ -187,7 +187,7 @@ describe('built-in checker rules', () => {
 				create_pairing_token(
 					create_lookup_token('first', { lookup_results: [lookup_result('first', { level: 1 })] }),
 					create_lookup_token('second', { lookup_results: [lookup_result('second', { level: 2 })] }),
-					'dynamic',
+					'literal',
 				),
 			])]
 	
@@ -213,7 +213,7 @@ describe('built-in checker rules', () => {
 				create_pairing_token(
 					create_lookup_token('first', { lookup_results: [lookup_result('first', { level: 3 })] }),
 					create_lookup_token('second', { lookup_results: [lookup_result('second', { level: 2 })] }),
-					'dynamic',
+					'literal',
 				),
 			])]
 	

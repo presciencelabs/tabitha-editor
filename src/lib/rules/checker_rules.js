@@ -695,8 +695,8 @@ const builtin_checker_rules = [
 							if (complex_word_filter(token)) {
 								messages.push({ token_to_flag: token, error: ERRORS.WORD_LEVEL_TOO_HIGH })
 							}
-							// A dynamic pairing has the same restrictions as a normal word
-							if (token.pairing && token.pairing_type === 'dynamic' && complex_word_filter(token.pairing)) {
+							// A literal pairing has the same restrictions as a normal word
+							if (token.pairing && token.pairing_type === 'literal' && complex_word_filter(token.pairing)) {
 								messages.push({ token_to_flag: token.pairing, error: ERRORS.WORD_LEVEL_TOO_HIGH })
 							}
 						}
@@ -736,8 +736,8 @@ const builtin_checker_rules = [
 				if (check_ambiguous_level(LOOKUP_FILTERS.IS_LEVEL(2))(token) || check_ambiguous_level(LOOKUP_FILTERS.IS_LEVEL(3))(token)) {
 					yield { warning: ERRORS.AMBIGUOUS_LEVEL }
 				}
-				// A dynamic pairing has the same restrictions as normal words
-				if (token.pairing && token.pairing_type === 'dynamic'
+				// A literal pairing has the same restrictions as normal words
+				if (token.pairing && token.pairing_type === 'literal'
 						&& (check_ambiguous_level(LOOKUP_FILTERS.IS_LEVEL(2))(token.pairing) || check_ambiguous_level(LOOKUP_FILTERS.IS_LEVEL(3))(token.pairing))) {
 					yield { token_to_flag: token.pairing, warning: ERRORS.AMBIGUOUS_LEVEL }
 				}

@@ -55,7 +55,7 @@ export function tokenize_input(text = '') {
 			return pairing('complex')
 
 		} else if (match(REGEXES.BACK_SLASH)) {
-			return pairing('dynamic')
+			return pairing('literal')
 
 		} else if (match_two(/\.\d/)) {
 			// may be a decimal number like 2.5
@@ -80,11 +80,11 @@ export function tokenize_input(text = '') {
 	 */
 	function pairing(pairing_type) {
 		if (!match(REGEXES.WORD_START_CHAR)) {
-			// simple/ or literal\
+			// simple/ or dynamic\
 			eat_until(REGEXES.TOKEN_END_BOUNDARY)
-			return error_token(pairing_type === 'complex' ? ERRORS.INVALID_COMPLEX_PAIRING_SYNTAX : ERRORS.INVALID_DYNAMIC_PAIRING_SYNTAX)
+			return error_token(pairing_type === 'complex' ? ERRORS.INVALID_COMPLEX_PAIRING_SYNTAX : ERRORS.INVALID_LITERAL_PAIRING_SYNTAX)
 		}
-		// simple/complex or literal\dynamic
+		// simple/complex or dynamic\literal
 		eat(REGEXES.WORD_CHAR)
 		return check_boundary_for_token(pairing_token(pairing_type))
 	}
@@ -156,7 +156,7 @@ export function tokenize_input(text = '') {
 		const messages = new Map([
 			[')', ERRORS.MISSING_OPENING_PAREN],
 			['/', ERRORS.INVALID_COMPLEX_PAIRING_SYNTAX],
-			['\\', ERRORS.INVALID_DYNAMIC_PAIRING_SYNTAX],
+			['\\', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX],
 		])
 
 		return error_token(messages.get(char) || ERRORS.UNRECOGNIZED_CHAR)
