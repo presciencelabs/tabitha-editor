@@ -19,6 +19,7 @@ export async function check_ontology(lookup_token) {
 	 */
 	function transform_results(transformed_results, ontology_result) {
 		const existing_result = lookup_token.lookup_results.find(LOOKUP_FILTERS.MATCHES_LOOKUP(ontology_result))
+		const level_number = Number(ontology_result.level) >= 0 ? Number(ontology_result.level) : -1
 
 		if (existing_result) {
 			// The stem was found in the form lookup
@@ -26,7 +27,7 @@ export async function check_ontology(lookup_token) {
 			transformed_results.push({
 				...existing_result,
 				...ontology_result,
-				ontology_id: parseInt(ontology_result.id),
+				level: level_number,
 				how_to_entries: [],
 			})
 
@@ -38,8 +39,11 @@ export async function check_ontology(lookup_token) {
 		} else {
 			// The word exists in the Ontology, but was not found in the form lookup
 			// This is the case for concepts like 'take-away'
-			const new_result = create_lookup_result(ontology_result, { ontology_id: parseInt(ontology_result.id), ...ontology_result })
-			transformed_results.push(new_result)
+			transformed_results.push(create_lookup_result(ontology_result, {
+				...ontology_result,
+				level: level_number,
+				how_to: ontology_result.how_to_hints,
+			}))
 		}
 
 		return transformed_results
