@@ -7,6 +7,6 @@ type OntologyResult = LookupWord & {
 	level: string
 	gloss: string
 	categorization: string
-	ontology_status: OntologyStatus
+	status: OntologyStatus
 	how_to_hints: HowToEntry[]
 }

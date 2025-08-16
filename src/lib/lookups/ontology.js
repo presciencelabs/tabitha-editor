@@ -28,7 +28,8 @@ export async function check_ontology(lookup_token) {
 				...existing_result,
 				...ontology_result,
 				level: level_number,
-				how_to_entries: [],
+				ontology_status: ontology_result.status,
+				how_to_entries: ontology_result.how_to_hints,
 			})
 
 		} else if (ontology_result.stem.toLowerCase() !== lookup_token.lookup_terms[0].toLowerCase()) {
@@ -42,6 +43,7 @@ export async function check_ontology(lookup_token) {
 			transformed_results.push(create_lookup_result(ontology_result, {
 				...ontology_result,
 				level: level_number,
+				ontology_status: ontology_result.status,
 				how_to: ontology_result.how_to_hints,
 			}))
 		}
