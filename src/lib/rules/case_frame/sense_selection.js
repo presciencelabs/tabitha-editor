@@ -447,7 +447,9 @@ export function select_sense(trigger_context) {
 	// apply the selected result's argument actions
 	for (const valid_argument of token.lookup_results[0].case_frame.result.valid_arguments) {
 		valid_argument.rule.trigger_rule.action(valid_argument.trigger_context)
-		add_tag_to_token(token, valid_argument.rule.main_word_tag)
+		if (valid_argument.rule.main_word_tag) {
+			add_tag_to_token(token, valid_argument.rule.main_word_tag, trigger_context.rule_id)
+		}
 	}
 }
 

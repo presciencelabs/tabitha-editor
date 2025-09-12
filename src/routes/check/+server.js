@@ -9,9 +9,11 @@ export async function GET({ url: { searchParams } }) {
 	/** @type {string} */
 	const text = searchParams.get('text') ?? ''
 
+	const debug = (searchParams.get('debug') ?? '').toLowerCase() === 'true'
+
 	const sentences = await parse(text)
 	const checked_sentences = apply_rules(sentences, RULES.CHECKER)
-	const tokens = simplify_tokens(checked_sentences)
+	const tokens = simplify_tokens(checked_sentences, debug)
 
 	const back_translation = backtranslate(sentences)
 
@@ -62,9 +64,10 @@ function expand_token(token) {
 /**
  * 
  * @param {Sentence[]} sentences 
+ * @param {boolean} debug
  * @returns {SimpleToken[]}
  */
-function simplify_tokens(sentences) {
+function simplify_tokens(sentences, debug) {
 	return sentences.map(({ clause }) => simplify_token(clause))
 
 	/**
@@ -72,7 +75,7 @@ function simplify_tokens(sentences) {
 	 * @param {Token} token 
 	 * @returns {SimpleToken}
 	 */
-	function simplify_token({ token, type, tag, messages, lookup_results, pairing, pairing_type, pronoun, sub_tokens }) {
+	function simplify_token({ token, type, tag, messages, lookup_results, pairing, pairing_type, pronoun, sub_tokens, applied_rules }) {
 		return {
 			token,
 			type,
@@ -83,6 +86,7 @@ function simplify_tokens(sentences) {
 			pairing_type,
 			pronoun: pronoun ? simplify_token(pronoun) : null,
 			sub_tokens: sub_tokens.map(simplify_token),
+			applied_rules: debug ? applied_rules : [],
 		}
 	}
 
