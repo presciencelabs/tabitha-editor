@@ -9,11 +9,9 @@ export async function GET({ url: { searchParams } }) {
 	/** @type {string} */
 	const text = searchParams.get('text') ?? ''
 
-	const debug = (searchParams.get('debug') ?? '').toLowerCase() === 'true'
-
 	const sentences = await parse(text)
 	const checked_sentences = apply_rules(sentences, RULES.CHECKER)
-	const tokens = simplify_tokens(checked_sentences, debug)
+	const tokens = simplify_tokens(checked_sentences)
 
 	const back_translation = backtranslate(sentences)
 
@@ -63,11 +61,10 @@ function expand_token(token) {
 
 /**
  * 
- * @param {Sentence[]} sentences 
- * @param {boolean} debug
+ * @param {Sentence[]} sentences
  * @returns {SimpleToken[]}
  */
-function simplify_tokens(sentences, debug) {
+function simplify_tokens(sentences) {
 	return sentences.map(({ clause }) => simplify_token(clause))
 
 	/**
@@ -86,7 +83,7 @@ function simplify_tokens(sentences, debug) {
 			pairing_type,
 			pronoun: pronoun ? simplify_token(pronoun) : null,
 			sub_tokens: sub_tokens.map(simplify_token),
-			applied_rules: debug ? applied_rules : [],
+			applied_rules,
 		}
 	}
 
