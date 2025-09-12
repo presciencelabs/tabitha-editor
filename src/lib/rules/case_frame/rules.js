@@ -77,9 +77,10 @@ const argument_and_sense_rules = [
 		comment: 'For now, only trigger when not within a relative clause or a question since arguments get moved around or are missing',
 		rule: {
 			trigger: token => create_token_filter({ 'category': 'Verb' })(token)
-					&& token.lookup_results.every(({ case_frame }) => case_frame.result.status === 'invalid'),
+					&& token.lookup_results.some(({ case_frame }) => case_frame.result.status === 'invalid'),
 			context: create_context_filter({
 				'precededby': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
+				'followedby': { 'tag': { 'pre_np_adposition': 'agent_of_passive' }, 'skip': 'all' },
 				'notprecededby': { 'tag': ['in_relative_clause', 'in_interrogative'], 'skip': 'all' },
 			}),
 			action: simple_rule_action(trigger_context => {

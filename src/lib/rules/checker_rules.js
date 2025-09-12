@@ -21,7 +21,7 @@ const checker_rules_json = [
 	},
 	{
 		'name': 'Expect an agent of a passive',
-		'trigger': { 'category': 'Verb' },
+		'trigger': { 'category': 'Verb', 'form': 'perfect' },
 		'context': {
 			'precededby': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
 			'notfollowedby': { 'tag': [{ 'role': 'agent' }, { 'pre_np_adposition': 'agent_of_passive' }], 'skip': 'all' },
@@ -33,12 +33,25 @@ const checker_rules_json = [
 		'comment': 'A passive verb requires a "by X" agent.',
 	},
 	{
-		'name': 'Suggest avoiding the Perfect aspect',
-		'trigger': { 'tag': { 'auxiliary': 'flashback' } },
-		'info': {
-			'message': 'The perfect is only allowed if it would have the right meaning if changed to the simple past tense with "recently" or "previously".',
+		'name': 'Expect an agent of a passive (handles stem verbs)',
+		'trigger': { 'category': 'Verb', 'form': 'stem' },
+		'context': {
+			'precededby': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
+			'notfollowedby': { 'token': 'by|by X', 'skip': 'all' },
 		},
+		'warning': {
+			'message': 'If this verb is passive, it must have an explicit agent. Use _implicitActiveAgent if necessary.',
+		},
+		'comment': 'eg. "John was go-up the mountain by(close to) the river" is not a passive, but this situation is incredibly rare.',
 	},
+	// I've noticed this causes more confusion than it helps, so disabling it for now.
+	// {
+	// 	'name': 'Suggest avoiding the Perfect aspect',
+	// 	'trigger': { 'tag': { 'auxiliary': 'flashback' } },
+	// 	'info': {
+	// 		'message': 'The perfect is only allowed if it would have the right meaning if changed to the simple past tense with "recently" or "previously".',
+	// 	},
+	// },
 	{
 		'name': 'each other must be hyphenated',
 		'trigger': { 'stem': 'each' },

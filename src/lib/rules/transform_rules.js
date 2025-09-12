@@ -381,6 +381,17 @@ const transform_rules_json = [
 		'comment': 'skip all because it may be a question (eg. "Are those people going?"). We\'ll have to assume it\'s not an error.',
 	},
 	{
+		'name': 'be before a stem Verb, (especially one that contains a hyphen) indicates the clause is potentially passive',
+		'trigger': { 'stem': 'be' },
+		'context': {
+			'followedby': [
+				{ 'category': 'Verb', 'form': 'stem', 'skip': 'all' },
+			],
+		},
+		'transform': { 'function': { 'auxiliary': 'generic|passive' } },
+		'comment': 'eg. "John was go-up the mountain by(close to) the river" is not a passive, but this situation is incredibly rare.',
+	},
+	{
 		'name': 'be before a perfect Verb indicates passive',
 		'trigger': { 'stem': 'be' },
 		'context': {
@@ -408,7 +419,8 @@ const transform_rules_json = [
 		'context': {
 			'precededby': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
 		},
-		'transform': { 'function': { 'pre_np_adposition': 'agent_of_passive' } },
+		'transform': { 'tag': { 'pre_np_adposition': 'agent_of_passive' } },
+		'comment': "Don't make it a function word yet in case it's not a passive. Let the case frame rules handle that part."
 	},
 	// Adpositions
 	{
