@@ -33,26 +33,6 @@ const checker_rules_json = [
 		'comment': 'A passive verb requires a "by X" agent.',
 	},
 	{
-		'name': 'Expect an agent of a passive (handles stem verbs)',
-		'trigger': { 'category': 'Verb', 'form': 'stem' },
-		'context': {
-			'precededby': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
-			'notfollowedby': { 'token': 'by|by X', 'skip': 'all' },
-		},
-		'warning': {
-			'message': 'If this verb is passive, it must have an explicit agent. Use _implicitActiveAgent if necessary.',
-		},
-		'comment': 'eg. "John was go-up the mountain by(close to) the river" is not a passive, but this situation is incredibly rare.',
-	},
-	// I've noticed this causes more confusion than it helps, so disabling it for now.
-	// {
-	// 	'name': 'Suggest avoiding the Perfect aspect',
-	// 	'trigger': { 'tag': { 'auxiliary': 'flashback' } },
-	// 	'info': {
-	// 		'message': 'The perfect is only allowed if it would have the right meaning if changed to the simple past tense with "recently" or "previously".',
-	// 	},
-	// },
-	{
 		'name': 'each other must be hyphenated',
 		'trigger': { 'stem': 'each' },
 		'context': {
@@ -824,6 +804,29 @@ const builtin_checker_rules = [
 						token_to_flag: complex_token,
 						warning: 'A simple vocabulary alternate typically directly follows a complex alternate, but no simple alternate was found.',
 					}
+				}
+			}),
+		},
+	},
+	{
+		name: 'Expect an agent of a passive (handles stem verbs)',
+		comment: 'eg. "John was go-up the mountain by(close to) the river" is not a passive, but this situation is incredibly rare.',
+		rule: {
+			trigger: create_token_filter({ 'category': 'Verb', 'form': 'stem' }),
+			context: create_context_filter({
+				'precededby': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
+				'notfollowedby': { 'token': 'by|by X', 'skip': 'all' },
+			}),
+			action: message_set_action(({ trigger_token }) => {
+				const top_result = trigger_token.lookup_results[0]
+				if (top_result.form.includes('perfect')) {
+					// don't show a warning for a word like 'cut', since we already know it's a passive, and is handled in another rule
+					return
+				}
+
+				if (top_result.case_frame.usage.possible_roles.includes('patient')) {
+					// A verb like 'was sit-down' looks at first like it could be passive, but can never take a patient
+					return { warning: 'If this verb is passive, it must have an explicit agent. Use _implicitActiveAgent if necessary.' }
 				}
 			}),
 		},

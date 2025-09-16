@@ -1176,7 +1176,7 @@ export function get_verb_case_frame_rules(token) {
 		return {
 			rules_by_sense: [],
 			default_rule_getter: () => [],
-			role_info_getter: () => ({ possible_roles: [], required_roles: [] }),
+			role_info_getter: get_verb_usage_info,
 			should_check: false,
 		}
 	}
