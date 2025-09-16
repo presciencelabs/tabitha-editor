@@ -426,7 +426,7 @@ const transform_rules_json = [
 	},
 	{
 		'name': 'by preceded by a passive be indicates the agent',
-		'trigger': { 'stem': 'by' },
+		'trigger': { 'token': 'by' },
 		'context': {
 			'precededby': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
 		},
