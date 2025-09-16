@@ -414,13 +414,36 @@ const transform_rules_json = [
 		'comment': 'the more precise function may be ambiguous e.g. "was cry-out".',
 	},
 	{
+		'name': 'be before any Verb and followed by _implicitActiveAgent always indicates the passive',
+		'trigger': { 'stem': 'be', 'tag': { 'auxiliary': 'generic' } },
+		'context': {
+			'followedby': [
+				{ 'category': 'Verb', 'skip': 'all' },
+				{ 'token': '_implicitActiveAgent', 'skip': 'all' },
+			],
+		},
+		'transform': { 'tag': { 'auxiliary': 'passive' } },
+	},
+	{
 		'name': 'by preceded by a passive be indicates the agent',
 		'trigger': { 'stem': 'by' },
 		'context': {
 			'precededby': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
 		},
-		'transform': { 'tag': { 'pre_np_adposition': 'agent_of_passive' } },
-		'comment': "Don't make it a function word yet in case it's not a passive. Let the case frame rules handle that part."
+		'transform': { 'function': { 'pre_np_adposition': 'agent_of_passive' } },
+		'comment': "Only in extremely rare cases like 'John was sit-down by the tree' will it not actually be passive.",
+	},
+	{
+		'name': "'same_participant' subordinate clauses become 'different_participant/same_subject_passive' if the verb is passive",
+		'trigger': { 'tag': { 'clause_type': 'patient_clause_same_participant' } },
+		'context': { 
+			'subtokens': [
+				{ 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
+				{ 'tag': { 'pre_np_adposition': 'agent_of_passive' }, 'skip': 'all' },
+			],
+		},
+		'transform': { 'tag': { 'clause_type': 'patient_clause_different_participant|patient_clause_same_subject_passive' } },
+		'comment': 'eg John was ready-C [to be killed by people].',
 	},
 	// Adpositions
 	{
@@ -554,7 +577,7 @@ const transform_rules_json = [
 export function parse_transform_rule(rule_json, index) {
 	const trigger = create_token_filter(rule_json['trigger'])
 	const context = create_context_filter(rule_json['context'])
-	const transform = create_token_transform(rule_json['transform'])
+	const transform = 'transform' in rule_json ? create_token_transform(rule_json['transform']) : null
 	const context_transforms = create_token_transforms(rule_json['context_transform'])
 	const subtoken_transforms = create_token_transforms(rule_json['subtoken_transform'])
 
@@ -572,7 +595,10 @@ export function parse_transform_rule(rule_json, index) {
 	 * @returns {number}
 	 */
 	function transform_rule_action({ tokens, trigger_index, context_indexes, subtoken_indexes, rule_id }) {
-		tokens[trigger_index] = transform(tokens[trigger_index])
+		if (transform) {
+			tokens[trigger_index] = transform(tokens[trigger_index])
+			tokens[trigger_index].applied_rules.push(`transform - ${rule_id}`)
+		}
 		apply_token_transforms(tokens, context_indexes, context_transforms, `transform:context - ${rule_id}`)
 		apply_token_transforms(tokens[trigger_index].sub_tokens, subtoken_indexes, subtoken_transforms, `transform:subtoken - ${rule_id}`)
 

@@ -318,8 +318,13 @@ function check_usage(lookup, role_matches) {
 
 	const { possible_roles, required_roles } = lookup.case_frame.usage
 
+	// Sometimes the same token matches multiple roles, especially with clauses. So if an 'extra' argument
+	// also matched a valid argument, remove it from the extras.
+
 	const valid_arguments = role_matches.filter(({ role_tag }) => possible_roles.includes(role_tag))
-	const extra_arguments = role_matches.filter(({ role_tag }) => !possible_roles.includes(role_tag))
+	const extra_arguments = role_matches.filter(({ role_tag, trigger_context }) => 
+		!possible_roles.includes(role_tag)
+		&& !valid_arguments.some(({ trigger_context: { trigger_index} }) => trigger_context.trigger_index === trigger_index))
 	const missing_arguments = required_roles.filter(role => !role_matches.some(({ role_tag }) => role_tag === role))
 
 	const is_valid = extra_arguments.length === 0 && missing_arguments.length === 0

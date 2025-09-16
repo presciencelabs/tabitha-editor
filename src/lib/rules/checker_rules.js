@@ -512,19 +512,6 @@ const checker_rules_json = [
 		'comment': 'While TBTA sometimes accepts it, using "that" as a complementizer is too inconsistent and so is not allowed in P1',
 	},
 	{
-		'name': "Don't allow passives in 'same subject' patient clauses",
-		'trigger': { 'tag': { 'clause_type': 'patient_clause_same_participant' } },
-		'context': {
-			'precededby': { 'category': 'Verb', 'skip': 'all' },
-			'subtokens': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
-		},
-		'error': {
-			'on': 'subtokens:0',
-			'message': 'Cannot use a passive within this patient clause because its subject is required to be the same as the outer Verb. Try making the subject explicit, or reword the sentence. See P1 Checklist 24.',
-		},
-		'comment': 'eg. John wanted XX[to be seen by Mary]XX.',
-	},
-	{
 		'name': "Don't allow passives in 'in-order-to' adverbial clauses",
 		'trigger': { 'tag': { 'auxiliary': 'passive' } },
 		'context': {
