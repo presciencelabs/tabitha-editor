@@ -232,7 +232,7 @@ const transform_rules_json = [
 	{
 		'name': '"no" before a noun becomes negative_noun_polarity',
 		'trigger': { 'token': 'no' },
-		'context': { 'followedby': { 'category': 'Noun', 'skip': { 'category': 'Adjective' } } },
+		'context': { 'followedby': { 'category': 'Noun', 'skip': 'adjp' } },
 		'transform': { 'function': { 'determiner': 'negative_noun_polarity' } },
 	},
 	{
