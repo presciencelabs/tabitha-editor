@@ -427,6 +427,7 @@ export function from_built_in_rule(group_name) {
 const SKIP_GROUPS = new Map([
 	['clause_start', [
 		{ 'token': '[' },
+		{ 'token': '"' },
 		{ 'tag': { 'syntax': 'coord_clause' } },
 		{ 'category': 'Conjunction' },
 	]],
