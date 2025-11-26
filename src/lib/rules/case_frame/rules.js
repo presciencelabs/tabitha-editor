@@ -5,7 +5,7 @@ import { get_adjective_case_frame_rules } from './adjectives/case_frames'
 import { get_verb_case_frame_rules, get_passive_verb_case_frame_rules } from './verbs/case_frames'
 import { get_adposition_case_frame_rules } from './adpositions/case_frames'
 import { initialize_case_frame_rules, check_case_frames, check_pairing_case_frames } from './common'
-import { fill_interrogative_gap, fill_relative_clause_gap, fill_same_subject_gap, handle_be_interrogative } from './gap_handling'
+import { fill_interrogative_gap, fill_relative_clause_gap, fill_same_subject_gap, handle_be_interrogative, restore_ghost_tokens } from './gap_handling'
 
 
 /** @type {BuiltInRule[]} */
@@ -77,20 +77,6 @@ const argument_and_sense_rules = [
 			}),
 			action: simple_rule_action(({ trigger_token, subtoken_indexes, rule_id }) => {
 				handle_be_interrogative(trigger_token.sub_tokens, subtoken_indexes[0], rule_id)
-			}),
-		},
-	},
-	{
-		name: 'Move around gap and ghost token lookup results',
-		comment: '',
-		rule: {
-			trigger: token => token.type === TOKEN_TYPE.GHOST,
-			context: create_context_filter({}),
-			action: simple_rule_action(({ tokens, trigger_token }) => {
-				const gap_index = parseInt(trigger_token.tag['gap_index'])
-				const gap_token = tokens[gap_index]
-				gap_token.lookup_results = trigger_token.lookup_results
-				trigger_token.lookup_results = []
 			}),
 		},
 	},
@@ -202,12 +188,8 @@ const argument_and_sense_rules = [
 		rule: {
 			trigger: token => token.type === TOKEN_TYPE.GHOST,
 			context: create_context_filter({}),
-			action: simple_rule_action(({ tokens, trigger_token }) => {
-				const gap_index = parseInt(trigger_token.tag['gap_index'])
-				const gap_token = tokens[gap_index]
-				trigger_token.lookup_results = gap_token.lookup_results
-				gap_token.lookup_results = []
-				trigger_token.type = TOKEN_TYPE.LOOKUP_WORD
+			action: simple_rule_action(({ tokens, trigger_index }) => {
+				restore_ghost_tokens(tokens, trigger_index)
 			}),
 		},
 	},

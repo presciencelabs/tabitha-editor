@@ -206,6 +206,22 @@ function insert_ghosted_gap_token(gap_label, tokens, ghost_index, gap_index, rul
 
 	const gap_token = create_gap_token(rule_id, gap_label, { 'ghost_index': `${ghost_index}`})
 	tokens.splice(gap_index, 0, gap_token)
+	
+	gap_token.lookup_results = ghost_token.lookup_results
+	ghost_token.lookup_results = []
+}
+
+/**
+ * @param {Token[]} tokens
+ * @param {number} ghost_index
+ */
+export function restore_ghost_tokens(tokens, ghost_index) {
+	const ghost_token = tokens[ghost_index]
+	const gap_index = parseInt(ghost_token.tag['gap_index'])
+	const gap_token = tokens[gap_index]
+	ghost_token.lookup_results = gap_token.lookup_results
+	gap_token.lookup_results = []
+	ghost_token.type = TOKEN_TYPE.LOOKUP_WORD
 }
 
 /**
