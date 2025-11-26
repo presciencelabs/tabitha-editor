@@ -1,4 +1,4 @@
-import { create_gap_token, TOKEN_TYPE } from '$lib/token'
+import { add_tag_to_token, create_gap_token, TOKEN_TYPE } from '$lib/token'
 import { create_context_filter, create_skip_filter, create_token_filter, simple_rule_action } from '../rules_parser'
 
 /**
@@ -9,7 +9,7 @@ export function fill_same_subject_gap(tokens, rule_id) {
 	// place the gap token right after any conjunction or adposition
 	const skip_filter = create_skip_filter(['clause_start', { 'category': 'Adposition' }])
 	const gap_index = skip_following(tokens, 0, skip_filter)
-	insert_gap_token('SAME_SUB', tokens, [gap_index], rule_id)
+	insert_gap_noun_token('SAME_SUB', tokens, [gap_index], rule_id)
 }
 
 /**
@@ -18,7 +18,7 @@ export function fill_same_subject_gap(tokens, rule_id) {
  */
 export function fill_relative_clause_gap(tokens, rule_id) {
 	const gap_indexes = find_clause_gap(tokens)
-	insert_gap_token('REL', tokens, gap_indexes, rule_id)
+	insert_gap_noun_token('REL', tokens, gap_indexes, rule_id)
 }
 
 /**
@@ -39,7 +39,7 @@ export function fill_interrogative_gap(tokens, verb_index, rule_id) {
 			}),
 			action: simple_rule_action(({ tokens, rule_id }) => {
 				const gap_index = find_clause_end_for_gap(tokens)
-				insert_gap_token('INTV', tokens, [gap_index], rule_id)
+				insert_gap_noun_token('INTV_N', tokens, [gap_index], rule_id)
 			})
 		},
 		{
@@ -49,7 +49,7 @@ export function fill_interrogative_gap(tokens, verb_index, rule_id) {
 			}),
 			action: simple_rule_action(({ tokens, rule_id }) => {
 				const gap_indexes = find_clause_gap(tokens)
-				insert_gap_token('INTV', tokens, gap_indexes, rule_id)
+				insert_gap_noun_token('INTV_N', tokens, gap_indexes, rule_id)
 			})
 		},
 	]
@@ -67,6 +67,35 @@ export function fill_interrogative_gap(tokens, verb_index, rule_id) {
 		}
 		gap_rule.action(verb_trigger_context)
 	}
+}
+
+/**
+ * 
+ * @param {Token[]} tokens
+ * @param {number} be_index
+ * @param {string} rule_id
+ */
+export function handle_be_interrogative(tokens, be_index, rule_id) {
+	// eg. 'Who(A) is happy?' 'Who(A) is at the store(S)?' 'Who(A) is like our God(S)?' (don't move)
+	// eg. 'Who(?) is that man(A) GAP(S)?' 'Which book(?) is John's book(A) GAP(S)?' 'What(?) is that book(A) about GAP(S)?'
+	// eg. 'Is John(A) that man's father(S)?' 'Is that book(A) John's book(S)?'
+	// eg. 'Is John(A) happy?' 'Is John(A) at the store(S)?' 'Is that book(A) about John(S)?'
+	// move the verb and leave behind a gap token ONLY if 'be' is followed directly by a head noun
+	const context_filter = create_context_filter({ 'followedby': { 'tag': { 'syntax': 'head_np' }, 'skip': ['np_modifiers', 'vp_modifiers'] } })
+	const context_result = context_filter(tokens, be_index)
+	if (!context_result.success) {
+		return
+	}
+
+	// Insert a 'gap' verb after the noun phrase that directly follows it
+	// This solution isn't perfect because there may be a norman genitive ('of X').
+	// 		We can't check for that because there's no way at this point to identify where that np would end.
+	// 		It may be followed directly by another NP ('Is the brother of Paul John?') or an AdjP ('Is the brother of Paul happy?').
+	// This solution will work in most cases, and since a genitive is not marked as 'head_np', it shouldn't affect the case frame checking either.
+	const head_np_index = context_result.context_indexes[0]
+	const np_end_skip_filter = create_skip_filter({ 'tag': { 'clause_type': 'relative_clause' } })
+	const vp_gap_index = skip_following(tokens, head_np_index, np_end_skip_filter)
+	insert_ghosted_gap_token('INTV_V', tokens, be_index, vp_gap_index, rule_id)
 }
 
 /**
@@ -152,7 +181,7 @@ function find_clause_gap(tokens) {
  * @param {number[]} gap_indexes 
  * @param {string} rule_id 
  */
-function insert_gap_token(gap_label, tokens, gap_indexes, rule_id) {
+function insert_gap_noun_token(gap_label, tokens, gap_indexes, rule_id) {
 	let gap_index = gap_indexes.splice(0, 1)[0]
 	while (gap_indexes.length) {
 		tokens = tokens[gap_index].sub_tokens
@@ -160,6 +189,22 @@ function insert_gap_token(gap_label, tokens, gap_indexes, rule_id) {
 	}
 
 	const gap_token = create_gap_token(rule_id, gap_label, { 'syntax': 'head_np' })
+	tokens.splice(gap_index, 0, gap_token)
+}
+
+/**
+ * @param {string} gap_label
+ * @param {Token[]} tokens
+ * @param {number} ghost_index
+ * @param {number} gap_index
+ * @param {string} rule_id
+ */
+function insert_ghosted_gap_token(gap_label, tokens, ghost_index, gap_index, rule_id) {
+	const ghost_token = tokens[ghost_index]
+	ghost_token.type = TOKEN_TYPE.GHOST
+	add_tag_to_token(ghost_token, { 'gap_index': `${gap_index}` }, rule_id)
+
+	const gap_token = create_gap_token(rule_id, gap_label, { 'ghost_index': `${ghost_index}`})
 	tokens.splice(gap_index, 0, gap_token)
 }
 

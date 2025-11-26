@@ -11,6 +11,7 @@ export const TOKEN_TYPE = {
 	ADDED: 'Added',
 	PHRASE: 'Phrase',
 	GAP: 'Gap',
+	GHOST: 'Ghost',
 }
 
 /** @type { { [key: string]: MessageType } } */

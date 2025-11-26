@@ -1,4 +1,4 @@
-type TokenType = 'Punctuation' | 'Note' | 'FunctionWord' | 'Word' | 'Clause' | 'Added' | 'Phrase' | 'Gap'
+type TokenType = 'Punctuation' | 'Note' | 'FunctionWord' | 'Word' | 'Clause' | 'Added' | 'Phrase' | 'Gap' | 'Ghost'
 
 type TokenBase = {
 	token: string
