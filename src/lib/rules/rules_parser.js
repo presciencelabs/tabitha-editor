@@ -251,7 +251,7 @@ function create_directional_context_filter(context_json, offset) {
 		 * @returns {ContextFilterResult}
 		 */
 		function check_context_with_skip(tokens, start_index) {
-			const tokens_to_skip = [TOKEN_TYPE.NOTE, TOKEN_TYPE.ADDED, TOKEN_TYPE.PHRASE, TOKEN_TYPE.GHOST]
+			const tokens_to_skip = [TOKEN_TYPE.NOTE, TOKEN_TYPE.ADDED, TOKEN_TYPE.PHRASE]
 
 			for (let i = start_index + offset; end_check(tokens, i); i += offset) {
 				if (filter(tokens[i])) {

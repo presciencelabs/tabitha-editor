@@ -201,7 +201,7 @@ function insert_gap_noun_token(gap_label, tokens, gap_indexes, rule_id) {
  */
 function insert_ghosted_gap_token(gap_label, tokens, ghost_index, gap_index, rule_id) {
 	const ghost_token = tokens[ghost_index]
-	ghost_token.type = TOKEN_TYPE.GHOST
+	ghost_token.type = TOKEN_TYPE.NOTE	// temporarily change to NOTE to avoid being processed as a normal token
 	add_tag_to_token(ghost_token, { 'gap_index': `${gap_index}` }, rule_id)
 
 	const gap_token = create_gap_token(rule_id, gap_label, { 'ghost_index': `${ghost_index}`})

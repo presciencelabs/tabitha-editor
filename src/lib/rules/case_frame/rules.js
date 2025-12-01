@@ -186,7 +186,7 @@ const argument_and_sense_rules = [
 		name: 'Revert ghost tokens to lookup tokens',
 		comment: 'In a previous rule, the lookup results of ghost tokens were moved to their corresponding gap tokens. These now get moved back.',
 		rule: {
-			trigger: token => token.type === TOKEN_TYPE.GHOST,
+			trigger: token => token_has_tag(token, 'gap_index'),
 			context: create_context_filter({}),
 			action: simple_rule_action(({ tokens, trigger_index }) => {
 				restore_ghost_tokens(tokens, trigger_index)
