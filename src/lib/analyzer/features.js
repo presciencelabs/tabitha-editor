@@ -30,10 +30,9 @@ const feature_rules_json = {
 			['Frame Inferable', {
 				'context': { 'followedby': { 'token': '_frameInferable' } },
 			}],
-			['Interrogative', [
-				{ 'context': { 'precededby': { 'tag': { 'determiner': 'interrogative' }, 'skip': 'np_modifiers' } } },
-				{ 'trigger': { 'tag': { 'determiner': 'interrogative' } } },
-			]],
+			['Interrogative', {
+				'trigger': { 'tag': { 'noun_tracking': 'interrogative' } },
+			}],
 		]],
 		['Polarity', [
 			['Affirmative', { }],
@@ -68,7 +67,80 @@ const feature_rules_json = {
 		]],
 	],
 	'Verb': [
-
+		['Time', [
+			['Present', { }],
+			['Present', [
+				{ 'trigger': { 'tag': { 'time': 'present' } } },
+				{ 'context': { 'precededby': { 'tag': { 'time': 'present' }, 'skip': 'all' } } },
+			]],
+			['Discourse', [
+				{ 'trigger': { 'tag': { 'time': 'past' } } },
+				{ 'context': { 'precededby': { 'tag': { 'time': 'past' }, 'skip': 'all' } } },
+			]],
+			['Immediate Future', {
+				'context': { 'precededby': { 'tag': { 'time': 'future' }, 'skip': 'all' } },
+			}],
+		]],
+		['Aspect', [
+			['Unmarked', { }],
+			['Inceptive', {
+				'context': { 'precededby': { 'tag': { 'auxiliary': 'inceptive_aspect' }, 'skip': 'all' } },
+			}],
+			['Completive', {
+				'context': { 'precededby': { 'tag': { 'auxiliary': 'completive_aspect' }, 'skip': 'all' } },
+			}],
+			['Cessative', {
+				'context': { 'precededby': { 'tag': { 'auxiliary': 'cessative_aspect' }, 'skip': 'all' } },
+			}],
+			['Continuative', {
+				'context': { 'precededby': { 'tag': { 'auxiliary': 'continuative_aspect' }, 'skip': 'all' } },
+			}],
+			['Imperfective', {
+				'trigger': { 'tag': { 'auxiliary': 'imperfective_aspect' } },
+				'context': { 'precededby': { 'tag': { 'time': 'present' }, 'skip': 'all' } },
+			}],
+			['Routine', {
+				'context': { 'followedby': { 'token': '_routine' } },
+			}],
+		]],
+		['Mood', [
+			['Indicative', { }],
+			['Definite Potential', {
+				'context': { 'precededby': { 'tag': { 'modal': 'definite_mood' }, 'skip': 'all' } },
+			}],
+			['Probable Potential', {
+				'context': { 'precededby': { 'tag': { 'modal': 'probable_mood' }, 'skip': 'all' } },
+			}],
+			["'might' Potential", {
+				'context': { 'precededby': { 'tag': { 'modal': 'might_mood' }, 'skip': 'all' } },
+			}],
+			["'must' Obligation", {
+				'context': { 'precededby': { 'tag': { 'modal': 'must_mood' }, 'skip': 'all' } },
+			}],
+			["'should' Obligation", {
+				'context': { 'precededby': { 'tag': { 'modal': 'should_mood' }, 'skip': 'all' } },
+			}],
+			["'may' (permissive)", {
+				'context': { 'precededby': { 'tag': { 'modal': 'may_permissive_mood' }, 'skip': 'all' } },
+			}],
+		]],
+		['Reflexivity', [
+			['Not Applicable', { }],
+			['Reciprocal', {
+				'context': { 'followedby': { 'tag': { 'pronoun': 'reciprocal' }, 'skip': 'all' } },
+			}],
+			['Reflexivity', [
+				{ 'context': { 'followedby': { 'tag': { 'pronoun': 'reflexive' }, 'skip': 'all' } } },
+				{ 'context': { 'followedby': { 'token': '_reflexive', 'skip': 'all' } } },
+			]],
+		]],
+		['Polarity', [
+			['Affirmative', { }],
+			['Negative', [
+				{ 'context': { 'precededby': { 'tag': { 'verb_polarity': 'negative' }, 'skip': 'all' } } },
+				{ 'context': { 'followedby': { 'tag': { 'verb_polarity': 'negative' }, 'skip': 'all' } } },
+			]],
+		]],
 	],
 	'Adjective': [
 		['Degree', [
@@ -111,19 +183,122 @@ const feature_rules_json = {
 
 	],
 	'NP': [
-
+		['Semantic Role', [
+			['Not Applicable', { }],
+			['Most Agent-Like', {
+				'trigger': { 'tag': { 'role': 'agent' } },
+			}],
+			['Most Patient-Like', {
+				'trigger': { 'tag': { 'role': 'patient' } },
+			}],
+			['State', {
+				'trigger': { 'tag': { 'role': 'state' } },
+			}],
+			['Source', {
+				'trigger': { 'tag': { 'role': 'source' } },
+			}],
+			['Destination', {
+				'trigger': { 'tag': { 'role': 'destination' } },
+			}],
+			['Instrument', {
+				'trigger': { 'tag': { 'role': 'instrument' } },
+			}],
+			['Beneficiary', {
+				'trigger': { 'tag': { 'role': 'beneficiary' } },
+			}],
+			['Addressee', {
+				'trigger': { 'tag': { 'role': 'addressee' } },
+			}],
+		]],
 	],
 	'VP': [
 
 	],
 	'AdjP': [
-
+		['Usage', [
+			['Predicative', { }],
+			['Attributive', {
+				'context': {
+					'followedby': { 'tag': { 'adj_usage': 'attributive', 'skip': 'adjp_modifiers_attributive' } },
+				},
+			}],
+		]],
 	],
 	'AdvP': [
 
 	],
 	'Clause': [
-
+		['Type', [
+			['Independent', {
+				'trigger': { 'tag': { 'clause_type': 'main_clause' } },
+			}],
+			['Restrictive Thing Modifier (Relative Clause)', {
+				'trigger': { 'tag': { 'relative_clause': 'restrictive' } },
+			}],
+			['Descriptive Thing Modifier (Relative Clause)', {
+				'trigger': { 'tag': { 'relative_clause': 'descriptive' } },
+			}],
+			['Event Modifier (Adverbial Clause)', {
+				'trigger': { 'tag': { 'clause_type': 'adverbial_clause' } },
+			}],
+			['Agent (Subject Complement)', {
+				'trigger': { 'tag': { 'clause_type': 'agent_clause' } },
+			}],
+			['Patient (Object Complement)', {
+				'trigger': { 'tag': { 'clause_type': 'patient_clause_same_participant|patient_clause_different_participant' } },
+			}],
+			['Attributive Patient (Adjectival Object Complement)', {
+				'trigger': { 'tag': { 'role': 'adjective_clausal_argument' } },
+			}],
+		]],
+		['Illocutionary Force', [
+			['Declarative', { }],
+			['Imperative', {
+				'context': {
+					'subtokens': { 'token': '(imp)', 'skip': 'all' },
+				},
+			}],
+			['Content Interrogative', {
+				'trigger': { 'tag': { 'interrogative': 'content' } },
+			}],
+			['Yes-No Interrogative', {
+				'trigger': { 'tag': { 'interrogative': 'yes-no' } },
+			}],
+			["Suggestive 'let's'", {
+				'context': {
+					'subtokens': { 'token': '_suggestiveLets|(suggestivelets)', 'skip': 'all' },
+				},
+			}],
+			['Jussive', {
+				'context': {
+					'subtokens': { 'token': '_jussive|(jussive)', 'skip': 'all' },
+				},
+			}],
+		]],
+		['Topic NP', [
+			['Most Agent-Like', { }],
+			['Most Patient-Like', {
+				'context': {
+					'subtokens': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
+				},
+			}],
+		]],
+		['Salience Band', [
+			['Primary Storyline', { }],
+			['Backgrounded Actions', {
+				'context': {
+					'subtokens': [
+						{ 'tag': { 'time': 'past' }, 'skip': 'all' },
+						{ 'tag': { 'auxiliary': 'imperfective_aspect' }, 'skip': 'all' },
+					],
+				},
+			}],
+			['Flashback', {
+				'context': {
+					'subtokens': { 'tag': { 'auxiliary': 'flashback' }, 'skip': 'all' },
+				},
+			}],
+		]],
 	],
 }
 

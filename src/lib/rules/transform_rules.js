@@ -228,6 +228,28 @@ const transform_rules_json = [
 		'transform': { 'remove_tag': 'syntax' },
 		'comment': 'this clears the relativizer tag but keeps the determiner tag',
 	},
+	{
+		'name': 'a relative clause is restrictive by default',
+		'trigger': { 'tag': { 'clause_type': 'relative_clause' } },
+		'context': { },
+		'transform': { 'tag': { 'relative_clause': 'restrictive' } },
+	},
+	{
+		'name': 'tag relative clauses on proper names as descriptive',
+		'trigger': { 'tag': { 'clause_type': 'relative_clause' } },
+		'context': {
+			'precededby': { 'category': 'Noun', 'level': '4' },
+		},
+		'transform': { 'tag': { 'relative_clause': 'descriptive' } },
+	},
+	{
+		'name': 'tag relative clauses with a _descriptive note as descriptive',
+		'trigger': { 'tag': { 'clause_type': 'relative_clause' } },
+		'context': {
+			'subtokens': { 'token': '_descriptive', 'skip': 'all' },
+		},
+		'transform': { 'tag': { 'relative_clause': 'descriptive' } },
+	},
 	// General function words
 	{
 		'name': '"no" before a noun becomes negative_noun_polarity',
