@@ -357,7 +357,7 @@ const structural_rules_json = [
 		name: 'Capitalize the pairing if it is the first word in a sentence.',
 		comment: '',
 		rule: {
-			trigger: token => is_first_word(token) && token.pairing_type === 'complex',
+			trigger: token => is_first_word(token) && !!token.pairing,
 			context: create_context_filter({ }),
 			action: simple_rule_action(({ trigger_token }) => {
 				if (!trigger_token.pairing) {
@@ -366,6 +366,68 @@ const structural_rules_json = [
 				}
 				trigger_token.pairing.token = capitalize_token(trigger_token.pairing)
 			}),
+		},
+	},
+	{
+		name: 'Expand out dynamic|literal pairings into two sentences.',
+		comment: '',
+		rule: {
+			trigger: create_token_filter({ 'tag': { 'clause_type': 'main_clause'} }),
+			context: create_context_filter({ }),
+			action: ({ tokens, trigger_index, trigger_token }) => {
+				// Check if there is a dynamic|literal pairing anywhere within the sentence
+				if (!has_literal_pairing(trigger_token.sub_tokens)) {
+					return trigger_index + 1
+				}
+
+				// duplicate the entire sentence. The literal sentence is inserted before the dynamic one
+				const dynamic_sentence = trigger_token
+				const literal_sentence = { ...dynamic_sentence, sub_tokens: with_literal_pairing(dynamic_sentence.sub_tokens) }
+				tokens.splice(trigger_index, 0, literal_sentence)
+
+				// Add the appropriate (literal) and (dynamic) notes at the start of each sentence
+				dynamic_sentence.sub_tokens.splice(0, 0, create_token('(dynamic)', TOKEN_TYPE.NOTE))
+				literal_sentence.sub_tokens.splice(0, 0, create_token('(literal)', TOKEN_TYPE.NOTE))
+
+				return trigger_index + 2	// move past both sentences
+
+				/**
+				 * @param {Token[]} clause_tokens 
+				 * @returns {boolean}
+				 */
+				function has_literal_pairing(clause_tokens) {
+					for (let i = 0; i < clause_tokens.length; i++) {
+						const token = clause_tokens[i]
+						if (token.pairing_type === 'literal') {
+							return true
+						}
+						if (token.sub_tokens.length > 0) {
+							return has_literal_pairing(token.sub_tokens)
+						}
+					}
+					return false
+				}
+
+				/**
+				 * @param {Token[]} clause_tokens
+				 * @returns {Token[]}
+				 */
+				function with_literal_pairing(clause_tokens) {
+					const new_tokens = [...clause_tokens]
+					for (let i = 0; i < new_tokens.length; i++) {
+						const token = new_tokens[i]
+						if (token.pairing && token.pairing_type === 'literal') {
+							// switch the pairing around
+							const literal_token = { ...token.pairing }
+							literal_token.pairing = { ...token, pairing: null }
+							new_tokens[i] = literal_token
+						} else if (token.sub_tokens.length > 0) {
+							new_tokens[i] = { ...token, sub_tokens: with_literal_pairing(token.sub_tokens)}
+						}
+					}
+					return new_tokens
+				}
+			},
 		},
 	},
 	{
