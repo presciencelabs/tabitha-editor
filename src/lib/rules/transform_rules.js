@@ -633,6 +633,37 @@ const transform_rules_json = [
 		'trigger': { 'stem': 'and|or|but', 'tag': { 'position': 'first_word' } },
 		'transform': { 'tag': { 'syntax': 'coord_clause' } },
 	},
+	// Noun List Indexing
+	{
+		'name': 'Set tag for nouns indexed with _1',
+		'trigger': { 'category': 'Noun' },
+		'context': { 'followedby': { 'token': '_1' } },
+		'transform': { 'tag': { 'noun_index': '1' } },
+	},
+	{
+		'name': 'Set tag for nouns indexed with _2',
+		'trigger': { 'category': 'Noun' },
+		'context': { 'followedby': { 'token': '_2' } },
+		'transform': { 'tag': { 'noun_index': '2' } },
+	},
+	{
+		'name': 'Set tag for nouns indexed with _3',
+		'trigger': { 'category': 'Noun' },
+		'context': { 'followedby': { 'token': '_3' } },
+		'transform': { 'tag': { 'noun_index': '3' } },
+	},
+	{
+		'name': 'Set tag for nouns indexed with _4',
+		'trigger': { 'category': 'Noun' },
+		'context': { 'followedby': { 'token': '_4' } },
+		'transform': { 'tag': { 'noun_index': '4' } },
+	},
+	{
+		'name': 'Set tag for nouns indexed with _5',
+		'trigger': { 'category': 'Noun' },
+		'context': { 'followedby': { 'token': '_5' } },
+		'transform': { 'tag': { 'noun_index': '5' } },
+	},
 ]
 
 /**

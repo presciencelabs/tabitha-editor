@@ -8,7 +8,7 @@ export async function GET({ url: { searchParams } }) {
 	const text = searchParams.get('text') ?? ''
 
 	const sentences = await parse(text)
-	const source_entities = analyze(sentences)
+	const source_data = analyze(sentences)
 
-	return json({ source_entities })
+	return json(source_data)
 }

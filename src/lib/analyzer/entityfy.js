@@ -48,18 +48,19 @@ export function entityfy(sentences) {
 				]
 			}
 
-		} else if (token.token.startsWith('{')) {
+		} else if (category.endsWith('Phrase')) {
 			// A phrase start
 			return [create_source_entity({ category, value: '(', features })]
 
-		} else if (token.token === '}') {
+		} else if (category === 'P_END') {
 			// A phrase end
 			return [create_source_entity({ value: ')' })]
 
 		} else if (token.lookup_results.length) {
 			const concept = convert_to_concept(token)
 			const pairing_concept = token.pairing ? convert_to_concept(token.pairing) : null
-			return [create_source_entity({ category, features, concept, pairing_concept, pairing_type: token.pairing_type })]
+			const noun_list_index = token.tag['noun_index'] || null
+			return [create_source_entity({ category, features, concept, pairing_concept, pairing_type: token.pairing_type, noun_list_index })]
 
 		} else {
 			return []
@@ -85,19 +86,26 @@ export function entityfy(sentences) {
  * @param {SourceConcept?} [data.concept=null]
  * @param {SourceConcept?} [data.pairing_concept=null]
  * @param {PairingType} [data.pairing_type='none']
+ * @param {string?} [data.noun_list_index=null]
  */
-function create_source_entity({ category='', value='', features=[], concept=null, pairing_concept=null, pairing_type='none' }={}) {
-	if (!value && concept) {
-		value = pairing_concept ? `${concept.stem}/${pairing_concept.sense}${pairing_concept.stem}` : concept.stem
-	}
+function create_source_entity({ category='', value='', features=[], concept=null, pairing_concept=null, pairing_type='none', noun_list_index=null }={}) {
 	return {
 		category,
-		value,
+		value: value || concept?.stem || '',
 		features,
 		concept,
 		pairing_concept,
 		pairing_type,
+		noun_list_index: noun_list_index || (category === 'Noun' ? '1' : null),
 	}
+}
+
+/** @type {Record<string, string>} */
+const PHRASE_CATEGORY_MAP = {
+	'NP': 'Noun Phrase',
+	'VP': 'Verb Phrase',
+	'AdjP': 'Adjective Phrase',
+	'AdvP': 'Adverb Phrase',
 }
 
 /**
@@ -107,9 +115,11 @@ function create_source_entity({ category='', value='', features=[], concept=null
 function get_token_category(token) {
 	if (token.type === TOKEN_TYPE.CLAUSE) {
 		return 'Clause'
-	} else if (token.type === TOKEN_TYPE.PHRASE) {
-		// A phrase token is in the format like "{NP" or "{AdjP"
-		return token.token.startsWith('{') ? token.token.substring(1) : 'P_END'
+	} else if (token.type === TOKEN_TYPE.PHRASE && token.token.startsWith('{')) {
+		// A phrase start token is in the format like "{NP" or "{AdjP"
+		return PHRASE_CATEGORY_MAP[token.token.substring(1)]
+	} else if (token.type === TOKEN_TYPE.PHRASE && token.token === '}') {
+		return 'P_END'
 	} else if (token.lookup_results.length) {
 		return token.lookup_results[0].part_of_speech
 	} else {

@@ -50,27 +50,37 @@ export function replace_punctuation(sentences) {
 }
 
 /**
- * @typedef {string} NounListIndex
- * @typedef {[NounListIndex, { stem: string, sense: string }][]} NounList
  * @param {SimpleSourceEntity[]} entities 
- * @returns {NounList}
+ * @returns {NounListEntry[]}
  */
 export function populate_noun_list(entities) {
-	/** @type {NounList} */
+	/** @type {NounListEntry[]} */
 	const noun_list = []
 
 	entities.forEach(entity => {
 		if (!entity.concept || entity.concept.part_of_speech !== 'Noun') {
 			return
 		}
-		const current_noun = { stem: entity.concept.stem, sense: entity.concept.sense }
+		const current_noun = `${entity.concept.stem}-${entity.concept.sense}`
 
-		const existing = noun_list.find(([_, noun]) => noun.stem === current_noun.stem && noun.sense === current_noun.sense)?.[0]
-		if (!existing) {
-			const noun_list_index = next_noun_index()
-			noun_list.push([noun_list_index, current_noun])
-			entity.features.push({ name: 'Noun List Index', value: noun_list_index })
+		const existing = noun_list.filter(({ noun }) => noun === current_noun)
+		let noun_list_index = ''
+		if (entity.noun_list_index) {
+			const index = parseInt(entity.noun_list_index)
+			if (index > existing.length) {
+				noun_list_index = next_noun_index()
+				noun_list.push({ index: noun_list_index, noun: current_noun })
+			} else {
+				noun_list_index = existing[index-1].index
+			}
+		} else if (existing.length) {
+			noun_list_index = existing[existing.length-1].index
+		} else {
+			noun_list_index = next_noun_index()
+			noun_list.push({ index: noun_list_index, noun: current_noun })
 		}
+
+		entity.noun_list_index = noun_list_index
 	})
 
 	return noun_list
@@ -86,16 +96,5 @@ export function populate_noun_list(entities) {
 		} else {
 			return next.toString()
 		}
-	}
-
-	/**
-	 * @param {Token[]} tokens 
-	 * @param {number} index 
-	 * @returns {number|undefined}
-	 */
-	function get_index_note(tokens, index) {
-		const index_note_context_filter = create_context_filter({ 'followedby': { 'token': '_1|_2|_3|_4' } })
-		const note_index = index_note_context_filter(tokens, index).context_indexes.at(0)
-		return note_index ? Number(tokens[note_index].token.substring(1)) : undefined
 	}
 }

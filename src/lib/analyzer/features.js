@@ -182,7 +182,7 @@ const feature_rules_json = {
 	'Conjunction': [
 
 	],
-	'NP': [
+	'Noun Phrase': [
 		['Semantic Role', [
 			['Not Applicable', { }],
 			['Most Agent-Like', {
@@ -211,20 +211,18 @@ const feature_rules_json = {
 			}],
 		]],
 	],
-	'VP': [
+	'Verb Phrase': [
 
 	],
-	'AdjP': [
+	'Adjective Phrase': [
 		['Usage', [
 			['Predicative', { }],
 			['Attributive', {
-				'context': {
-					'followedby': { 'tag': { 'adj_usage': 'attributive', 'skip': 'adjp_modifiers_attributive' } },
-				},
+				'trigger': { 'tag': { 'adj_usage': 'attributive' } },
 			}],
 		]],
 	],
-	'AdvP': [
+	'Adverb Phrase': [
 
 	],
 	'Clause': [
@@ -245,7 +243,7 @@ const feature_rules_json = {
 				'trigger': { 'tag': { 'clause_type': 'agent_clause' } },
 			}],
 			['Patient (Object Complement)', {
-				'trigger': { 'tag': { 'clause_type': 'patient_clause_same_participant|patient_clause_different_participant' } },
+				'trigger': { 'tag': { 'clause_type': 'patient_clause_same_participant|patient_clause_different_participant|patient_clause_quote_begin' } },
 			}],
 			['Attributive Patient (Adjectival Object Complement)', {
 				'trigger': { 'tag': { 'role': 'adjective_clausal_argument' } },
@@ -276,8 +274,8 @@ const feature_rules_json = {
 			}],
 		]],
 		['Topic NP', [
-			['Most Agent-Like', { }],
-			['Most Patient-Like', {
+			['Most Agent-like', { }],
+			['Most Patient-like', {
 				'context': {
 					'subtokens': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
 				},
