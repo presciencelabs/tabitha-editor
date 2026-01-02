@@ -324,7 +324,7 @@ const structural_rules_json = [
 			context: create_context_filter({ 'precededby': { 'token': "God's" } }),
 			action: simple_rule_action(({ tokens, trigger_index, context_indexes }) => {
 				const new_tokens = [
-					create_token('the', TOKEN_TYPE.FUNCTION_WORD),
+					create_token(is_first_word(tokens[context_indexes[0]]) ? 'The' : 'the', TOKEN_TYPE.FUNCTION_WORD),
 					create_token('Scriptures', TOKEN_TYPE.LOOKUP_WORD),
 				]
 				const inner_phrase_start = find_phrase_start(tokens, context_indexes[0])
@@ -335,6 +335,21 @@ const structural_rules_json = [
 				if (next_word?.token === 'says') {
 					next_word.token = 'say'
 				}
+			}),
+		},
+	},
+	{
+		name: "Yahweh -> the LORD",
+		comment: '',
+		rule: {
+			trigger: create_token_filter({ 'stem': 'Yahweh' }),
+			context: create_context_filter({ }),
+			action: simple_rule_action(({ tokens, trigger_token, trigger_index }) => {
+				const new_tokens = [
+					create_token(is_first_word(trigger_token) ? 'The' : 'the', TOKEN_TYPE.FUNCTION_WORD),
+					create_token('LORD', TOKEN_TYPE.LOOKUP_WORD),
+				]
+				tokens.splice(trigger_index, 1, ...new_tokens)
 			}),
 		},
 	},
