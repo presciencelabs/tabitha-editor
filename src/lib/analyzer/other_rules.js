@@ -1,4 +1,4 @@
-import { create_context_filter, create_token_filter } from '$lib/rules/rules_parser'
+import { create_token_filter } from '$lib/rules/rules_parser'
 import { create_lookup_result, TOKEN_TYPE } from '$lib/token'
 
 /** @type {[string, TokenFilter][]} */
@@ -35,9 +35,9 @@ export function replace_punctuation(sentences) {
 			return token
 		}
 		
-		const particle_entry = PUNCTUATION_PARTICLES.find(([_, filter]) => filter(token))
+		const particle_entry = PUNCTUATION_PARTICLES.find(([, filter]) => filter(token))
 		if (particle_entry) {
-			const [stem, _] = particle_entry
+			const [stem,] = particle_entry
 			return {
 				...token,
 				token: stem,
