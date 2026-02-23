@@ -15,6 +15,12 @@ const feature_rules_json = {
 			['Plural', {
 				'trigger': { 'form': 'plural' },
 			}],
+			['Singular', {
+				'trigger': { 'form': 'stem' },
+			}],
+			['Plural', {
+				'context': { 'followedby': { 'token': '_plural' } },
+			}],
 			['Dual', {
 				'context': { 'followedby': { 'token': '_dual' } },
 			}],
@@ -65,6 +71,12 @@ const feature_rules_json = {
 				'context': { 'followedby': { 'token': '_excl|_exclusive' } },
 			}],
 		]],
+		['Participant Status', [
+			['Not Applicable', { }],
+			['Emphasized', {
+				'context': { 'followedby': { 'token': '_emphasized' } },
+			}],
+		]],
 	],
 	'Verb': [
 		['Time', [
@@ -77,9 +89,11 @@ const feature_rules_json = {
 				{ 'trigger': { 'tag': { 'time': 'past' } } },
 				{ 'context': { 'precededby': { 'tag': { 'time': 'past' }, 'skip': 'all' } } },
 			]],
-			['Immediate Future', {
-				'context': { 'precededby': { 'tag': { 'time': 'future' }, 'skip': 'all' } },
-			}],
+			['Immediate Future', [
+				{ 'context': { 'precededby': { 'tag': { 'time': 'future' }, 'skip': 'all' } } },
+				{ 'context': { 'precededby': { 'token': '(imp)|_jussive|(jussive)|_suggestiveLets|(suggestivelets)', 'skip': 'all' } } },
+				{ 'context': { 'followedby': { 'token': '(imp)|_jussive|(jussive)|_suggestiveLets|(suggestivelets)', 'skip': 'all' } } },
+			]],
 		]],
 		['Aspect', [
 			['Unmarked', { }],
@@ -174,21 +188,49 @@ const feature_rules_json = {
 		]],
 	],
 	'Adverb': [
-
+		['Degree', [
+			['No Degree', { }],
+			['Comparative', [
+				{ 'context': { 'precededby': { 'tag': { 'degree': 'comparative' } } } },
+				{ 'trigger': { 'form': 'comparative' } },
+			]],
+			['Superlative', [
+				{ 'context': { 'precededby': { 'tag': { 'degree': 'superlative' } } } },
+				{ 'trigger': { 'form': 'superlative' } },
+			]],
+			['Intensified', {
+				'context': { 'precededby': { 'tag': { 'degree': 'intensified' } } },
+			}],
+			['Extremely Intensified', {
+				'context': { 'precededby': { 'tag': { 'degree': 'extremely_intensified' } } },
+			}],
+			["'too'", {
+				'context': { 'precededby': { 'tag': { 'degree': 'too' } } },
+			}],
+			["'less'", {
+				'context': { 'precededby': { 'tag': { 'degree': 'less' } } },
+			}],
+			["'least'", {
+				'context': { 'precededby': { 'tag': { 'degree': 'least' } } },
+			}],
+		]],
 	],
-	'Adposition': [
-
-	],
+	'Adposition': [],
 	'Conjunction': [
-
+		['Implicit', [
+			['No', { }],
+			['Yes', {
+				'context': { 'followedby': { 'token': '_implicit' } },
+			}],
+		]],
 	],
 	'Noun Phrase': [
 		['Semantic Role', [
 			['Not Applicable', { }],
-			['Most Agent-Like', {
+			['Most Agent-like', {
 				'trigger': { 'tag': { 'role': 'agent' } },
 			}],
-			['Most Patient-Like', {
+			['Most Patient-like', {
 				'trigger': { 'tag': { 'role': 'patient' } },
 			}],
 			['State', {
@@ -210,9 +252,22 @@ const feature_rules_json = {
 				'trigger': { 'tag': { 'role': 'addressee' } },
 			}],
 		]],
+		['Implicit', [
+			// TODO this needs to be handled differently, since we need to know which Noun is the head of this NP
+		]],
 	],
 	'Verb Phrase': [
-
+		['Implicit', [
+			['No', { }],
+			['Yes', {
+				'context': {
+					'followedby': [
+						{ 'category': 'Verb', 'skip': 'vp_modifiers' },
+						{ 'token': '_implicit' },
+					],
+				},
+			}],
+		]],
 	],
 	'Adjective Phrase': [
 		['Usage', [
@@ -221,9 +276,22 @@ const feature_rules_json = {
 				'trigger': { 'tag': { 'adj_usage': 'attributive' } },
 			}],
 		]],
+		['Implicit', [
+			// TODO this needs to be handled differently, since we need to know which Adjective is the head of this AdjP
+		]],
 	],
 	'Adverb Phrase': [
-
+		['Implicit', [
+			['No', { }],
+			['Yes', {
+				'context': {
+					'followedby': [
+						{ 'category': 'Adverb', 'skip': 'advp_modifiers' },
+						{ 'token': '_implicit' },
+					],
+				},
+			}],
+		]],
 	],
 	'Clause': [
 		['Type', [
@@ -296,6 +364,55 @@ const feature_rules_json = {
 					'subtokens': { 'tag': { 'auxiliary': 'flashback' }, 'skip': 'all' },
 				},
 			}],
+		]],
+		['Implicit Information', [
+			['Not Applicable', { }],
+			['Implicit Cultural Information', {
+				'context': {
+					'subtokens': { 'token': '(implicit-cultural)', 'skip': 'all' },
+				},
+			}],
+			['Implicit Situational Information', {
+				'context': {
+					'subtokens': { 'token': '(implicit-situational)', 'skip': 'all' },
+				},
+			}],
+			['Implicit Historical Information', {
+				'context': {
+					'subtokens': { 'token': '(implicit-historical)', 'skip': 'all' },
+				},
+			}],
+			['Implicit Background Information', {
+				'context': {
+					'subtokens': { 'token': '(implicit-background)', 'skip': 'all' },
+				},
+			}],
+			['Implicit Subactions', {
+				'context': {
+					'subtokens': { 'token': '(implicit-subaction)', 'skip': 'all' },
+				},
+			}],
+			['Implicit Argument', {
+				'context': {
+					'subtokens': { 'token': '(implicit-argument)', 'skip': 'all' },
+				},
+			}],
+		]],
+		['Location', [
+			// TODO
+			['Not Applicable', { }],
+		]],
+		['Alternative Analysis', [
+			// TODO
+			['Not Applicable', { }],
+		]],
+		['Vocabulary Alternate', [
+			// TODO
+			['Not Applicable', { }],
+		]],
+		['Rhetorical Question', [
+			// TODO
+			['Not Applicable', { }],
 		]],
 	],
 }
