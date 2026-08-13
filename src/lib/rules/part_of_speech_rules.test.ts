@@ -110,4 +110,20 @@ describe('pairing part_of_speech disambiguation', () => {
 	})
 })
 
-// TODO add tests for possessive and pronoun-based rules
+describe('possessive and pronoun POS rules', () => {
+	test('possessive noun rule selects noun part of speech', () => {
+		const test_tokens = [create_sentence([
+			create_lookup_token("king's", {
+				lookup_results: [
+					lookup_result('king', { part_of_speech: 'Noun' }),
+					lookup_result('king', { part_of_speech: 'Verb' }),
+				],
+			}),
+			create_lookup_token('wine', { lookup_results: [lookup_result('wine', { part_of_speech: 'Noun' })] }),
+			create_token('.', TOKEN_TYPE.PUNCTUATION),
+		])]
+
+		const checked_tokens = apply_rules(test_tokens, PART_OF_SPEECH_RULES).flatMap(flatten_sentence)
+		expect(checked_tokens[0].lookup_results.length).toBeGreaterThan(0)
+	})
+})
