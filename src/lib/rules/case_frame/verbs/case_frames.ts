@@ -2,8 +2,7 @@ import { TOKEN_TYPE } from '$lib/token'
 import { parse_case_frame_rule, parse_sense_rules } from '../common'
 import { by_adposition, by_clause_tag, by_complementizer, by_adposition_concept, by_relative_context, directly_after_verb, directly_after_verb_with_adposition, directly_before_verb, patient_from_subordinate_clause, predicate_adjective, with_be_auxiliary, with_no_double_patient } from './presets'
 
-/** @type {RoleRuleJson<VerbRoleTag>} */
-const default_verb_case_frame_json = {
+const default_verb_case_frame_json: RoleRuleJson<VerbRoleTag> = {
 	'agent': directly_before_verb(),
 	'patient': {
 		...directly_after_verb(),
@@ -52,10 +51,8 @@ const default_verb_case_frame_json = {
 /**
  * These rules allow each verb sense to specify rules for each argument that is different from the default.
  * Only senses that differ from the default structure need to be included here.
- *
- * @type {Map<WordStem, [WordSense, SenseRuleJson<VerbRoleTag>][]>}
  */
-const verb_case_frames = new Map([
+const verb_case_frames: Map<WordStem, [WordSense, SenseRuleJson<VerbRoleTag>][]> = new Map([
 	['accept', []],
 	['act', []],
 	['admit', []],
@@ -1123,8 +1120,7 @@ function create_default_argument_rules(): ArgumentRoleRule[] {
 function create_verb_argument_rules(): Map<WordStem, ArgumentRulesForSense[]> {
 	return new Map(Array.from(verb_case_frames.entries()).map(([stem, sense_rules_json]) => {
 		const defaults = get_default_rules_for_stem(stem)
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		return [stem, parse_sense_rules(sense_rules_json as any, defaults)]
+		return [stem, parse_sense_rules(sense_rules_json, defaults)]
 	}))
 }
 

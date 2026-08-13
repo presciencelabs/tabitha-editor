@@ -66,16 +66,14 @@ export function parse_case_frame_rule(sense: WordSense, role_tag: RoleTag, rule_
 	const tag_role = rule_json['tag_role'] ?? true
 	const tag_transform = tag_role ? { 'tag': { 'role': role_tag } } : {}
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	rule_json['transform'] = { ...tag_transform, ...rule_json['transform'] as any }
+	rule_json['transform'] = { ...tag_transform, ...rule_json['transform'] }
 
 	const missing_message = rule_json['missing_message'] ?? missing_argument_message(role_tag)
 	const extra_message = rule_json['extra_message'] ?? extra_argument_message(role_tag)
 
 	return [{
 		role_tag,
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		trigger_rule: { ...parse_transform_rule(rule_json as any, 0), id: `case_frame:${sense}:${role_tag}` },
+		trigger_rule: { ...parse_transform_rule(rule_json, 0), id: `case_frame:${sense}:${role_tag}` },
 		relative_context_index: rule_json['argument_context_index'] ?? -1,
 		missing_message: missing_message.replaceAll('{role}', role_tag),
 		extra_message: extra_message.replaceAll('{role}', role_tag),
@@ -83,34 +81,29 @@ export function parse_case_frame_rule(sense: WordSense, role_tag: RoleTag, rule_
 	}]
 }
 
-/**
- * @param {[WordSense, any][]} rule_json
- * @param {ArgumentRoleRule[]} defaults
- * @returns {ArgumentRulesForSense[]}
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function parse_sense_rules(rule_json: [WordSense, any][], defaults: ArgumentRoleRule[]): ArgumentRulesForSense[] {
+export function parse_sense_rules<K extends string = string>(
+	rule_json: [WordSense, SenseRuleJson<K>][],
+	defaults: ArgumentRoleRule[],
+): ArgumentRulesForSense[] {
 	return rule_json.map(parse_sense_rule(defaults))
 
 	function parse_sense_rule(defaults: ArgumentRoleRule[]) {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		return ([sense, rules_json]: [WordSense, Record<string, any>]): ArgumentRulesForSense => {
+		return ([sense, rules_json]: [WordSense, SenseRuleJson<K>]): ArgumentRulesForSense => {
 			const role_rules = defaults.flatMap(rule => rule.role_tag in rules_json
-				? parse_case_frame_rule(sense, rule.role_tag, rules_json[rule.role_tag])
+				? parse_case_frame_rule(sense, rule.role_tag, rules_json[rule.role_tag as K] as RoleRuleValueJson)
 				: [rule])
 
-			const other_rules = 'other_rules' in rules_json
-				? Object.entries(rules_json['other_rules'])
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					.flatMap(([other_tag, other_rule_json]) => parse_case_frame_rule(sense, other_tag, other_rule_json as any))
+			const other_rules = rules_json.other_rules
+				? Object.entries(rules_json.other_rules)
+					.flatMap(([other_tag, other_rule_json]) => parse_case_frame_rule(sense, other_tag, other_rule_json))
 				: []
 
 			return {
 				sense,
 				role_rules: role_rules.concat(other_rules),
-				other_optional: rules_json['other_optional']?.split('|') ?? [],
-				other_required: rules_json['other_required']?.split('|') ?? [],
-				patient_clause_type: rules_json['patient_clause_type'] ?? '',
+				other_optional: rules_json.other_optional?.split('|') ?? [],
+				other_required: rules_json.other_required?.split('|') ?? [],
+				patient_clause_type: rules_json.patient_clause_type ?? '',
 			}
 		}
 	}

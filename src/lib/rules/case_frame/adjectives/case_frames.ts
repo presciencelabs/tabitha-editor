@@ -1,8 +1,7 @@
 import { parse_case_frame_rule, parse_sense_rules } from '../common'
 import { by_adposition, by_clause_tag, by_complementizer, by_same_participant_complementizer, modified_noun_of_adjective, modified_noun_with_subgroup, unit_with_measure } from './presets'
 
-/** @type {RoleRuleJson<AdjectiveRoleTag>} */
-const default_adjective_case_frame_json = {
+const default_adjective_case_frame_json: RoleRuleJson<AdjectiveRoleTag> = {
 	'modified_noun': modified_noun_of_adjective(),
 	'nominal_argument': { 'trigger': 'none' },
 	'patient_clause_different_participant': by_clause_tag('patient_clause_different_participant'),
@@ -13,10 +12,8 @@ const default_adjective_case_frame_json = {
 /**
  * These rules allow each adjective sense to specify rules for each argument that is different from the default.
  * Only senses that differ from the default structure need to be included here.
- *
- * @type {Map<WordStem, [WordSense, SenseRuleJson<AdjectiveRoleTag>][]>}
  */
-const adjective_case_frames = new Map([
+const adjective_case_frames: Map<WordStem, [WordSense, SenseRuleJson<AdjectiveRoleTag>][]> = new Map([
 	['afraid', [
 		['afraid-B', { 'nominal_argument': by_adposition('of') }],
 	]],
@@ -252,8 +249,7 @@ function create_default_argument_rules(): ArgumentRoleRule[] {
 
 function create_adjective_argument_rules(): Map<WordStem, ArgumentRulesForSense[]> {
 	return new Map(Array.from(adjective_case_frames.entries()).map(([stem, sense_rules_json]) => {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		return [stem, parse_sense_rules(sense_rules_json as any, DEFAULT_CASE_FRAME_RULES)]
+		return [stem, parse_sense_rules(sense_rules_json, DEFAULT_CASE_FRAME_RULES)]
 	}))
 }
 

@@ -1,8 +1,7 @@
 import { parse_case_frame_rule, parse_sense_rules } from '../common'
 import { by_relative_context, head_noun, head_noun_post, opening_subordinate_clause } from './presets'
 
-/** @type {RoleRuleJson<AdpositionRoleTag>} */
-const default_adposition_usage_json = {
+const default_adposition_usage_json: RoleRuleJson<AdpositionRoleTag> = {
 	'opening_subordinate_clause': opening_subordinate_clause(),
 	'in_noun_phrase': head_noun(),
 }
@@ -10,10 +9,8 @@ const default_adposition_usage_json = {
 /**
  * These rules allow each adposition sense to specify rules for each argument that is different from the default.
  * Only senses that differ from the default structure need to be included here.
- *
- * @type {Map<WordStem, [WordSense, SenseRuleJson<AdpositionRoleTag>][]>}
  */
-const adposition_case_frames = new Map([
+const adposition_case_frames: Map<WordStem, [WordSense, SenseRuleJson<AdpositionRoleTag>][]> = new Map([
 	['ago', [
 		['ago-A', {
 			'in_noun_phrase': head_noun_post(),
@@ -94,18 +91,14 @@ const adposition_case_frames = new Map([
 	]],
 ])
 
-/**
- * @returns {ArgumentRoleRule[]}
- */
-function create_usage_rules() {
+function create_usage_rules(): ArgumentRoleRule[] {
 	return Object.entries(default_adposition_usage_json)
 		.flatMap(([role_tag, rule_json]) => parse_case_frame_rule('adp_default', role_tag, rule_json))
 }
 
 function create_adposition_argument_rules(): Map<WordStem, ArgumentRulesForSense[]> {
 	return new Map(Array.from(adposition_case_frames.entries()).map(([stem, sense_rules_json]) => {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		return [stem, parse_sense_rules(sense_rules_json as any, DEFAULT_USAGE_RULES)]
+		return [stem, parse_sense_rules(sense_rules_json, DEFAULT_USAGE_RULES)]
 	}))
 }
 

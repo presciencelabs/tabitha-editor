@@ -52,8 +52,7 @@ const argument_and_sense_rules: BuiltInRule[] = [
 			trigger: (token: Token) => token.lookup_results.length > 0 && is_one_part_of_speech(token),
 			context: create_context_filter({}),
 			action: simple_rule_action(trigger_context => {
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const CASE_FRAME_RULE_GETTERS = new Map<string, (token: Token) => any>([
+				const CASE_FRAME_RULE_GETTERS = new Map<string, (token: Token) => CaseFrameRuleInfo>([
 					['Verb', get_verb_case_frame_rules],
 					['Adjective', get_adjective_case_frame_rules],
 					['Adposition', get_adposition_case_frame_rules],

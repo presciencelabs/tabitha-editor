@@ -2,9 +2,6 @@ import { LOOKUP_FILTERS } from '$lib/lookup_filters'
 import { add_tag_to_token, set_message, split_stem_and_sense } from '$lib/token'
 import { create_context_filter, create_token_filter } from '../rules_parser'
 
-/** @typedef {[string, any]} PriorityOverrideRules */
-/** @typedef {(role_matches: RoleMatchResult[]) => boolean} ArgumentMatchFilter */
-
 /**
  * By default, senses with valid case frames are prioritized by letter (eg. -A is selected over -B).
  * These rules allow overriding that priority based on filters applied to the verb arguments.
@@ -18,10 +15,8 @@ import { create_context_filter, create_token_filter } from '../rules_parser'
  * as overlapping and compatible argument structures need to be considered.
  * 
  * TODO store these in the db
- * 
- * @type {[WordStem, PriorityOverrideRules[]][]}
  */
-const verb_sense_priority_overrides = [
+const verb_sense_priority_overrides: WordStemPriorityOverrides[] = [
 	['answer', [
 		['answer-B', { 'patient': { 'stem': 'prayer' } }],
 		['answer-C', { 'patient': { 'stem': 'question' } }],
@@ -323,10 +318,8 @@ const verb_sense_priority_overrides = [
  * 
  * Many adjective sense B's have a nominal argument where sense A does not, so if sense B has a
  * valid argument, it needs to be entered here in order to prioritize it over sense A.
- * 
- * @type {[WordStem, PriorityOverrideRules[]][]}
  */
-const adjective_sense_priority_overrides = [
+const adjective_sense_priority_overrides: WordStemPriorityOverrides[] = [
 	['afraid', [['afraid-B', { }]]],
 	['amazed', [['amazed-B', { }]]],
 	['angry', [['angry-B', { }]]],
@@ -373,10 +366,8 @@ const adjective_sense_priority_overrides = [
  * Note that not all senses have a rule, only those that are different from the default letter-based priority.
  * 
  * An empty filter means that sense will always apply as long as its case frame is valid.
- * 
- * @type {[WordStem, PriorityOverrideRules[]][]}
  */
-const adposition_sense_priority_overrides = [
+const adposition_sense_priority_overrides: WordStemPriorityOverrides[] = [
 	['if', [
 		['if-B', { 'were': { } }],
 		['if-C', { 'had': { } }],
@@ -388,17 +379,13 @@ const adposition_sense_priority_overrides = [
 	]],
 ]
 
-type ArgumentMatchFilter = (role_matches: RoleMatchResult[]) => boolean
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parse_sense_rule([sense, sense_rule_json]: [WordSense, Record<string, any>]): [WordSense, ArgumentMatchFilter] {
+function parse_sense_rule([sense, sense_rule_json]: PriorityOverrideRule): [WordSense, ArgumentMatchFilter] {
 	const role_filters = Object.entries(sense_rule_json).map(parse_role_rule)
 	return [sense, role_match => role_filters.every(filter => filter(role_match))]
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	function parse_role_rule([role_tag, role_filter_json]: [string, any]): ArgumentMatchFilter {
+	function parse_role_rule([role_tag, role_filter_json]: [string, RoleFilterRuleJson]): ArgumentMatchFilter {
 		const trigger = create_token_filter(role_filter_json)
-		const context = create_context_filter(role_filter_json['context'])
+		const context = create_context_filter(role_filter_json.context)
 
 		return role_matches => {
 			const match_result = role_matches.find(match => match.role_tag === role_tag)
@@ -412,21 +399,17 @@ function parse_sense_rule([sense, sense_rule_json]: [WordSense, Record<string, a
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const VERB_SENSE_FILTER_RULES = new Map<string, [WordSense, ArgumentMatchFilter][]>(verb_sense_priority_overrides.map(parse_sense_override as any))
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ADJECTIVE_SENSE_FILTER_RULES = new Map<string, [WordSense, ArgumentMatchFilter][]>(adjective_sense_priority_overrides.map(parse_sense_override as any))
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ADPOSITION_SENSE_FILTER_RULES = new Map<string, [WordSense, ArgumentMatchFilter][]>(adposition_sense_priority_overrides.map(parse_sense_override as any))
+const VERB_SENSE_FILTER_RULES = new Map<WordStem, [WordSense, ArgumentMatchFilter][]>(verb_sense_priority_overrides.map(parse_sense_override))
+const ADJECTIVE_SENSE_FILTER_RULES = new Map<WordStem, [WordSense, ArgumentMatchFilter][]>(adjective_sense_priority_overrides.map(parse_sense_override))
+const ADPOSITION_SENSE_FILTER_RULES = new Map<WordStem, [WordSense, ArgumentMatchFilter][]>(adposition_sense_priority_overrides.map(parse_sense_override))
 
-const SENSE_FILTER_RULES = new Map<string, Map<string, [WordSense, ArgumentMatchFilter][]>>([
+const SENSE_FILTER_RULES = new Map<string, Map<WordStem, [WordSense, ArgumentMatchFilter][]>>([
 	['Verb', VERB_SENSE_FILTER_RULES],
 	['Adjective', ADJECTIVE_SENSE_FILTER_RULES],
 	['Adposition', ADPOSITION_SENSE_FILTER_RULES],
 ])
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parse_sense_override([stem, sense_rules]: [string, any[]]): [string, [WordSense, ArgumentMatchFilter][]] {
+function parse_sense_override([stem, sense_rules]: WordStemPriorityOverrides): [WordStem, [WordSense, ArgumentMatchFilter][]] {
 	return [stem, sense_rules.map(parse_sense_rule)]
 }
 
