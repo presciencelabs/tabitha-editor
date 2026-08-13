@@ -26,6 +26,6 @@
 	<nav>
 		<h6 class="footer-title">Theme</h6>
 
-		<Selector colors="bg-accent text-accent-content" />
+		<Selector colors="btn-outline" />
 	</nav>
 </footer>
