@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import CopyButton from '$lib/CopyButton.svelte'
 	import Icon from '@iconify/svelte'
 

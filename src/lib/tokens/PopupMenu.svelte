@@ -1,6 +1,13 @@
-<script>
-	/** @type {{ popup_content: import('svelte').Snippet, button_content: import('svelte').Snippet, color_classes?: string }}*/
-	let { popup_content, button_content, color_classes = 'bg-info text-info-content' } = $props()
+<script lang="ts">
+	import type { Snippet } from 'svelte'
+
+	interface Props {
+		popup_content: Snippet
+		button_content: Snippet
+		color_classes?: string
+	}
+
+	let { popup_content, button_content, color_classes = 'bg-info text-info-content' }: Props = $props()
 </script>
 
 <div class="dropdown dropdown-hover dropdown-top">
