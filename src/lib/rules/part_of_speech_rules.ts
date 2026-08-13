@@ -5,11 +5,7 @@ import { LOOKUP_FILTERS } from '$lib/lookup_filters'
 
 /**
  * These rules are designed to disambiguate words that could be multiple parts of speech.
- * E.g. guard(N/V), command(N/V), pleased(V/Adj), well(N/Adj/Adv)
- * The Analyzer has many of these, but this is just a few for now.
- * TODO add more rules
- *
- * @type {PartOfSpeechRuleJson[]}
+ * E.g. guard(N/V), command(N/V), pleased(V/Adj), well(N/Adj/Adv).
  */
 const part_of_speech_rules_json = [
 	{
