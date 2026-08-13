@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { TOKEN_TYPE, create_clause_token, create_added_token, create_token, MESSAGE_TYPE } from '../token'
 import { ERRORS } from './error_messages'
-import { clausify } from './clausify'
+import { clausify, flatten_sentences } from './clausify'
 
 function create_tokens(tokens: string[]): Token[] {
 	const type = (token: string): TokenType => token.length > 1 ? TOKEN_TYPE.LOOKUP_WORD : TOKEN_TYPE.PUNCTUATION
@@ -104,6 +104,14 @@ describe('clausify: brackets', () => {
 			]
 
 			expect(clausify(test_tokens)).toEqual(expected)
+		})
+
+		test('warns when clause nesting depth exceeds 3 levels', () => {
+			const test_tokens = create_tokens(['[', 'a', '[', 'b', '[', 'c', '[', 'd', ']', ']', ']', ']', '.'])
+			const result = clausify(test_tokens)
+			const flattened = flatten_sentences(result)
+			const warning_added = flattened.find(t => t.messages.some(m => m.rule_id === 'clause:nesting_depth'))
+			expect(warning_added).toBeDefined()
 		})
 	})
 

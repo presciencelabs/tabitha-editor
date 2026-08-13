@@ -62,8 +62,14 @@ export function clausify(tokens: Token[]): Sentence[] {
 	}
 
 	function start_clause() {
-		// TODO: if nesting depth is more than 3, suggest to rework the sentence
 		clause_tokens.push([])
+		if (clause_tokens.length > 4) {
+			add_token_to_clause(create_added_token('[', {
+				...MESSAGE_TYPE.WARNING,
+				message: 'Clause nesting depth exceeds 3 levels. Consider reworking the sentence for clarity.',
+				rule_id: 'clause:nesting_depth',
+			}))
+		}
 	}
 
 	function end_clause() {
