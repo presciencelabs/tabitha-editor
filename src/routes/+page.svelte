@@ -1,10 +1,10 @@
 <script lang="ts">
 	import CopyButton from '$lib/CopyButton.svelte'
-	import { SaveButton, saved } from '$lib/save'
+	import { SaveButton, save_state } from '$lib/save'
 	import { Tokens } from '$lib/tokens'
 	import Icon from '@iconify/svelte'
 
-	let entered_text = $state($saved)
+	let entered_text = $state(save_state.value)
 	let checking = $state(false)
 	let check_response = $state<{ status: string; tokens: SimpleToken[]; back_translation: string }>({ status: 'ok', tokens: [], back_translation: '' })
 

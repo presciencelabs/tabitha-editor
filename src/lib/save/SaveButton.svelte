@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte'
-	import { saved } from '.'
+	import { save_state } from '.'
 
 	interface Props {
 		content: string
@@ -9,10 +9,10 @@
 
 	let { content, classes = '' }: Props = $props()
 
-	let is_saved = $derived(content !== '' && $saved === content)
+	let is_saved = $derived(content !== '' && save_state.value === content)
 
 	function save() {
-		$saved = content
+		save_state.set(content)
 	}
 </script>
 
