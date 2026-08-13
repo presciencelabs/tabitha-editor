@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { current_theme, set_theme } from '.'
+	import { theme_state, set_theme } from '.'
 	import themes from './themes'
 
 	/** class(es) separated by space */
@@ -7,7 +7,7 @@
 
 	let open = $state(false)
 
-	let other_themes = $derived(themes.filter(theme => theme !== $current_theme))
+	let other_themes = $derived(themes.filter(theme => theme !== theme_state.current))
 
 	function set(theme: string) {
 		set_theme(theme)
@@ -17,7 +17,7 @@
 </script>
 
 <details bind:open class={`prose collapse collapse-arrow ${colors}`}>
-	<summary class="collapse-title">{$current_theme}</summary>
+	<summary class="collapse-title">{theme_state.current}</summary>
 
 	<ul class="collapse-content mt-0">
 		{#each other_themes as theme}
