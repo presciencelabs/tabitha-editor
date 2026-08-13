@@ -20,6 +20,7 @@
 		</svg>
 	</div>
 
+	<!-- Uses flex-col instead of daisyUI's menu class because footer-horizontal overrides menu layout -->
 	<div
 		class="dropdown-content z-[100] mb-2 p-2 shadow-2xl bg-base-200 border border-base-300 text-base-content rounded-box w-80 max-h-80 overflow-y-auto"
 	>
