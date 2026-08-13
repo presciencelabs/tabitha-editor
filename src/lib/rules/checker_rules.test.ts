@@ -5,51 +5,21 @@ import { describe, expect, test } from 'vitest'
 import { CHECKER_RULES } from './checker_rules'
 import { expect_error, expect_message_to_match, expect_no_message } from '$lib/test_helps'
 
-/**
- * 
- * @param {Token} left
- * @param {Token} right
- * @param {PairingType} pairing_type
- * @returns {Token}
- */
-function create_pairing_token(left, right, pairing_type='complex') {
+function create_pairing_token(left: Token, right: Token, pairing_type: PairingType = 'complex'): Token {
 	left.pairing = right
 	left.pairing_type = pairing_type
 	return left
 }
 
-/**
- * 
- * @param {string} token
- * @param {Object} [data={}]
- * @param {LookupResult[]} [data.lookup_results=[]]
- * @param {Tag} [data.tag={}]
- * @returns {Token}
- */
-function create_lookup_token(token, { lookup_results=[], tag={} }={}) {
+function create_lookup_token(token: string, { lookup_results = [], tag = {} }: { lookup_results?: LookupResult[]; tag?: Tag } = {}): Token {
 	return create_token(token, TOKEN_TYPE.LOOKUP_WORD, { tag, lookup_term: token, lookup_results })
 }
 
-/**
- * 
- * @param {Token[]} tokens
- * @returns {Sentence}
- */
-function create_sentence(tokens) {
+function create_sentence(tokens: Token[]): Sentence {
 	return { clause: create_clause_token(tokens, { 'clause_type': 'main_clause' }) }
 }
 
-/**
- * 
- * @param {string} stem
- * @param {Object} [data={}]
- * @param {string} [data.sense='A']
- * @param {string} [data.part_of_speech='Noun']
- * @param {number} [data.level=1]
- * @param {OntologyStatus} [data.ontology_status='in ontology']
- * @returns {LookupResult}
- */
-function lookup_result(stem, { sense='A', part_of_speech='Noun', level=1, ontology_status='in ontology' }={}) {
+function lookup_result(stem: string, { sense = 'A', part_of_speech = 'Noun', level = 1, ontology_status = 'in ontology' as OntologyStatus }: { sense?: string; part_of_speech?: string; level?: number; ontology_status?: OntologyStatus } = {}): LookupResult {
 	return create_lookup_result({ stem, part_of_speech }, { sense, level, ontology_status })
 }
 

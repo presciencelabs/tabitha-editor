@@ -1,84 +1,40 @@
-/**
- * @param {{ ontology_status: OntologyStatus }} lookup 
- * @returns {boolean}
- */
-function IS_IN_ONTOLOGY(lookup) {
+function IS_IN_ONTOLOGY(lookup: { ontology_status: OntologyStatus }): boolean {
 	return lookup.ontology_status === 'in ontology'
 }
 
-/**
- * @param {{ ontology_status: OntologyStatus }} lookup 
- * @returns {boolean}
- */
-function IS_OR_WILL_BE_IN_ONTOLOGY(lookup) {
+function IS_OR_WILL_BE_IN_ONTOLOGY(lookup: { ontology_status: OntologyStatus }): boolean {
 	return ['in ontology', 'approved'].includes(lookup.ontology_status)
 }
 
-/**
- * @param {string} part_of_speech 
- * @returns {(lookup: { part_of_speech: string }) => boolean}
- */
-function IS_PART_OF_SPEECH(part_of_speech) {
+function IS_PART_OF_SPEECH(part_of_speech: string): (lookup: { part_of_speech: string }) => boolean {
 	return lookup => lookup.part_of_speech.toLowerCase() === part_of_speech.toLowerCase()
 }
 
-/**
- * @param {number} level 
- * @returns {(lookup: { level: number }) => boolean}
- */
-function IS_LEVEL(level) {
+function IS_LEVEL(level: number): (lookup: { level: number }) => boolean {
 	return lookup => lookup.level === level
 }
 
-/**
- * @param {{ level: number }} lookup 
- * @returns {boolean}
- */
-function IS_LEVEL_SIMPLE(lookup) {
+function IS_LEVEL_SIMPLE(lookup: { level: number }): boolean {
 	return [0, 1].includes(lookup.level)
 }
 
-/**
- * @param {{ level: number }} lookup 
- * @returns {boolean}
- */
-function IS_LEVEL_COMPLEX(lookup) {
+function IS_LEVEL_COMPLEX(lookup: { level: number }): boolean {
 	return [2, 3].includes(lookup.level)
 }
 
-/**
- * 
- * @param {{ stem: string, part_of_speech: string }} lookup 
- * @returns {(lookup: { stem: string, part_of_speech: string }) => boolean}
- */
-function MATCHES_LOOKUP({ stem, part_of_speech }) {
+function MATCHES_LOOKUP({ stem, part_of_speech }: { stem: string; part_of_speech: string }): (lookup: { stem: string; part_of_speech: string }) => boolean {
 	return lookup => lookup.stem === stem && lookup.part_of_speech === part_of_speech
 }
 
-/**
- * 
- * @param {{ stem: string, sense: string }} lookup
- * @returns {(lookup: { stem: string, sense: string }) => boolean}
- */
-function MATCHES_SENSE({ stem, sense }) {
+function MATCHES_SENSE({ stem, sense }: { stem: string; sense: string }): (lookup: { stem: string; sense: string }) => boolean {
 	return lookup => lookup.stem === stem && lookup.sense === sense
 }
 
-/**
- * 
- * @param {string} argument 
- * @returns {(lookup: { case_frame: CaseFrame }) => boolean}
- */
-function HAS_MISSING_ARGUMENT(argument) {
+function HAS_MISSING_ARGUMENT(argument: string): (lookup: { case_frame: CaseFrame }) => boolean {
 	return lookup => lookup.case_frame.result.missing_arguments.some(role_tag => role_tag.includes(argument))
 }
 
-/**
- * 
- * @param {string} argument 
- * @returns {(lookup: { case_frame: CaseFrame }) => boolean}
- */
-function HAS_EXTRA_ARGUMENT(argument) {
+function HAS_EXTRA_ARGUMENT(argument: string): (lookup: { case_frame: CaseFrame }) => boolean {
 	return lookup => lookup.case_frame.result.extra_arguments.some(({ role_tag }) => role_tag.includes(argument))
 }
 

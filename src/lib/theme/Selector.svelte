@@ -1,16 +1,15 @@
-<script>
+<script lang="ts">
 	import { current_theme, set_theme } from '.'
 	import themes from './themes'
 
-	/** @type {{ colors?: string }} class(es) separated by space */
-	let { colors = '' } = $props()
+	/** class(es) separated by space */
+	let { colors = '' }: { colors?: string } = $props()
 
 	let open = $state(false)
 
 	let other_themes = $derived(themes.filter(theme => theme !== $current_theme))
 
-	/** @param {string} theme */
-	function set(theme) {
+	function set(theme: string) {
 		set_theme(theme)
 
 		open = false

@@ -1,32 +1,14 @@
-/**
- * 
- * @param {TokenRule[]} rules 
- * @returns {(sentences: Sentence[]) => Sentence[]}
- */
-export function rules_applier(rules) {
+export function rules_applier(rules: TokenRule[]): (sentences: Sentence[]) => Sentence[] {
 	return sentences => apply_rules(sentences, rules)
 }
 
-/**
- * 
- * @param {Sentence[]} sentences 
- * @param {TokenRule[]} rules 
- * @returns {Sentence[]}
- */
-export function apply_rules(sentences, rules) {
+export function apply_rules(sentences: Sentence[], rules: TokenRule[]): Sentence[] {
 	return apply_rules_to_tokens(sentences.map(sentence => sentence.clause), rules).map(clause => ({ clause }))
 	
-	/**
-	 * 
-	 * @param {Token[]} tokens 
-	 * @param {TokenRule[]} rules 
-	 * @returns {Token[]}
-	 */
-	function apply_rules_to_tokens(tokens, rules) {
-		/** @type {Token[]} */
+	function apply_rules_to_tokens(tokens: Token[], rules: TokenRule[]): Token[] {
 		tokens = tokens.slice()
 
-		for (let rule of rules) {
+		for (const rule of rules) {
 			tokens = apply_rule_to_tokens(tokens, rule)
 		}
 
@@ -34,13 +16,7 @@ export function apply_rules(sentences, rules) {
 	}
 }
 
-/**
- * 
- * @param {Token[]} tokens
- * @param {TokenRule} rule
- * @returns {Token[]}
- */
-export function apply_rule_to_tokens(tokens, rule) {
+export function apply_rule_to_tokens(tokens: Token[], rule: TokenRule): Token[] {
 	if (tokens.length === 0) {
 		return tokens
 	}

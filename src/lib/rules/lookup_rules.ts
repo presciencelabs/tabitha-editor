@@ -124,13 +124,7 @@ const lookup_rules_json = [
 	},
 ]
 
-/**
- *
- * @param {LookupRuleJson} rule_json
- * @param {number} index
- * @returns {TokenRule}
- */
-export function parse_lookup_rule(rule_json, index) {
+export function parse_lookup_rule(rule_json: LookupRuleJson, index: number): TokenRule {
 	const trigger = create_token_filter(rule_json['trigger'])
 	const context = create_context_filter(rule_json['context'])
 
@@ -145,12 +139,7 @@ export function parse_lookup_rule(rule_json, index) {
 		action: lookup_rule_action,
 	}
 
-	/**
-	 * 
-	 * @param {RuleTriggerContext} trigger_context 
-	 * @returns {number}
-	 */
-	function lookup_rule_action({ tokens, trigger_index, trigger_token, context_indexes }) {
+	function lookup_rule_action({ tokens, trigger_index, trigger_token, context_indexes }: RuleTriggerContext): number {
 		const lookup_terms = lookup_term.split('|')
 		
 		tokens[trigger_index] = {

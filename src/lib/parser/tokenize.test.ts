@@ -5,47 +5,23 @@ import { FUNCTION_WORDS } from './function_words'
 import { MESSAGE_TYPE, TOKEN_TYPE, create_token } from '../token'
 import { tokenize_input } from './tokenize'
 
-/**
- * @param {string} token
- * @param {Object} other_data
- * @param {string?} [other_data.lookup_term=null]
- * @param {string} [other_data.sense='']
- * @returns {Token}
- */
-function create_word_token(token, { lookup_term=null, sense='' }={}) {
+function create_word_token(token: string, { lookup_term = null, sense = '' }: { lookup_term?: string | null; sense?: string } = {}): Token {
 	return create_token(token, TOKEN_TYPE.LOOKUP_WORD, { lookup_term: lookup_term || token, specified_sense: sense })
 }
 
-/**
- * @param {Token} left_token
- * @param {Token} right_token
- * @param {PairingType} pairing_type
- * @returns {Token}
- */
-function create_pairing(left_token, right_token, pairing_type) {
+function create_pairing(left_token: Token, right_token: Token, pairing_type: PairingType): Token {
 	left_token.pairing = right_token
 	left_token.pairing_type = pairing_type
 	return left_token
 }
 
-/**
- * @param {string} pronoun
- * @param {Token} referent_token
- * @returns {Token}
- */
-function create_pronoun_token(pronoun, referent_token) {
+function create_pronoun_token(pronoun: string, referent_token: Token): Token {
 	const pronoun_token = create_token(pronoun, TOKEN_TYPE.FUNCTION_WORD)
 	referent_token.pronoun = pronoun_token
 	return referent_token
 }
 
-/**
- * 
- * @param {string} token 
- * @param {string} message 
- * @returns {Token}
- */
-function create_error_token(token, message) {
+function create_error_token(token: string, message: string): Token {
 	return create_token(token, TOKEN_TYPE.NOTE, { message: { ...MESSAGE_TYPE.ERROR, message: message, rule_id: 'token:syntax' } })
 }
 
@@ -53,8 +29,7 @@ describe('tokenize_input', () => {
 	test("'' should return an empty array", () => {
 		const INPUT = ''
 
-		/** @type {any[]} */
-		const EXPECTED_OUTPUT = []
+		const EXPECTED_OUTPUT: Token[] = []
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)
 	})
@@ -234,8 +209,7 @@ describe('tokenize_input', () => {
 	})
 
 	describe('all valid function words lowercase', () => {
-		test.each(Array.from(FUNCTION_WORDS).map(word => [[word]]))('%s', test_text => {
-			const [word, tag] = test_text[0]
+		test.each(Array.from(FUNCTION_WORDS))('%s', (word, tag) => {
 			const EXPECTED_OUTPUT = [
 				create_token(word, TOKEN_TYPE.FUNCTION_WORD, { tag }),
 			]
@@ -245,13 +219,13 @@ describe('tokenize_input', () => {
 	})
 
 	describe('all valid function words uppercase', () => {
-		test.each(Array.from(FUNCTION_WORDS).map(([word, tag]) => [[[word.toUpperCase(), tag]]]))('%s', test_text => {
-			const [word, tag] = test_text[0]
+		test.each(Array.from(FUNCTION_WORDS))('%s', (word, tag) => {
+			const upper_word = word.toUpperCase()
 			const EXPECTED_OUTPUT = [
-				create_token(word, TOKEN_TYPE.FUNCTION_WORD, { tag }),
+				create_token(upper_word, TOKEN_TYPE.FUNCTION_WORD, { tag }),
 			]
 
-			expect(tokenize_input(word)).toEqual(EXPECTED_OUTPUT)
+			expect(tokenize_input(upper_word)).toEqual(EXPECTED_OUTPUT)
 		})
 	})
 
@@ -428,7 +402,7 @@ describe('tokenize_input', () => {
 	})
 
 	test('valid literal pairing', () => {
-		const INPUT = "dynamic\\literal dynamic's\\literal's dynamics'\\literals' dynamics'-A\\literals' dynamic-A\\literal-B. [dynamic\\literal]"
+		const INPUT = "dynamic|literal dynamic's|literal's dynamics'|literals' dynamics'-A|literals' dynamic-A|literal-B. [dynamic|literal]"
 
 		const EXPECTED_OUTPUT = [
 			create_pairing(create_word_token('dynamic'), create_word_token('literal'), 'literal'),
@@ -462,17 +436,17 @@ describe('tokenize_input', () => {
 	})
 
 	test('invalid literal pairing', () => {
-		const INPUT = '\\literal dynamic\\ \\ dynamic\\\\literal dynamic\\.literal dynamic.\\literal'
+		const INPUT = '|literal dynamic| | dynamic||literal dynamic|.literal dynamic.|literal'
 
 		const EXPECTED_OUTPUT = [
-			create_error_token('\\literal', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
-			create_error_token('dynamic\\', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
-			create_error_token('\\', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
-			create_error_token('dynamic\\\\literal', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
-			create_error_token('dynamic\\', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
+			create_error_token('|literal', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
+			create_error_token('dynamic|', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
+			create_error_token('|', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
+			create_error_token('dynamic||literal', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
+			create_error_token('dynamic|', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX),
 			create_error_token('.literal', ERRORS.INVALID_TOKEN_END('.')),
 			create_word_token('dynamic'),
-			create_error_token('.\\literal', ERRORS.INVALID_TOKEN_END('.')),
+			create_error_token('.|literal', ERRORS.INVALID_TOKEN_END('.')),
 		]
 
 		expect(tokenize_input(INPUT)).toEqual(EXPECTED_OUTPUT)

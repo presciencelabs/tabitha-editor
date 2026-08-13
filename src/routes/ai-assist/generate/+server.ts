@@ -3,8 +3,9 @@ import OpenAI from 'openai'
 import { PHASE1_AI_ASSIST_API_KEY } from '$env/static/private'
 
 
-/** @type {import('./$types').RequestHandler} */
-export async function POST({ request }) {
+import type { RequestEvent } from './$types'
+
+export async function POST({ request }: RequestEvent) {
 	const { message, temperature, frequency_penalty, presence_penalty } = await request.json()
 
 	const openai = new OpenAI({ apiKey: PHASE1_AI_ASSIST_API_KEY })
@@ -26,8 +27,7 @@ export async function POST({ request }) {
 		message: chat_response.choices[0].message.content ?? '',
 	})
 
-	/** @param {{ finish_reason: string, message: string }} result  */
-	function response(result) {
+	function response(result: { finish_reason: string, message: string }) {
 		return json(result)
 	}
 }

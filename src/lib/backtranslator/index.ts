@@ -4,12 +4,7 @@ import { rules_applier } from '$lib/rules'
 import { phrasify } from '$lib/parser/phrasify'
 import { BT_STRUCTURAL_RULES } from './structural_rules'
 
-/**
- * 
- * @param {Sentence[]} sentences 
- * @return {string}
- */
-export function backtranslate(sentences) {
+export function backtranslate(sentences: Sentence[]): string {
 	return pipe(
 		remove_some_gap_tokens,
 		phrasify,
@@ -19,18 +14,10 @@ export function backtranslate(sentences) {
 	)(sentences)
 }
 
-/**
- * @param {Sentence[]} sentences
- * @returns {Sentence[]}
- */
-export function remove_some_gap_tokens(sentences) {
+export function remove_some_gap_tokens(sentences: Sentence[]): Sentence[] {
 	return remove_intv_v_gaps(sentences.map(sentence => sentence.clause)).map(clause => ({ clause }))
 
-	/**
-	 * @param {Token[]} tokens
-	 * @returns {Token[]}
-	 */
-	function remove_intv_v_gaps(tokens) {
+	function remove_intv_v_gaps(tokens: Token[]): Token[] {
 		return tokens.filter(token => token.token !== 'GAP_INTV_V').map(token => {
 			token.sub_tokens = remove_intv_v_gaps(token.sub_tokens)
 			return token
@@ -38,29 +25,14 @@ export function remove_some_gap_tokens(sentences) {
 	}
 }
 
-/**
- * 
- * @param {Sentence[]} sentences 
- * @returns {string}
- */
-export function textify(sentences) {
+export function textify(sentences: Sentence[]): string {
 	return textify_tokens(sentences.map(sentence => sentence.clause))
 
-	/**
-	 * 
-	 * @param {Token[]} tokens 
-	 * @returns {string}
-	 */
-	function textify_tokens(tokens) {
+	function textify_tokens(tokens: Token[]): string {
 		return tokens.map(textify_token).filter(text => text).join(' ')
 	}
 
-	/**
-	 * 
-	 * @param {Token} token 
-	 * @returns {string}
-	 */
-	function textify_token(token) {
+	function textify_token(token: Token): string {
 		if (token.sub_tokens.length) {
 			return textify_tokens(token.sub_tokens)
 		} else if (token.pairing && token.pairing_type === 'complex') {
@@ -87,23 +59,14 @@ export function textify(sentences) {
 		}
 	}
 
-	/**
-	 * @param {Token} token
-	 * @returns {string}
-	 */
-	function textify_lookup_word(token) {
+	function textify_lookup_word(token: Token): string {
 		// Remove the sense from the token and any remaining hyphens
 		// We want to keep the hyphen in notes like (poetry-begin) so this is specific to lookup words
 		return token.token.replace(/-[A-Z]$/, '').replace(/(\w)-(\w)/g, '$1 $2')
 	}
 }
 
-/**
- * 
- * @param {string} text 
- * @returns {string}
- */
-export function find_replace(text) {
+export function find_replace(text: string): string {
 	return text
 		// remove both spaces around hyphen (found in verse references)
 		.replace(/ - /g, '-')

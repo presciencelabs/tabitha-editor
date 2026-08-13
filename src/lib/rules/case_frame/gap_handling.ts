@@ -5,32 +5,22 @@ import { create_context_filter, create_skip_filter, create_token_filter, simple_
  * @param {Token[]} tokens
  * @param {string} rule_id
  */
-export function fill_same_subject_gap(tokens, rule_id) {
+export function fill_same_subject_gap(tokens: Token[], rule_id: string) {
 	// place the gap token right after any conjunction or adposition
 	const skip_filter = create_skip_filter(['clause_start', { 'category': 'Adposition' }, { 'tag': { 'syntax': 'gerundifier' } }])
 	const gap_index = skip_following(tokens, 0, skip_filter)
 	insert_gap_noun_token('SAME_SUB', tokens, [gap_index], rule_id)
 }
 
-/**
- * @param {Token[]} tokens
- * @param {string} rule_id
- */
-export function fill_relative_clause_gap(tokens, rule_id) {
+export function fill_relative_clause_gap(tokens: Token[], rule_id: string) {
 	const gap_indexes = find_clause_gap(tokens)
 	insert_gap_noun_token('REL', tokens, gap_indexes, rule_id)
 }
 
-/**
- * @param {Token[]} tokens
- * @param {number} verb_index
- * @param {string} rule_id
- */
-export function fill_interrogative_gap(tokens, verb_index, rule_id) {
+export function fill_interrogative_gap(tokens: Token[], verb_index: number, rule_id: string) {
 	const head_np = { 'tag': { 'syntax': 'head_np' }, 'skip': ['np_modifiers', 'vp_modifiers'] }
 
-	/** @type {TokenRuleCore[]} */
-	const gap_rules = [
+	const gap_rules: TokenRuleCore[] = [
 		{
 			trigger: create_token_filter({ 'stem': 'be' }),
 			context: create_context_filter({
@@ -57,7 +47,7 @@ export function fill_interrogative_gap(tokens, verb_index, rule_id) {
 	const verb_token = tokens[verb_index]
 	const gap_rule = gap_rules.find(rule => rule.trigger(verb_token) && rule.context(tokens, verb_index).success)
 	if (gap_rule) {
-		const verb_trigger_context = {
+		const verb_trigger_context: RuleTriggerContext = {
 			trigger_token: verb_token,
 			trigger_index: verb_index,
 			tokens,
@@ -69,13 +59,7 @@ export function fill_interrogative_gap(tokens, verb_index, rule_id) {
 	}
 }
 
-/**
- * 
- * @param {Token[]} tokens
- * @param {number} be_index
- * @param {string} rule_id
- */
-export function handle_be_interrogative(tokens, be_index, rule_id) {
+export function handle_be_interrogative(tokens: Token[], be_index: number, rule_id: string) {
 	// eg. 'Who(A) is happy?' 'Who(A) is at the store(S)?' 'Who(A) is like our God(S)?' (don't move)
 	// eg. 'Who(?) is that man(A) GAP(S)?' 'Which book(?) is John's book(A) GAP(S)?' 'What(?) is that book(A) about GAP(S)?'
 	// eg. 'Is John(A) that man's father(S)?' 'Is that book(A) John's book(S)?'
@@ -102,18 +86,16 @@ export function handle_be_interrogative(tokens, be_index, rule_id) {
  * @param {Token[]} tokens 
  * @returns {number}
  */
-function find_clause_end_for_gap(tokens) {
-	/** @type {TokenFilter} */
-	const IS_PUNCTUATION = token => token.type === TOKEN_TYPE.PUNCTUATION
+function find_clause_end_for_gap(tokens: Token[]): number {
 	// starting from the end, find the first index that isn't punctuation
+	const IS_PUNCTUATION: TokenFilter = token => token.type === TOKEN_TYPE.PUNCTUATION
 	return find_preceding(tokens, tokens.length, token => !IS_PUNCTUATION(token), IS_PUNCTUATION)[1] + 1
 }
 
 /**
- * @param {Token[]} tokens
  * @returns {number[]} an array of indexes, where the length indicates the nested level of the found gap
  */
-function find_clause_gap(tokens) {
+function find_clause_gap(tokens: Token[]): number[] {
 	const head_np_filter = create_token_filter({ 'tag': { 'syntax': 'head_np' } })
 	const np_vp_filter = create_skip_filter(['np', 'vp_modifiers'])
 	const np_filter = create_skip_filter('np')
@@ -175,13 +157,7 @@ function find_clause_gap(tokens) {
 	return [find_clause_end_for_gap(tokens)]
 }
 
-/**
- * @param {string} gap_label 
- * @param {Token[]} tokens 
- * @param {number[]} gap_indexes 
- * @param {string} rule_id 
- */
-function insert_gap_noun_token(gap_label, tokens, gap_indexes, rule_id) {
+function insert_gap_noun_token(gap_label: string, tokens: Token[], gap_indexes: number[], rule_id: string) {
 	let gap_index = gap_indexes.splice(0, 1)[0]
 	while (gap_indexes.length) {
 		tokens = tokens[gap_index].sub_tokens
@@ -192,14 +168,7 @@ function insert_gap_noun_token(gap_label, tokens, gap_indexes, rule_id) {
 	tokens.splice(gap_index, 0, gap_token)
 }
 
-/**
- * @param {string} gap_label
- * @param {Token[]} tokens
- * @param {number} ghost_index
- * @param {number} gap_index
- * @param {string} rule_id
- */
-function insert_ghosted_gap_token(gap_label, tokens, ghost_index, gap_index, rule_id) {
+function insert_ghosted_gap_token(gap_label: string, tokens: Token[], ghost_index: number, gap_index: number, rule_id: string) {
 	const ghost_token = tokens[ghost_index]
 	ghost_token.type = TOKEN_TYPE.NOTE	// temporarily change to NOTE to avoid being processed as a normal token
 	add_tag_to_token(ghost_token, { 'gap_index': `${gap_index}` }, rule_id)
@@ -211,11 +180,7 @@ function insert_ghosted_gap_token(gap_label, tokens, ghost_index, gap_index, rul
 	ghost_token.lookup_results = []
 }
 
-/**
- * @param {Token[]} tokens
- * @param {number} ghost_index
- */
-export function restore_ghost_tokens(tokens, ghost_index) {
+export function restore_ghost_tokens(tokens: Token[], ghost_index: number) {
 	const ghost_token = tokens[ghost_index]
 	const gap_index = parseInt(ghost_token.tag['gap_index'])
 	const gap_token = tokens[gap_index]
@@ -224,28 +189,15 @@ export function restore_ghost_tokens(tokens, ghost_index) {
 	ghost_token.type = TOKEN_TYPE.LOOKUP_WORD
 }
 
-/**
- * @param {Token[]} tokens
- * @param {number} start_index
- * @param {TokenFilter} token_filter
- * @param {TokenFilter} skip_filter
- * @returns {[boolean, number]}
- */
-function find_preceding(tokens, start_index, token_filter, skip_filter=()=>false) {
+function find_preceding(tokens: Token[], start_index: number, token_filter: TokenFilter, skip_filter: TokenFilter = () => false): [boolean, number] {
 	let index = start_index - 1
 	while (index >= 0 && !token_filter(tokens[index]) && should_skip(tokens[index], skip_filter)) {
 		index -= 1
 	}
-	return token_filter(tokens[index]) ? [true, index] : [false, index]
+	return tokens[index] && token_filter(tokens[index]) ? [true, index] : [false, index]
 }
 
-/**
- * @param {Token[]} tokens
- * @param {number} start_index
- * @param {TokenFilter} skip_filter
- * @returns 
- */
-function skip_following(tokens, start_index, skip_filter) {
+function skip_following(tokens: Token[], start_index: number, skip_filter: TokenFilter): number {
 	let index = start_index + 1
 	while (index < tokens.length && should_skip(tokens[index], skip_filter)) {
 		index += 1
@@ -253,25 +205,14 @@ function skip_following(tokens, start_index, skip_filter) {
 	return index
 }
 
-/**
- * @param {Token[]} tokens
- * @param {number} start_index
- * @param {TokenFilter} token_filter
- * @param {TokenFilter} skip_filter
- * @returns {[boolean, number]}
- */
-function find_following(tokens, start_index, token_filter, skip_filter=()=>false) {
+function find_following(tokens: Token[], start_index: number, token_filter: TokenFilter, skip_filter: TokenFilter = () => false): [boolean, number] {
 	let index = start_index + 1
 	while (index < tokens.length && !token_filter(tokens[index]) && should_skip(tokens[index], skip_filter)) {
 		index += 1
 	}
-	return token_filter(tokens[index]) ? [true, index] : [false, index]
+	return tokens[index] && token_filter(tokens[index]) ? [true, index] : [false, index]
 }
 
-/**
- * @param {Token} token
- * @param {TokenFilter} skip_filter
- */
-function should_skip(token, skip_filter) {
+function should_skip(token: Token, skip_filter: TokenFilter): boolean {
 	return skip_filter(token) || token.type === TOKEN_TYPE.NOTE
 }

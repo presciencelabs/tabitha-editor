@@ -4,12 +4,7 @@ import { REGEXES } from '$lib/regexes'
 import { MESSAGE_TYPE, TOKEN_TYPE, create_token } from '../token'
 import { ERRORS } from './error_messages'
 
-/**
- *
- * @param {string} text
- * @returns {string}
- */
-function normalize_input(text) {
+function normalize_input(text: string): string {
 	return text
 		// U+201C : LEFT DOUBLE QUOTATION MARK
 		// U+201D : RIGHT DOUBLE QUOTATION MARK
@@ -19,15 +14,10 @@ function normalize_input(text) {
 		.replaceAll(/[’ʼ]/g, "'")
 }
 
-/**
- * @param {string} text
- * @returns {Token[]}
- */
-export function tokenize_input(text = '') {
+export function tokenize_input(text: string = ''): Token[] {
 	text = normalize_input(text)
 
-	/** @type {Array<[() => boolean, () => Token]>} */
-	const parsers = [
+	const parsers: Array<[() => boolean, () => Token]> = [
 		[() => match(REGEXES.WORD_START_CHAR), word],
 		[() => match(REGEXES.OPENING_PAREN), clause_notation],
 		[() => match(/_/), underscore_notation],
@@ -37,7 +27,7 @@ export function tokenize_input(text = '') {
 		[() => match(/[.,?!\]]/), closing_punctuation],
 	]
 
-	const tokens = []
+	const tokens: Token[] = []
 	let token_start = 0
 
 	let i = 0
@@ -52,7 +42,7 @@ export function tokenize_input(text = '') {
 
 	return tokens
 
-	function word() {
+	function word(): Token {
 		eat(REGEXES.WORD_CHAR)
 		if (match(REGEXES.OPENING_PAREN)) {
 			return pronoun_referent()
@@ -73,7 +63,7 @@ export function tokenize_input(text = '') {
 		}
 	}
 
-	function pronoun_referent() {
+	function pronoun_referent(): Token {
 		eat(REGEXES.WORD_CHAR)
 		if (!match(REGEXES.CLOSING_PAREN)) {
 			return error_token(ERRORS.MISSING_CLOSING_PAREN)
@@ -81,10 +71,7 @@ export function tokenize_input(text = '') {
 		return check_boundary_for_token(pronoun_referent_token)
 	}
 
-	/**
-	 * @param {PairingType} pairing_type
-	 */
-	function pairing(pairing_type) {
+	function pairing(pairing_type: PairingType): Token {
 		if (!match(REGEXES.WORD_START_CHAR)) {
 			// simple/ or dynamic\
 			eat_until(REGEXES.TOKEN_END_BOUNDARY)
@@ -95,12 +82,12 @@ export function tokenize_input(text = '') {
 		return check_boundary_for_token(pairing_token(pairing_type))
 	}
 
-	function decimal_number() {
+	function decimal_number(): Token {
 		eat(/\d/)
 		return check_boundary_for_token(word_token)
 	}
 
-	function colon() {
+	function colon(): Token {
 		if (peek_match(/\d/)) {
 			// verse reference
 			return create_token(collect_text(), TOKEN_TYPE.LOOKUP_WORD, {
@@ -111,7 +98,7 @@ export function tokenize_input(text = '') {
 		return check_boundary_for_token(() => simple_token(TOKEN_TYPE.PUNCTUATION))
 	}
 
-	function clause_notation() {
+	function clause_notation(): Token {
 		// any non-boundary character can go between the parentheses
 		eat_until(REGEXES.OR(REGEXES.TOKEN_END_BOUNDARY, REGEXES.CLOSING_PAREN))
 		if (!match(REGEXES.CLOSING_PAREN)) {
@@ -126,28 +113,24 @@ export function tokenize_input(text = '') {
 		return check_boundary_for_token(() => simple_token(TOKEN_TYPE.NOTE))
 	}
 
-	function underscore_notation() {
+	function underscore_notation(): Token {
 		// anything can go after the underscore
 		// in addition to the normal boundary punctuation, [ can follow as well
 		eat_until(REGEXES.OR(REGEXES.TOKEN_END_BOUNDARY, REGEXES.OPENING_BRACKET))
 		return simple_token(TOKEN_TYPE.NOTE)
 	}
 
-	function closing_punctuation() {
+	function closing_punctuation(): Token {
 		// Cannot be followed directly by text or [
 		return check_boundary_for_token(() => simple_token(TOKEN_TYPE.PUNCTUATION))
 	}
 
-	function opening_punctuation() {
+	function opening_punctuation(): Token {
 		// Can be followed by anything
 		return simple_token(TOKEN_TYPE.PUNCTUATION)
 	}
 
-	/**
-	 * @param {(string: text) => Token} token_if_valid
-	 * @returns {Token}
-	 */
-	function check_boundary_for_token(token_if_valid) {
+	function check_boundary_for_token(token_if_valid: (text: string) => Token): Token {
 		if (!is_at_end() && !peek_match(REGEXES.TOKEN_END_BOUNDARY)) {
 			return invalid_closing_char()
 		}
@@ -155,20 +138,21 @@ export function tokenize_input(text = '') {
 		return token_if_valid(collect_text())
 	}
 
-	function invalid_opening_char() {
+	function invalid_opening_char(): Token {
 		const char = peek()
 		eat_until(REGEXES.TOKEN_END_BOUNDARY)
 
-		const messages = new Map([
+		const messages = new Map<string, string>([
 			[')', ERRORS.MISSING_OPENING_PAREN],
 			['/', ERRORS.INVALID_COMPLEX_PAIRING_SYNTAX],
+			['|', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX],
 			['\\', ERRORS.INVALID_LITERAL_PAIRING_SYNTAX],
 		])
 
 		return error_token(messages.get(char) || ERRORS.UNRECOGNIZED_CHAR)
 	}
 
-	function invalid_closing_char() {
+	function invalid_closing_char(): Token {
 		if (match(REGEXES.OPENING_BRACKET)) {
 			// token[ .[ ][ etc
 			return error_token(ERRORS.NO_SPACE_BEFORE_OPENING_BRACKET)
@@ -191,33 +175,20 @@ export function tokenize_input(text = '') {
 		}
 	}
 
-	function collect_text() {
+	function collect_text(): string {
 		return text.substring(token_start, i)
 	}
 
-	/**
-	 * @param {string} token
-	 * @returns {Token}
-	 */
-	function word_token(token) {
+	function word_token(token: string): Token {
 		return get_function_word(token) || lookup_token(token)
 	}
 
-	/**
-	 *
-	 * @param {string} token
-	 * @returns {Token|null}
-	 */
-	function get_function_word(token) {
+	function get_function_word(token: string): Token | null {
 		const word_function = FUNCTION_WORDS.get(token.toLowerCase())
 		return word_function ? create_token(token, TOKEN_TYPE.FUNCTION_WORD, { tag: word_function }) : null
 	}
 
-	/**
-	 * @param {string} text
-	 * @returns {Token}
-	 */
-	function lookup_token(text) {
+	function lookup_token(text: string): Token {
 		const lookup_match = text.match(REGEXES.EXTRACT_LOOKUP_TERM)
 
 		// combine stem and sense
@@ -226,11 +197,7 @@ export function tokenize_input(text = '') {
 		return create_token(text, TOKEN_TYPE.LOOKUP_WORD, { lookup_term: stem, specified_sense: sense })
 	}
 
-	/**
-	 * @param {PairingType} pairing_type
-	 * @returns {(token: string) => Token}
-	 */
-	function pairing_token(pairing_type) {
+	function pairing_token(pairing_type: PairingType): (token: string) => Token {
 		const pairing_regex = pairing_type === 'complex' ? REGEXES.FORWARD_SLASH : REGEXES.PIPE
 		return token => {
 			const [left, right] = token.split(pairing_regex).map(lookup_token)
@@ -240,14 +207,8 @@ export function tokenize_input(text = '') {
 		}
 	}
 
-	/**
-	 * @param {string} token
-	 * @returns {Token}
-	 */
-	function pronoun_referent_token(token) {
-		/** @type {RegExpMatchArray} */
-		// @ts-expect-error the match will always succeed here
-		const referent_match = token.match(REGEXES.EXTRACT_PRONOUN_REFERENT)
+	function pronoun_referent_token(token: string): Token {
+		const referent_match = token.match(REGEXES.EXTRACT_PRONOUN_REFERENT)!
 
 		const [pronoun_text, referent_text] = [referent_match[1], referent_match[2]]
 		const referent = lookup_token(referent_text)
@@ -256,39 +217,23 @@ export function tokenize_input(text = '') {
 		return referent
 	}
 
-	/**
-	 * @param {string} message
-	 * @returns {Token}
-	 */
-	function error_token(message) {
+	function error_token(message: string): Token {
 		return create_token(collect_text(), TOKEN_TYPE.NOTE, { message: { ...MESSAGE_TYPE.ERROR, message, rule_id: 'token:syntax' } })
 	}
 
-	/**
-	 * @param {TokenType} type
-	 * @returns {Token}
-	 */
-	function simple_token(type) {
+	function simple_token(type: TokenType): Token {
 		return create_token(collect_text(), type)
 	}
 
-	function peek() {
+	function peek(): string {
 		return text[i]
 	}
 
-	/**
-	 * peek_match() checks if the current character matches the given regex without advancing
-	 * @param {RegExp} regex
-	 */
-	function peek_match(regex) {
-		return !is_at_end() && peek().match(regex)
+	function peek_match(regex: RegExp): boolean {
+		return !is_at_end() && Boolean(peek().match(regex))
 	}
 
-	/**
-	 * match() advances if the current character matches the given regex
-	 * @param {RegExp} regex
-	 */
-	function match(regex) {
+	function match(regex: RegExp): boolean {
 		if (peek_match(regex)) {
 			advance()
 			return true
@@ -296,11 +241,7 @@ export function tokenize_input(text = '') {
 		return false
 	}
 
-	/**
-	 * match_two() advances if the next two characters match the given regex
-	 * @param {RegExp} regex
-	 */
-	function match_two(regex) {
+	function match_two(regex: RegExp): boolean {
 		if (i < text.length - 1 && (text[i] + text[i + 1]).match(regex)) {
 			i += 2
 			return true
@@ -309,21 +250,13 @@ export function tokenize_input(text = '') {
 		return false
 	}
 
-	/**
-	 * eat() advances greedily until a character does not match the given regex
-	 * @param {RegExp} regex
-	 */
-	function eat(regex) {
+	function eat(regex: RegExp) {
 		while (peek_match(regex)) {
 			advance()
 		}
 	}
 
-	/**
-	 * eat_until() advances greedily until a character matches the given regex
-	 * @param {RegExp} regex
-	 */
-	function eat_until(regex) {
+	function eat_until(regex: RegExp) {
 		while (!is_at_end() && !peek().match(regex)) {
 			advance()
 		}
@@ -333,7 +266,7 @@ export function tokenize_input(text = '') {
 		i++
 	}
 
-	function is_at_end() {
+	function is_at_end(): boolean {
 		return i >= text.length
 	}
 }

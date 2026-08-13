@@ -2,8 +2,7 @@ import { TOKEN_TYPE, create_token, token_has_tag } from '$lib/token'
 import { REGEXES } from '$lib/regexes'
 import { create_context_filter, create_token_filter, from_built_in_rule, simple_rule_action } from '$lib/rules/rules_parser'
 
-/** @type {BuiltInRule[]} */
-const structural_rules_json = [
+const structural_rules_json: BuiltInRule[] = [
 	{
 		name: 'Imperatives',
 		comment: '',
@@ -392,11 +391,7 @@ const structural_rules_json = [
 
 				return trigger_index + 2	// move past both sentences
 
-				/**
-				 * @param {Token[]} clause_tokens 
-				 * @returns {boolean}
-				 */
-				function has_literal_pairing(clause_tokens) {
+				function has_literal_pairing(clause_tokens: Token[]): boolean {
 					for (let i = 0; i < clause_tokens.length; i++) {
 						const token = clause_tokens[i]
 						if (token.pairing_type === 'literal') {
@@ -409,11 +404,7 @@ const structural_rules_json = [
 					return false
 				}
 
-				/**
-				 * @param {Token[]} clause_tokens
-				 * @returns {Token[]}
-				 */
-				function with_literal_pairing(clause_tokens) {
+				function with_literal_pairing(clause_tokens: Token[]): Token[] {
 					const new_tokens = [...clause_tokens]
 					for (let i = 0; i < new_tokens.length; i++) {
 						const token = new_tokens[i]
@@ -435,7 +426,7 @@ const structural_rules_json = [
 		name: 'Simple text mappings',
 		comment: '',
 		rule: {
-			trigger: token => TOKEN_TEXT_MAP.has(token.token),
+			trigger: (token: Token) => TOKEN_TEXT_MAP.has(token.token),
 			context: create_context_filter({ }),
 			action: simple_rule_action(({ trigger_token }) => {
 				trigger_token.token = TOKEN_TEXT_MAP.get(trigger_token.token) ?? trigger_token.token
@@ -446,7 +437,7 @@ const structural_rules_json = [
 		name: 'Simple number text mappings',
 		comment: 'Change some numbers to text (eg. 2 -> two), unless they are part of a verse reference (eg. Habakkuk 2:3)',
 		rule: {
-			trigger: token => NUMBER_TOKEN_TEXT_MAP.has(token.token) && !token_has_tag(token, { 'role': 'verse_ref' }),
+			trigger: (token: Token) => NUMBER_TOKEN_TEXT_MAP.has(token.token) && !token_has_tag(token, { 'role': 'verse_ref' }),
 			context: create_context_filter({ }),
 			action: simple_rule_action(({ trigger_token }) => {
 				trigger_token.token = NUMBER_TOKEN_TEXT_MAP.get(trigger_token.token) ?? trigger_token.token
@@ -474,12 +465,7 @@ const NUMBER_TOKEN_TEXT_MAP = new Map([
 	['.8', '0.8'],
 ])
 
-/**
- *
- * @param {Token[]} tokens
- * @param {number} start_index
- */
-function find_phrase_start(tokens, start_index) {
+function find_phrase_start(tokens: Token[], start_index: number): number {
 	for (let i = start_index - 1; i >= 0; i--) {
 		const token = tokens[i]
 		if (is_opening_phrase(token)) {
@@ -491,12 +477,7 @@ function find_phrase_start(tokens, start_index) {
 	return -1
 }
 
-/**
- *
- * @param {Token[]} tokens
- * @param {number} start_index
- */
-function find_phrase_end(tokens, start_index) {
+function find_phrase_end(tokens: Token[], start_index: number): number {
 	for (let i = start_index + 1; i < tokens.length; i++) {
 		const token = tokens[i]
 		if (is_closing_phrase(token)) {
@@ -508,26 +489,15 @@ function find_phrase_end(tokens, start_index) {
 	return -1
 }
 
-/**
- * @param {Token} token
- */
-function is_opening_phrase(token) {
+function is_opening_phrase(token: Token): boolean {
 	return token.token.startsWith('{')
 }
 
-/**
- * @param {Token} token
- */
-function is_closing_phrase(token) {
+function is_closing_phrase(token: Token): boolean {
 	return token.token === '}'
 }
 
-/**
- *
- * @param {Token[]} tokens
- * @param {number} start_index
- */
-function find_next_word(tokens, start_index) {
+function find_next_word(tokens: Token[], start_index: number): Token | undefined {
 	// Find the next word in the sentence (skip any notes, phrases, or implicit markers)
 	const skip_filters = [
 		create_token_filter({ 'type': `${TOKEN_TYPE.NOTE}|${TOKEN_TYPE.PHRASE}` }),
@@ -539,14 +509,9 @@ function find_next_word(tokens, start_index) {
 /**
  * Finds all the arguments that match one of the given filters, and adds it to the context arguments object according to the provided 
  * key and value getters. The argument is always at the top level within the phrase or clause located at the provided start_index.
- * 
- * @param {number} start_index 
- * @param {Token[]} tokens 
- * @param {TokenFilter} filter 
- * @return {number[]}
  */
-function find_tokens_within_phrase(start_index, tokens, filter) {
-	const matched_indexes = []
+function find_tokens_within_phrase(start_index: number, tokens: Token[], filter: TokenFilter): number[] {
+	const matched_indexes: number[] = []
 	for (let i = start_index + 1; i < tokens.length; i++) {
 		const token = tokens[i]
 
@@ -563,13 +528,7 @@ function find_tokens_within_phrase(start_index, tokens, filter) {
 	return matched_indexes
 }
 
-/**
- *
- * @param {Token[]} old_tokens
- * @param {Token[]} new_tokens
- * @param {boolean} decapitalize
- */
-function fix_capitalization(old_tokens, new_tokens, decapitalize=false) {
+function fix_capitalization(old_tokens: Token[], new_tokens: Token[], decapitalize = false) {
 	const old_first_word = find_next_word(old_tokens, 0)
 	if (!old_first_word || !is_first_word(old_first_word)) {
 		return
@@ -587,12 +546,7 @@ function fix_capitalization(old_tokens, new_tokens, decapitalize=false) {
 		}
 	}
 
-	/**
-	 *
-	 * @param {Token} token
-	 * @returns {string}
-	 */
-	function decapitalize_token(token) {
+	function decapitalize_token(token: Token): string {
 		if (create_token_filter({ 'level': '4' })(token)) {
 			return token.token
 		}
@@ -600,23 +554,14 @@ function fix_capitalization(old_tokens, new_tokens, decapitalize=false) {
 	}
 }
 
-/**
- *
- * @param {Token} token
- * @returns {string}
- */
-function capitalize_token({ token }) {
+function capitalize_token({ token }: Token): string {
 	if (REGEXES.STARTS_LOWERCASE.test(token)) {
 		return `${token[0].toUpperCase()}${token.slice(1)}`
 	}
 	return token
 }
 
-/**
- *
- * @param {Token} token
- */
-function is_first_word(token) {
+function is_first_word(token: Token): boolean {
 	return create_token_filter({ 'tag': { 'position': 'first_word' } })(token)
 }
 

@@ -11,8 +11,8 @@ function initialize_theme() {
 	set_theme(dark_mode ? 'dark' : 'light')
 }
 
-/** @param {string} theme themes configured in ontology/app/tailwind.config.js */
-function set_theme(theme) {
+/** themes configured in ontology/app/tailwind.config.js */
+function set_theme(theme: string) {
 	const html = document.documentElement
 
 	localStorage.setItem('theme', theme)

@@ -245,39 +245,23 @@ const adjective_case_frames = new Map([
 	]],
 ])
 
-/**
- * @returns {ArgumentRoleRule[]}
- */
-function create_default_argument_rules() {
+function create_default_argument_rules(): ArgumentRoleRule[] {
 	return Object.entries(default_adjective_case_frame_json)
-		.flatMap(([role_tag, rule_json]) => parse_case_frame_rule('adj_default', role_tag, rule_json))
+		.flatMap(([role_tag, rule_json]) => parse_case_frame_rule('adj_default', role_tag as RoleTag, rule_json as RoleRuleValueJson))
 }
 
-/**
- * @returns {Map<WordStem, ArgumentRulesForSense[]>}
- */
-function create_adjective_argument_rules() {
-	return new Map([...adjective_case_frames.entries()].map(create_rules_for_stem))
-
-	/**
-	 *
-	 * @param {[WordStem, [WordSense, SenseRuleJson<AdjectiveRoleTag>][]]} stem_rules
-	 * @returns {[WordStem, ArgumentRulesForSense[]]}
-	 */
-	function create_rules_for_stem([stem, sense_rules_json]) {
-		return [stem, parse_sense_rules(sense_rules_json, DEFAULT_CASE_FRAME_RULES)]
-	}
+function create_adjective_argument_rules(): Map<WordStem, ArgumentRulesForSense[]> {
+	return new Map(Array.from(adjective_case_frames.entries()).map(([stem, sense_rules_json]) => {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		return [stem, parse_sense_rules(sense_rules_json as any, DEFAULT_CASE_FRAME_RULES)]
+	}))
 }
 
 const DEFAULT_CASE_FRAME_RULES = create_default_argument_rules()
 const ADJECTIVE_CASE_FRAME_RULES = create_adjective_argument_rules()
 const SUBGROUPABLE_CASE_FRAME_RULE = parse_case_frame_rule('adj_default', 'modified_noun_with_subgroup', modified_noun_with_subgroup())
 
-/**
- * @param {Token} token
- * @returns {CaseFrameRuleInfo}
- */
-export function get_adjective_case_frame_rules(token) {
+export function get_adjective_case_frame_rules(token: Token): CaseFrameRuleInfo {
 	const stem = token.lookup_results[0].stem
 	return {
 		rules_by_sense: ADJECTIVE_CASE_FRAME_RULES.get(stem) ?? [],
@@ -295,20 +279,13 @@ const ADJECTIVE_LETTER_TO_ROLE = new Map([
 	['E', 'patient_clause_different_participant'],
 ])
 
-/**
- * @param {string} categorization
- */
-function is_subgroupable_category(categorization) {
+function is_subgroupable_category(categorization: string): boolean {
 	const category = categorization[0]
 	// Quantity (all), Cardinal Number (7), Fractional Number (.5)
 	return ['Q', 'C', 'F'].includes(category)
 }
 
-/**
- * @param {LookupResult} lookup
- * @returns {ArgumentRoleRule[]}
- */
-function get_adjective_default_rules(lookup) {
+function get_adjective_default_rules(lookup: LookupResult): ArgumentRoleRule[] {
 	if (is_subgroupable_category(lookup.categorization)) {
 		const subgroup_index = DEFAULT_CASE_FRAME_RULES.findIndex(({ role_tag }) => role_tag === 'modified_noun_with_subgroup')
 		return DEFAULT_CASE_FRAME_RULES.with(subgroup_index, SUBGROUPABLE_CASE_FRAME_RULE[0])
@@ -317,12 +294,7 @@ function get_adjective_default_rules(lookup) {
 	return DEFAULT_CASE_FRAME_RULES
 }
 
-/**
- * @param {string} categorization
- * @param {ArgumentRulesForSense} role_rules
- * @returns {RoleUsageInfo}
- */
-function get_adjective_usage_info(categorization, role_rules) {
+function get_adjective_usage_info(categorization: string, role_rules: ArgumentRulesForSense): RoleUsageInfo {
 	// The first character of the categorization is the category (Generic, Quantity, Cardinal Number, etc)
 	const role_letters = [...categorization.slice(1)].filter(c => c !== '_')
 
@@ -335,20 +307,16 @@ function get_adjective_usage_info(categorization, role_rules) {
 		}
 	}
 
-	/** @type {string[]} */
-	// @ts-expect-error this will never be undefined
 	const possible_roles = role_letters
 		.map(c => ADJECTIVE_LETTER_TO_ROLE.get(c.toUpperCase()))
 		.concat(is_subgroupable_category(categorization) ? ['modified_noun_with_subgroup'] : [])
 		.concat([...role_rules.other_optional, ...role_rules.other_required])
-		.filter(role => role)
+		.filter((role): role is string => Boolean(role))
 
-	/** @type {string[]} */
-	// @ts-expect-error this will never be undefined
 	const required_roles = role_letters
 		.map(c => ADJECTIVE_LETTER_TO_ROLE.get(c))
 		.concat(role_rules.other_required)
-		.filter(role => role && role !== 'modified_noun')
+		.filter((role): role is string => Boolean(role) && role !== 'modified_noun')
 		// a modified noun should never be required, as usually it's possible for it to also be used predicatively
 
 	return { possible_roles, required_roles }

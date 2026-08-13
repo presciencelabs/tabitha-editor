@@ -2,22 +2,14 @@ import { PUBLIC_ONTOLOGY_API_HOST } from '$env/static/public'
 import { LOOKUP_FILTERS } from '$lib/lookup_filters'
 import { create_lookup_result } from '$lib/token'
 
-/**
- * @param {Token} lookup_token
- */
-export async function check_ontology(lookup_token) {
+export async function check_ontology(lookup_token: Token) {
 	const results = (await Promise.all(lookup_token.lookup_terms.map(get_matches_from_ontology))).flat()
 
 	const found_results = results.reduce(transform_results, [])
 	const not_found_results = lookup_token.lookup_results.filter(lookup => !results.some(LOOKUP_FILTERS.MATCHES_LOOKUP(lookup)))
 	lookup_token.lookup_results = found_results.concat(not_found_results)
 
-	/**
-	 * @param {LookupResult[]} transformed_results
-	 * @param {OntologyResult} ontology_result
-	 * @returns {LookupResult[]}
-	 */
-	function transform_results(transformed_results, ontology_result) {
+	function transform_results(transformed_results: LookupResult[], ontology_result: OntologyResult): LookupResult[] {
 		const existing_result = lookup_token.lookup_results.find(LOOKUP_FILTERS.MATCHES_LOOKUP(ontology_result))
 		const level_number = Number(ontology_result.level) >= 0 ? Number(ontology_result.level) : -1
 
@@ -52,12 +44,7 @@ export async function check_ontology(lookup_token) {
 	}
 }
 
-/**
- * @param {string} lookup_term
- *
- * @returns {Promise<OntologyResult[]>}
- */
-async function get_matches_from_ontology(lookup_term) {
+async function get_matches_from_ontology(lookup_term: string): Promise<OntologyResult[]> {
 	const response = await fetch(`${PUBLIC_ONTOLOGY_API_HOST}/search?q=${lookup_term}`)
 
 	if (!response.ok) return []

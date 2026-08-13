@@ -7,37 +7,15 @@ import { parse_checker_rule } from './checker_rules'
 import { parse_part_of_speech_rule } from './part_of_speech_rules'
 import { expect_error } from '$lib/test_helps'
 
-/**
- * 
- * @param {Token[]} tokens 
- * @returns {Sentence}
- */
-function create_sentence(tokens) {
+function create_sentence(tokens: Token[]): Sentence {
 	return { clause: create_clause_token(tokens, { 'clause_type': 'main_clause' }) }
 }
 
-/**
- * 
- * @param {string} token 
- * @param {Object} [data={}] 
- * @param {LookupResult[]} [data.lookup_results=[]] 
- * @returns {Token}
- */
-function create_lookup_token(token, { lookup_results=[] }={}) {
+function create_lookup_token(token: string, { lookup_results = [] }: { lookup_results?: LookupResult[] } = {}): Token {
 	return create_token(token, TOKEN_TYPE.LOOKUP_WORD, { lookup_term: token, lookup_results })
 }
 
-/**
- * 
- * @param {string} stem
- * @param {Object} [data={}] 
- * @param {string} [data.sense='A'] 
- * @param {string} [data.part_of_speech='Noun'] 
- * @param {number} [data.level=1] 
- * @param {OntologyStatus} [data.ontology_status='in ontology'] 
- * @returns {LookupResult}
- */
-function lookup_result(stem, { sense='A', part_of_speech='Noun', level=1, ontology_status='in ontology' }={}) {
+function lookup_result(stem: string, { sense = 'A', part_of_speech = 'Noun', level = 1, ontology_status = 'in ontology' as OntologyStatus }: { sense?: string; part_of_speech?: string; level?: number; ontology_status?: OntologyStatus } = {}): LookupResult {
 	return create_lookup_result({ stem, part_of_speech }, { sense, level, ontology_status })
 }
 
@@ -183,7 +161,7 @@ describe('transform rules', () => {
 
 describe('checker rules', () => {
 	test('trigger does not match', () => {
-		const rules = /** @type {CheckerRuleJson[]} */ [
+		const rules = ([
 			{
 				'trigger': { 'token': 'token' },
 				'context': { 'followedby': { 'token': 'context' } },
@@ -192,7 +170,7 @@ describe('checker rules', () => {
 					'message': 'message',
 				},
 			},
-		].map(parse_checker_rule)
+		] as CheckerRuleJson[]).map(parse_checker_rule)
 
 		const input_tokens = [
 			create_sentence([
@@ -205,7 +183,7 @@ describe('checker rules', () => {
 		expect(output_tokens).toEqual(input_tokens)
 	})
 	test('triggered but context does not match', () => {
-		const rules = [
+		const rules = ([
 			{
 				'trigger': { 'token': 'token' },
 				'context': { 'followedby': { 'token': 'context' } },
@@ -214,7 +192,7 @@ describe('checker rules', () => {
 					'message': 'message',
 				},
 			},
-		].map(parse_checker_rule)
+		] as CheckerRuleJson[]).map(parse_checker_rule)
 
 		const input_tokens = [
 			create_sentence([
@@ -227,7 +205,7 @@ describe('checker rules', () => {
 		expect(output_tokens).toEqual(input_tokens)
 	})
 	test('triggered with require followedby', () => {
-		const rules = [
+		const rules = ([
 			{
 				'trigger': { 'token': 'token' },
 				'context': { 'followedby': { 'token': 'context' } },
@@ -236,7 +214,7 @@ describe('checker rules', () => {
 					'message': 'message',
 				},
 			},
-		].map(parse_checker_rule)
+		] as CheckerRuleJson[]).map(parse_checker_rule)
 
 		const input_tokens = [
 			create_sentence([
@@ -254,7 +232,7 @@ describe('checker rules', () => {
 		expect(output_tokens[2].messages.length).toBe(0)
 	})
 	test('triggered with require precededby', () => {
-		const rules = [
+		const rules = ([
 			{
 				'trigger': { 'token': 'token' },
 				'context': { 'followedby': { 'token': 'context' } },
@@ -263,7 +241,7 @@ describe('checker rules', () => {
 					'message': 'message',
 				},
 			},
-		].map(parse_checker_rule)
+		] as CheckerRuleJson[]).map(parse_checker_rule)
 
 		const input_tokens = [
 			create_sentence([
@@ -281,7 +259,7 @@ describe('checker rules', () => {
 		expect(output_tokens[2].messages.length).toBe(0)
 	})
 	test('triggered with multiple precededby', () => {
-		const rules = [
+		const rules = ([
 			{
 				'trigger': { 'token': 'token' },
 				'context': { 'followedby': { 'token': 'context' } },
@@ -298,7 +276,7 @@ describe('checker rules', () => {
 					'message': 'message2',
 				},
 			},
-		].map(parse_checker_rule)
+		] as CheckerRuleJson[]).map(parse_checker_rule)
 
 		const input_tokens = [
 			create_sentence([
@@ -318,13 +296,13 @@ describe('checker rules', () => {
 		expect(output_tokens[3].messages.length).toBe(0)
 	})
 	test('triggered with message on trigger', () => {
-		const rules = [
+		const rules = ([
 			{
 				'trigger': { 'token': 'token' },
 				'context': { 'followedby': { 'token': 'context' } },
 				'error': { 'message': 'message' },
 			},
-		].map(parse_checker_rule)
+		] as CheckerRuleJson[]).map(parse_checker_rule)
 
 		const input_tokens = [
 			create_sentence([
@@ -341,7 +319,7 @@ describe('checker rules', () => {
 		expect(output_tokens[1].messages.length).toBe(0)
 	})
 	test('not triggered across sentences', () => {
-		const rules = [
+		const rules = ([
 			{
 				'trigger': { 'token': 'token' },
 				'context': { 'followedby': { 'token': 'context', 'skip': 'all' } },
@@ -350,7 +328,7 @@ describe('checker rules', () => {
 					'message': 'message',
 				},
 			},
-		].map(parse_checker_rule)
+		] as CheckerRuleJson[]).map(parse_checker_rule)
 
 		const input_tokens = [
 			create_sentence([
@@ -366,7 +344,7 @@ describe('checker rules', () => {
 		expect(output_tokens).toEqual(input_tokens)
 	})
 	test('context not triggered from within subordinate clauses', () => {
-		const rules = [
+		const rules = ([
 			{
 				'trigger': { 'token': 'token' },
 				'context': { 'followedby': { 'token': 'context', 'skip': 'all' } },
@@ -375,7 +353,7 @@ describe('checker rules', () => {
 					'message': 'message',
 				},
 			},
-		].map(parse_checker_rule)
+		] as CheckerRuleJson[]).map(parse_checker_rule)
 
 		const input_tokens = [
 			create_sentence([
@@ -392,7 +370,7 @@ describe('checker rules', () => {
 	})
 
 	test('triggered within a subordinate clauses', () => {
-		const rules = [
+		const rules = ([
 			{
 				'trigger': { 'token': 'token' },
 				'context': { 'followedby': { 'token': 'context' } },
@@ -401,7 +379,7 @@ describe('checker rules', () => {
 					'message': 'message',
 				},
 			},
-		].map(parse_checker_rule)
+		] as CheckerRuleJson[]).map(parse_checker_rule)
 
 		const input_tokens = [
 			create_sentence([

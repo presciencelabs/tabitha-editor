@@ -4,32 +4,16 @@ import { TOKEN_TYPE, create_clause_token, create_token, flatten_sentence } from 
 import { apply_rules } from './rules_processor'
 import { expect_error_to_match } from '$lib/test_helps'
 
-/**
- *
- * @param {string[]} tokens
- * @returns {Token[]}
- */
-function create_tokens(tokens) {
+function create_tokens(tokens: string[]): Token[] {
 	return tokens.map(token => create_token(token, TOKEN_TYPE.LOOKUP_WORD))
 }
 
-/**
- * @param {string} pronoun
- * @param {string} referent
- * @param {string?} referent_lookup
- * @returns {Token}
- */
-function create_pronoun_token(pronoun, referent, referent_lookup=null) {
+function create_pronoun_token(pronoun: string, referent: string, referent_lookup: string | null = null): Token {
 	const pronoun_token = create_token(pronoun, TOKEN_TYPE.FUNCTION_WORD)
 	return create_token(referent, TOKEN_TYPE.LOOKUP_WORD, { lookup_term: referent_lookup ?? referent, pronoun: pronoun_token })
 }
 
-/**
- * 
- * @param {Token[]} tokens 
- * @returns {Sentence}
- */
-function create_sentence(tokens) {
+function create_sentence(tokens: Token[]): Sentence {
 	return { clause: create_clause_token(tokens, { 'clause_type': 'main_clause' }) }
 }
 

@@ -6,8 +6,7 @@
 /// <reference lib="webworker" />
 import { build, files, version } from '$service-worker'
 
-// eslint-disable-next-line no-extra-parens
-const sw = /** @type {ServiceWorkerGlobalScope} */ (/** @type {unknown} */ (self))
+declare const self: ServiceWorkerGlobalScope
 
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`
@@ -17,13 +16,12 @@ const ASSETS = [
 	...files, // everything in `static`
 ]
 
-sw.addEventListener('install', event => event.waitUntil(addFilesToCache()))
-sw.addEventListener('activate', event => event.waitUntil(deleteOldCaches()))
-sw.addEventListener('fetch', event => {
+self.addEventListener('install', (event: ExtendableEvent) => event.waitUntil(addFilesToCache()))
+self.addEventListener('activate', (event: ExtendableEvent) => event.waitUntil(deleteOldCaches()))
+self.addEventListener('fetch', (event: FetchEvent) => {
 	// ignore POST requests etc
 	if (event.request.method !== 'GET') return
 
-	// @ts-expect-error – this is a valid ServiceWorkerGlobalScope
 	event.respondWith(respond(event.request))
 })
 
@@ -40,18 +38,14 @@ async function deleteOldCaches() {
 	}
 }
 
-/**
- * @param {Request} request
- *
- * @returns {Promise<Response | undefined>}
- */
-async function respond(request) {
+async function respond(request: Request): Promise<Response> {
 	const url = new URL(request.url)
 	const cache = await caches.open(CACHE)
 
 	// `build` and `files` can always be served from the cache
 	if (ASSETS.includes(url.pathname)) {
-		return cache.match(url.pathname)
+		const cached = await cache.match(url.pathname)
+		if (cached) return cached
 	}
 
 	// for everything else, try the network first, but
@@ -65,6 +59,8 @@ async function respond(request) {
 
 		return response
 	} catch {
-		return cache.match(request)
+		const cached = await cache.match(request)
+		if (cached) return cached
+		return new Response('Offline', { status: 503 })
 	}
 }

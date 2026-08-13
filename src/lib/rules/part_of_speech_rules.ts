@@ -480,7 +480,7 @@ const builtin_part_of_speech_rules = [
 		name: 'Words with a pronoun must be a noun.',
 		comment: '',
 		rule: {
-			trigger: token => token.pronoun !== null,
+			trigger: (token: Token) => token.pronoun !== null,
 			context: create_context_filter({}),
 			action: simple_rule_action(({ trigger_token }) => keep_parts_of_speech(new Set(['Noun']))(trigger_token)),
 		},
@@ -489,14 +489,12 @@ const builtin_part_of_speech_rules = [
 		name: 'Filter lookup results for pairings based on part of speech',
 		comment: '',
 		rule: {
-			trigger: token => !!(token.lookup_results.length && token.pairing?.lookup_results.length),
+			trigger: (token: Token) => !!(token.lookup_results.length && token.pairing?.lookup_results.length),
 			context: create_context_filter({}),
 			action: message_set_action(({ trigger_token: token }) => {
-				/** @type {Token[]} */
-				// @ts-expect-error there will always be a pairing at this point
-				const [left, right] = [token, token.pairing]
+				const left = token
+				const right = token.pairing!
 
-				// filter lookup results based on the overlap of the two concepts
 				const left_categories = new Set(left.lookup_results.map(result => result.part_of_speech))
 				const right_categories = new Set(right.lookup_results.map(result => result.part_of_speech))
 				const overlapping_categories = new Set([...left_categories].filter(x => right_categories.has(x)))
@@ -515,7 +513,7 @@ const builtin_part_of_speech_rules = [
 		name: 'Select part-of-speech based on a note',
 		comment: '',
 		rule: {
-			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD,
+			trigger: (token: Token) => token.type === TOKEN_TYPE.LOOKUP_WORD,
 			context: create_context_filter({ 'followedby': { 'token': '_noun|_verb|_adj|_adv|_adp|_conj' } }),
 			action: simple_rule_action(({ trigger_token, tokens, context_indexes }) => {
 				const part_of_speech_note = tokens[context_indexes[0]].token
@@ -541,7 +539,7 @@ const builtin_part_of_speech_rules = [
 		name: 'Disambiguate part-of-speech based on the selected sense',
 		comment: '',
 		rule: {
-			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD && token.specified_sense.length > 0,
+			trigger: (token: Token) => token.type === TOKEN_TYPE.LOOKUP_WORD && token.specified_sense.length > 0,
 			context: create_context_filter({}),
 			action: message_set_action(({ trigger_token: token }) => {
 				if (is_one_part_of_speech(token)) {
@@ -565,7 +563,7 @@ const builtin_part_of_speech_rules = [
 		name: 'Disambiguate "is Xing"',
 		comment: 'When a verb like "saying" or "teaching" is preceded by "be", another rule wrongly selects the Noun. In these cases, a Noun like this would never immediately follow "be", so we can select the Verb instead.',
 		rule: {
-			trigger: token => has_part_of_speech(token, 'Verb') && has_part_of_speech(token, 'Noun'),
+			trigger: (token: Token) => has_part_of_speech(token, 'Verb') && has_part_of_speech(token, 'Noun'),
 			context: create_context_filter({ 'precededby': { 'stem': 'be' } }),
 			action: simple_rule_action(({ trigger_token }) => {
 				if (trigger_token.lookup_results
@@ -581,7 +579,7 @@ const builtin_part_of_speech_rules = [
 		name: 'If an ambiguous word could be a Verb, and there are no other Verbs in the clause, select the Verb',
 		comment: 'this is an implicit rule in the Analyzer',
 		rule: {
-			trigger: token => has_part_of_speech(token, 'Verb') && !is_one_part_of_speech(token),
+			trigger: (token: Token) => has_part_of_speech(token, 'Verb') && !is_one_part_of_speech(token),
 			context: create_context_filter({}),
 			action: simple_rule_action(({ tokens, trigger_token, trigger_index }) => {
 				// Can't use the context filter, because there may be another ambiguous word somewhere.
@@ -595,13 +593,7 @@ const builtin_part_of_speech_rules = [
 	},
 ]
 
-/**
- *
- * @param {PartOfSpeechRuleJson} rule_json
- * @param {number} index
- * @returns {TokenRule}
- */
-export function parse_part_of_speech_rule(rule_json, index) {
+export function parse_part_of_speech_rule(rule_json: PartOfSpeechRuleJson, index: number): TokenRule {
 	const category = category_filter(rule_json['category'])
 	const trigger = create_token_filter(rule_json['trigger'] ?? 'all')
 	const context = create_context_filter(rule_json['context'])
@@ -610,28 +602,17 @@ export function parse_part_of_speech_rule(rule_json, index) {
 	return {
 		id: `part_of_speech:${index}`,
 		name: rule_json['name'] ?? '',
-		trigger: token => category(token) && trigger(token),
+		trigger: (token: Token) => category(token) && trigger(token),
 		context,
 		action,
 	}
 
-	/**
-	 *
-	 * @param {string} categories_json
-	 * @returns {TokenFilter}
-	 */
-	function category_filter(categories_json) {
-		// the token must have at least one result from each given category
+	function category_filter(categories_json: string): TokenFilter {
 		const categories = categories_json.split('|')
 		return token => categories.every(category => token.lookup_results.some(LOOKUP_FILTERS.IS_PART_OF_SPEECH(category)))
 	}
 
-	/**
-	 *
-	 * @param {string} remove_json
-	 * @returns {RuleAction}
-	 */
-	function create_remove_action(remove_json) {
+	function create_remove_action(remove_json: string): RuleAction {
 		const remove_action = remove_part_of_speech(remove_json)
 
 		return simple_rule_action(({ trigger_token }) => {
@@ -647,29 +628,14 @@ export function parse_part_of_speech_rule(rule_json, index) {
 export const PART_OF_SPEECH_RULES = builtin_part_of_speech_rules.map(from_built_in_rule('part_of_speech'))
 	.concat(part_of_speech_rules_json.map(parse_part_of_speech_rule))
 
-/**
- *
- * @param {Token} token
- * @param {string} part_of_speech
- */
-function has_part_of_speech(token, part_of_speech) {
+function has_part_of_speech(token: Token, part_of_speech: string): boolean {
 	return token.lookup_results.some(LOOKUP_FILTERS.IS_PART_OF_SPEECH(part_of_speech))
 }
 
-/**
- *
- * @param {Set<string>} parts_of_speech
- * @returns {(token: Token) => void}
- */
-function keep_parts_of_speech(parts_of_speech) {
+function keep_parts_of_speech(parts_of_speech: Set<string>): (token: Token) => void {
 	return token => token.lookup_results = token.lookup_results.filter(result => parts_of_speech.has(result.part_of_speech))
 }
 
-/**
- *
- * @param {string} part_of_speech
- * @returns {(token: Token) => void}
- */
-function remove_part_of_speech(part_of_speech) {
+function remove_part_of_speech(part_of_speech: string): (token: Token) => void {
 	return token => token.lookup_results = token.lookup_results.filter(result => result.part_of_speech !== part_of_speech)
 }

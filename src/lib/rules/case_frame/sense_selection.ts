@@ -388,20 +388,15 @@ const adposition_sense_priority_overrides = [
 	]],
 ]
 
-/**
- * @param {PriorityOverrideRules} sense_rules 
- * @returns {[WordSense, ArgumentMatchFilter]}
- */
-function parse_sense_rule([sense, sense_rule_json]) {
-	const role_filters = Object.entries(sense_rule_json).map(parse_sense_rule)
+type ArgumentMatchFilter = (role_matches: RoleMatchResult[]) => boolean
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parse_sense_rule([sense, sense_rule_json]: [WordSense, Record<string, any>]): [WordSense, ArgumentMatchFilter] {
+	const role_filters = Object.entries(sense_rule_json).map(parse_role_rule)
 	return [sense, role_match => role_filters.every(filter => filter(role_match))]
 
-	/**
-	 * 
-	 * @param {[RoleTag, any]} role_filter_json 
-	 * @returns {ArgumentMatchFilter}
-	 */
-	function parse_sense_rule([role_tag, role_filter_json]) {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	function parse_role_rule([role_tag, role_filter_json]: [string, any]): ArgumentMatchFilter {
 		const trigger = create_token_filter(role_filter_json)
 		const context = create_context_filter(role_filter_json['context'])
 
@@ -417,33 +412,31 @@ function parse_sense_rule([sense, sense_rule_json]) {
 	}
 }
 
-/** @type {Map<WordStem, [WordSense, ArgumentMatchFilter][]>} */
-const VERB_SENSE_FILTER_RULES = new Map(verb_sense_priority_overrides.map(parse_sense_override))
-const ADJECTIVE_SENSE_FILTER_RULES = new Map(adjective_sense_priority_overrides.map(parse_sense_override))
-const ADPOSITION_SENSE_FILTER_RULES = new Map(adposition_sense_priority_overrides.map(parse_sense_override))
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const VERB_SENSE_FILTER_RULES = new Map<string, [WordSense, ArgumentMatchFilter][]>(verb_sense_priority_overrides.map(parse_sense_override as any))
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ADJECTIVE_SENSE_FILTER_RULES = new Map<string, [WordSense, ArgumentMatchFilter][]>(adjective_sense_priority_overrides.map(parse_sense_override as any))
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ADPOSITION_SENSE_FILTER_RULES = new Map<string, [WordSense, ArgumentMatchFilter][]>(adposition_sense_priority_overrides.map(parse_sense_override as any))
 
-const SENSE_FILTER_RULES = new Map([
+const SENSE_FILTER_RULES = new Map<string, Map<string, [WordSense, ArgumentMatchFilter][]>>([
 	['Verb', VERB_SENSE_FILTER_RULES],
 	['Adjective', ADJECTIVE_SENSE_FILTER_RULES],
 	['Adposition', ADPOSITION_SENSE_FILTER_RULES],
 ])
 
-/**
- * @param {[string, PriorityOverrideRules[]]} param 
- * @return {[stem, [WordSense, ArgumentMatchFilter][]]}
- */
-function parse_sense_override([stem, sense_rules]) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parse_sense_override([stem, sense_rules]: [string, any[]]): [string, [WordSense, ArgumentMatchFilter][]] {
 	return [stem, sense_rules.map(parse_sense_rule)]
 }
 
-/**
- * 
- * @param {RuleTriggerContext} trigger_context 
- */
-export function select_sense(trigger_context) {
+export function select_sense(trigger_context: RuleTriggerContext) {
 	const token = trigger_context.trigger_token
 	select_word_sense(token, trigger_context)
 
+	if (!token.lookup_results[0]?.case_frame) {
+		return
+	}
 	// apply the selected result's argument actions
 	// apply to all present arguments, even 'extra' ones, since the usage info may be inaccurate
 	const selected_result = token.lookup_results[0].case_frame.result
@@ -457,23 +450,14 @@ export function select_sense(trigger_context) {
 	}
 }
 
-/**
- * 
- * @param {RuleTriggerContext} trigger_context 
- */
-export function select_pairing_sense(trigger_context) {
+export function select_pairing_sense(trigger_context: RuleTriggerContext) {
 	if (!trigger_context.trigger_token.pairing) {
 		return
 	}
 	select_word_sense(trigger_context.trigger_token.pairing, trigger_context)
 }
 
-/**
- * 
- * @param {Token} token
- * @returns {string | undefined} the sense letter or undefined
- */
-function find_matching_sense(token) {
+function find_matching_sense(token: Token): string | undefined {
 	if (token.lookup_results.every(result => result.case_frame.result.status === 'unchecked')) {
 		return undefined
 	}
@@ -484,12 +468,7 @@ function find_matching_sense(token) {
 	const matching_sense = sense_filters.find(sense_matches)?.[0]
 	return matching_sense ? split_stem_and_sense(matching_sense).sense : undefined
 
-	/**
-	 * 
-	 * @param {[WordSense, ArgumentMatchFilter]} sense_match_filters 
-	 * @returns {boolean}
-	 */
-	function sense_matches([sense, match_filter]) {
+	function sense_matches([sense, match_filter]: [WordSense, ArgumentMatchFilter]): boolean {
 		const lookup = token.lookup_results.find(LOOKUP_FILTERS.MATCHES_SENSE(split_stem_and_sense(sense)))
 		if (!lookup) {
 			return false
@@ -500,12 +479,7 @@ function find_matching_sense(token) {
 	}
 }
 
-/**
- * 
- * @param {Token} token
- * @param {RuleTriggerContext} trigger_context
- */
-function select_word_sense(token, trigger_context) {
+function select_word_sense(token: Token, trigger_context: RuleTriggerContext) {
 	if (!token.lookup_results.some(LOOKUP_FILTERS.IS_IN_ONTOLOGY)) {
 		return
 	}
@@ -529,6 +503,13 @@ function select_word_sense(token, trigger_context) {
 	
 	// put the selected sense at the top of the results
 	const selected_index = token.lookup_results.findIndex(LOOKUP_FILTERS.MATCHES_SENSE({ stem, sense: sense_to_select }))
-	const selected_result = token.lookup_results.splice(selected_index, 1)[0]
-	token.lookup_results = [selected_result, ...token.lookup_results]
+	if (selected_index >= 0) {
+		const selected_result = token.lookup_results.splice(selected_index, 1)[0]
+		token.lookup_results = [selected_result, ...token.lookup_results]
+	}
+
+	const result = token.lookup_results[0]
+	if (result?.part_of_speech === 'Verb') {
+		add_tag_to_token(token, { 'stem': result.stem }, trigger_context.rule_id)
+	}
 }

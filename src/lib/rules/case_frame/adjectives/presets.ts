@@ -20,12 +20,7 @@ export function modified_noun_with_subgroup() {
 	}
 }
 
-/**
- * 
- * @param {string} adposition 
- * @returns {CaseFrameRuleJson}
- */
-export function by_adposition(adposition) {
+export function by_adposition(adposition: string): CaseFrameRuleJson {
 	return {
 		...by_relative_context({
 			'followedby': [
@@ -35,17 +30,12 @@ export function by_adposition(adposition) {
 		}),
 		'argument_context_index': 1,
 		'transform': { 'tag': { 'role': 'adjective_nominal_argument', 'syntax': 'nested_np' } },
-		'context_transform': { 'function': { 'pre_np_adposition': 'adjective_argument' }, 'remove_tag': 'relation' },	// make the adposition a function word and clear other tag values
+		'context_transform': { 'function': { 'pre_np_adposition': 'adjective_argument' }, 'remove_tag': 'relation' },
 		'missing_message': `'{stem} ${adposition} N'`,
 	}
 }
 
-/**
- * 
- * @param {string} clause_type 
- * @returns {CaseFrameRuleJson}
- */
-export function by_clause_tag(clause_type) {
+export function by_clause_tag(clause_type: string): CaseFrameRuleJson {
 	return {
 		...by_relative_context({
 			'followedby': { 'type': TOKEN_TYPE.CLAUSE, 'tag': { 'clause_type': clause_type, 'role': 'none' } },
@@ -55,12 +45,7 @@ export function by_clause_tag(clause_type) {
 	}
 }
 
-/**
- * 
- * @param {string} complementizer 
- * @returns {CaseFrameRuleJson}
- */
-export function by_complementizer(complementizer) {
+export function by_complementizer(complementizer: string): CaseFrameRuleJson {
 	return {
 		'trigger': { 'type': TOKEN_TYPE.CLAUSE, 'tag': { 'clause_type': 'adverbial_clause' } },
 		'context': {
@@ -71,12 +56,7 @@ export function by_complementizer(complementizer) {
 	}
 }
 
-/**
- * 
- * @param {string} complementizer 
- * @returns {CaseFrameRuleJson}
- */
-export function by_same_participant_complementizer(complementizer) {
+export function by_same_participant_complementizer(complementizer: string): CaseFrameRuleJson {
 	return {
 		'trigger': { 'type': TOKEN_TYPE.CLAUSE, 'tag': { 'clause_type': 'adverbial_clause|patient_clause_same_participant' } },
 		'context': {
@@ -88,11 +68,7 @@ export function by_same_participant_complementizer(complementizer) {
 	}
 }
 
-/**
- * 
- * @returns {CaseFrameRuleJson}
- */
-export function modified_noun_of_adjective() { 
+export function modified_noun_of_adjective(): CaseFrameRuleJson { 
 	return {
 		...by_relative_context({
 			'followedby': { 'category': 'Noun', 'skip': 'np_modifiers' },
@@ -104,12 +80,7 @@ export function modified_noun_of_adjective() {
 	}
 }
 
-/**
- * 
- * @param {string} unit_type 
- * @returns {CaseFrameRuleJson}
- */
-export function unit_with_measure(unit_type) {
+export function unit_with_measure(unit_type: string): CaseFrameRuleJson {
 	return {
 		...by_relative_context({
 			'precededby': { 'category': 'Noun' },
@@ -120,12 +91,7 @@ export function unit_with_measure(unit_type) {
 	}
 }
 
-/**
- * 
- * @param {TokenContextFilterJson} relative_context 
- * @returns {CaseFrameRuleJson}
- */
-function by_relative_context(relative_context) {
+function by_relative_context(relative_context: TokenContextFilterJson): CaseFrameRuleJson {
 	return {
 		'trigger': 'all',
 		'context': relative_context,

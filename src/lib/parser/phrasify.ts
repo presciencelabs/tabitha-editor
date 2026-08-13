@@ -1,20 +1,11 @@
 import { TOKEN_TYPE, create_token } from '$lib/token'
 import { create_token_filter } from '$lib/rules/rules_parser'
 
-/**
- *
- * @param {Sentence[]} sentences
- * @returns {Sentence[]}
- */
-export function phrasify(sentences) {
+export function phrasify(sentences: Sentence[]): Sentence[] {
 	return phrasify_tokens(sentences.map(sentence => sentence.clause)).map(clause => ({ clause }))
 }
 
-/**
- * @param {Token[]} tokens
- * @returns {Token[]}
- */
-function phrasify_tokens(tokens) {
+function phrasify_tokens(tokens: Token[]): Token[] {
 	if (tokens.length === 0) {
 		return []
 	}
@@ -44,12 +35,11 @@ function phrasify_tokens(tokens) {
 	/**
 	 * @param {number} direction +1 for forward, -1 for reverse
 	 */
-	function expand_phrases(direction) {
-		const i_start = direction < 0 ? tokens.length-1 : 0
-		/** @type {(i: number) => boolean} */
+	function expand_phrases(direction: number) {
+		const i_start = direction < 0 ? tokens.length - 1 : 0
 		const i_condition = direction < 0
-			? i => i >= 0
-			: i => i < tokens.length
+			? (i: number) => i >= 0
+			: (i: number) => i < tokens.length
 
 		for (let i = i_start; i_condition(i); i += direction) {
 			const token = tokens[i]
@@ -71,7 +61,7 @@ function phrasify_tokens(tokens) {
 			// find all tokens AFTER the current phrase that should be included
 			const post_token_filters = ORDERED_PHRASE_POST_FILTERS.find(([phrase_filter]) => phrase_filter(token))?.[1] ?? []
 			// underscore notes always directly follow the word they're associated with
-			post_token_filters.splice(0, 0, token => token.token.startsWith('_'))
+			post_token_filters.splice(0, 0, (token: Token) => token.token.startsWith('_'))
 			let post_index = i + 1
 			for (const token_filter of post_token_filters) {
 				// keep matching the filter until it no longer matches. then move on to the next filter and repeat
@@ -106,40 +96,32 @@ function phrasify_tokens(tokens) {
 	 * Create a phrase based on the part-of-speech of the given token, and copy the tags
 	 * from the head onto the phrase itself. This will make it easier to check the function
 	 * of the phrase.
-	 *
-	 * @param {Token} head_token
-	 * @returns {Phrase}
 	 */
-	function create_phrase(head_token) {
-		const tag = {
-			'phrase_type': get_phrase_type(head_token),
+	function create_phrase(head_token: Token): Phrase {
+		const tag: Tag = {
+			phrase_type: get_phrase_type(head_token),
 			...head_token.tag,
 		}
 		return create_token('', TOKEN_TYPE.PHRASE, { tag, sub_tokens: [head_token] })
 	}
 
-	/**
-	 * @param {Token} head_token
-	 * @returns {string}
-	 */
-	function get_phrase_type(head_token) {
-		return {
+	function get_phrase_type(head_token: Token): string {
+		const pos = head_token.lookup_results[0]?.part_of_speech ?? ''
+		const type_map: Record<string, string> = {
 			Noun: 'NP',
 			Verb: 'VP',
 			Adjective: 'AdjP',
 			Adverb: 'AdvP',
-		}[head_token.lookup_results[0].part_of_speech] ?? ''
+		}
+		return type_map[pos] ?? ''
 	}
 
 	/**
 	 * Using subtokens was helpful for creating the phrases. But for the sake of the structural rules,
 	 * it's easier if phrases don't have subtokens and instead are simple opening and closing tokens
 	 * surrounding its words, just like in the semantic representation.
-	 *
-	 * @param {Token} token
-	 * @returns {Token[]}
 	 */
-	function flatten_phrases(token) {
+	function flatten_phrases(token: Token): Token[] {
 		if (token.type === TOKEN_TYPE.PHRASE) {
 			const tags_to_maintain = ['role', 'adj_usage', 'implicit']
 			const tag = Object.fromEntries(Object.entries(token.tag).filter(([key]) => tags_to_maintain.includes(key)))
@@ -163,10 +145,8 @@ function phrasify_tokens(tokens) {
  * 	- When all filters have been applied, all tokens that were matched are to be included in the phrase.
  * 	- The order matters because of how English phrases are structured. For example, you say 'the red balloon' NOT 'red the balloon'
  */
-
 // Filters for tokens that come before the head word of the phrase
-/** @type {[phrase_filter: TokenFilter, token_filters: TokenFilter[]][]} */
-const ORDERED_PHRASE_PRE_FILTERS = [
+const ORDERED_PHRASE_PRE_FILTERS: Array<[phrase_filter: TokenFilter, token_filters: TokenFilter[]]> = [
 	[
 		{ 'tag': { 'phrase_type': 'AdvP' } },
 		[
@@ -239,12 +219,10 @@ const ORDERED_PHRASE_PRE_FILTERS = [
 			{ 'tag': { 'syntax': 'coord_noun' } },
 		],
 	],
-// @ts-expect-error the array initializer doesn't like the different object structures
-].map(parse_phrase_filter)
+].map(entry => parse_phrase_filter(entry as [TokenFilterJson, TokenFilterJson[]]))
 
 // Filters for tokens that come after the head word of the phrase
-/** @type {[phrase_filter: TokenFilter, token_filters: TokenFilter[]][]} */
-const ORDERED_PHRASE_POST_FILTERS = [
+const ORDERED_PHRASE_POST_FILTERS: Array<[phrase_filter: TokenFilter, token_filters: TokenFilter[]]> = [
 	[
 		{ 'tag': { 'phrase_type': 'AdjP', 'adj_type': 'subgroup' } },
 		[
@@ -277,14 +255,9 @@ const ORDERED_PHRASE_POST_FILTERS = [
 			{ 'tag': 'verb_polarity' },
 		],
 	],
-// @ts-expect-error the array initializer doesn't like the different object structures
-].map(parse_phrase_filter)
+].map(entry => parse_phrase_filter(entry as [TokenFilterJson, TokenFilterJson[]]))
 
-/**
- * @param {[phrase_filter_json: any, token_filters_json: any[]]} filter_json
- * @returns {[phrase_filter: TokenFilter, token_filters: TokenFilter[]]}
- */
-function parse_phrase_filter([phrase_filter_json, token_filters_json]) {
+function parse_phrase_filter([phrase_filter_json, token_filters_json]: [TokenFilterJson, TokenFilterJson[]]): [TokenFilter, TokenFilter[]] {
 	return [
 		create_token_filter(phrase_filter_json),
 		token_filters_json.map(create_token_filter),

@@ -3,12 +3,7 @@ import { phrasify } from '$lib/parser/phrasify'
 import { entityfy } from './entityfy'
 import { populate_noun_list, replace_punctuation } from './other_rules'
 
-/**
- * 
- * @param {Sentence[]} sentences 
- * @return {SimpleSourceData[]}
- */
-export function analyze(sentences) {
+export function analyze(sentences: Sentence[]): SimpleSourceData {
 	return pipe(
 		replace_punctuation,
 		phrasify,
@@ -20,12 +15,7 @@ export function analyze(sentences) {
 	)(sentences)
 }
 
-/**
- * 
- * @param {SimpleSourceEntity[]} source_entities 
- * @returns {SimpleSourceData}
- */
-function to_source_data(source_entities) {
+function to_source_data(source_entities: SimpleSourceEntity[]): SimpleSourceData {
 	return {
 		source_entities,
 		noun_list: populate_noun_list(source_entities),

@@ -50,10 +50,11 @@ const argument_and_sense_rules = [
 		name: 'Initialize case frame rules and usage',
 		comment: '',
 		rule: {
-			trigger: token => token.lookup_results.length > 0 && is_one_part_of_speech(token),
+			trigger: (token: Token) => token.lookup_results.length > 0 && is_one_part_of_speech(token),
 			context: create_context_filter({}),
 			action: simple_rule_action(trigger_context => {
-				const CASE_FRAME_RULE_GETTERS = new Map([
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				const CASE_FRAME_RULE_GETTERS = new Map<string, (token: Token) => any>([
 					['Verb', get_verb_case_frame_rules],
 					['Adjective', get_adjective_case_frame_rules],
 					['Adposition', get_adposition_case_frame_rules],
@@ -100,7 +101,7 @@ const argument_and_sense_rules = [
 
 				const token = trigger_context.trigger_token
 				const selected_result = token.lookup_results[0]
-				if (selected_result.case_frame.result.status === 'unchecked') {
+				if (!selected_result?.case_frame || selected_result.case_frame.result.status === 'unchecked') {
 					return
 				}
 
@@ -128,7 +129,7 @@ const argument_and_sense_rules = [
 		name: 'Verb case frame, passive',
 		comment: '',
 		rule: {
-			trigger: token => create_token_filter({ 'category': 'Verb' })(token)
+			trigger: (token: Token) => create_token_filter({ 'category': 'Verb' })(token)
 					&& token.lookup_results.some(({ case_frame }) => case_frame.result.status === 'invalid'),
 			context: create_context_filter({
 				'precededby': { 'tag': { 'auxiliary': 'passive' }, 'skip': 'all' },
@@ -162,7 +163,7 @@ const argument_and_sense_rules = [
 		name: 'Other word sense selection',
 		comment: 'Adjective and Verb senses have already been selected',
 		rule: {
-			trigger: token => token.lookup_results.length > 0
+			trigger: (token: Token) => token.lookup_results.length > 0
 					&& is_one_part_of_speech(token)
 					&& !create_token_filter({ 'category': 'Adjective|Verb' })(token),
 			context: create_context_filter({}),
@@ -173,7 +174,7 @@ const argument_and_sense_rules = [
 		name: 'Pairing compatibility and sense selection',
 		comment: '',
 		rule: {
-			trigger: token => token.pairing !== null,
+			trigger: (token: Token) => token.pairing !== null,
 			context: create_context_filter({}),
 			action: simple_rule_action(trigger_context => {
 				if (trigger_context.trigger_token.lookup_results.at(0)?.case_frame.result.status === 'valid') {
@@ -187,7 +188,7 @@ const argument_and_sense_rules = [
 		name: 'Revert ghost tokens to lookup tokens',
 		comment: 'In a previous rule, the lookup results of ghost tokens were moved to their corresponding gap tokens. These now get moved back.',
 		rule: {
-			trigger: token => token_has_tag(token, 'gap_index'),
+			trigger: (token: Token) => token_has_tag(token, 'gap_index'),
 			context: create_context_filter({}),
 			action: simple_rule_action(({ tokens, trigger_index }) => {
 				restore_ghost_tokens(tokens, trigger_index)

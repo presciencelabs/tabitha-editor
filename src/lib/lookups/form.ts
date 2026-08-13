@@ -2,10 +2,7 @@ import { PUBLIC_TARGETS_API_HOST } from '$env/static/public'
 import { LOOKUP_FILTERS } from '$lib/lookup_filters'
 import { create_lookup_result } from '$lib/token'
 
-/**
- * @param {Token} lookup_token
- */
-export async function check_forms(lookup_token) {
+export async function check_forms(lookup_token: Token) {
 	// At this point there is always just one lookup term
 	// The term is expected to have no sense attached to it
 	const term = lookup_token.lookup_terms[0]
@@ -36,12 +33,8 @@ export async function check_forms(lookup_token) {
 	 * for each unique combination of stem and part-of-speech. If there are multiple lexicon entries
 	 * with the same stem and part-of-speech (eg. Judah), simply take the id of the first one
 	 * and ignore the others. This is what the Analyzer does.
-	 * 
-	 * @param {LookupResult[]} transformed_results
-	 * @param {LexicalFormResult} form_result
-	 * @returns {LookupResult[]}
 	 */
-	function transform_results(transformed_results, form_result) {
+	function transform_results(transformed_results: LookupResult[], form_result: LexicalFormResult): LookupResult[] {
 		const existing_result = transformed_results.find(LOOKUP_FILTERS.MATCHES_LOOKUP(form_result))
 
 		if (!existing_result) {
@@ -61,12 +54,7 @@ export async function check_forms(lookup_token) {
 		return transformed_results
 	}
 
-	/**
-	 * 
-	 * @param {LookupResult[]} results 
-	 * @param {string} term 
-	 */
-	function add_missing_forms(results, term) {
+	function add_missing_forms(results: LookupResult[], term: string) {
 		const missing_form = MISSING_FORMS.get(term.toLowerCase())
 
 		// Some missing forms may become not missing before the code here is updated. Avoid duplicate results in that case.
@@ -76,11 +64,7 @@ export async function check_forms(lookup_token) {
 	}
 }
 
-/**
- * @param {string} lookup_term
- * @returns {Promise<LexicalFormResult[]>}
- */
-async function get_matches_from_form_lookup(lookup_term) {
+async function get_matches_from_form_lookup(lookup_term: string): Promise<LexicalFormResult[]> {
 	const response = await fetch(`${PUBLIC_TARGETS_API_HOST}/English/lookup/forms?word=${lookup_term}`)
 
 	if (!response.ok) return []
@@ -88,8 +72,7 @@ async function get_matches_from_form_lookup(lookup_term) {
 	return response.json()
 }
 
-/** @type {Map<string, { stem: string, part_of_speech: string, forms: string }>} */
-const MISSING_FORMS = new Map([
+const MISSING_FORMS: Map<string, { stem: string; part_of_speech: string; forms: string }> = new Map([
 	// TODO add more or remove some when we include Analyzer inflections as well
 	// see https://github.com/presciencelabs/tabitha-editor/issues/37
 	['chiefer', { stem: 'chief', part_of_speech: 'Adjective', forms: 'comparative' }],

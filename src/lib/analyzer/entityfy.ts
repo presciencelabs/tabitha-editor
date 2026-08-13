@@ -1,30 +1,14 @@
 import { token_has_tag, TOKEN_TYPE } from '$lib/token'
 import { get_features_for_token } from './features'
 
-/**
- * 
- * @param {Sentence[]} sentences 
- * @returns {SimpleSourceEntity[]}
- */
-export function entityfy(sentences) {
+export function entityfy(sentences: Sentence[]): SimpleSourceEntity[] {
 	return entityfy_tokens(sentences.map(sentence => sentence.clause))
 
-	/**
-	 * 
-	 * @param {Token[]} tokens 
-	 * @returns {SimpleSourceEntity[]}
-	 */
-	function entityfy_tokens(tokens) {
+	function entityfy_tokens(tokens: Token[]): SimpleSourceEntity[] {
 		return tokens.flatMap((_, index, tokens) => entityfy_token(tokens, index))
 	}
 
-	/**
-	 * 
-	 * @param {Token[]} tokens 
-	 * @param {number} token_index 
-	 * @returns {SimpleSourceEntity[]}
-	 */
-	function entityfy_token(tokens, token_index) {
+	function entityfy_token(tokens: Token[], token_index: number): SimpleSourceEntity[] {
 		const token = tokens[token_index]
 		const category = get_token_category(token)
 		if (!category) {
@@ -67,28 +51,29 @@ export function entityfy(sentences) {
 		}
 	}
 
-	/**
-	 * @param {Token} token
-	 * @returns {SourceConcept}
-	 */
-	function convert_to_concept(token) {
+	function convert_to_concept(token: Token): SourceConcept {
 		const { stem, sense, part_of_speech } = token.lookup_results[0]
 		return { stem, sense, part_of_speech }
 	}
 }
 
-/**
- * 
- * @param {Object} [data={}]
- * @param {CategoryName} [data.category='']
- * @param {string} [data.value='']
- * @param {EntityFeature[]} [data.features=[]]
- * @param {SourceConcept?} [data.concept=null]
- * @param {SourceConcept?} [data.pairing_concept=null]
- * @param {PairingType} [data.pairing_type='none']
- * @param {string?} [data.noun_list_index=null]
- */
-function create_source_entity({ category='', value='', features=[], concept=null, pairing_concept=null, pairing_type='none', noun_list_index=null }={}) {
+function create_source_entity({
+	category = '',
+	value = '',
+	features = [],
+	concept = null,
+	pairing_concept = null,
+	pairing_type = 'none',
+	noun_list_index = null,
+}: {
+	category?: CategoryName
+	value?: string
+	features?: EntityFeature[]
+	concept?: SourceConcept | null
+	pairing_concept?: SourceConcept | null
+	pairing_type?: PairingType
+	noun_list_index?: string | null
+} = {}): SimpleSourceEntity {
 	return {
 		category,
 		value: value || concept?.stem || '',
@@ -100,28 +85,23 @@ function create_source_entity({ category='', value='', features=[], concept=null
 	}
 }
 
-/** @type {Record<string, string>} */
-const PHRASE_CATEGORY_MAP = {
+const PHRASE_CATEGORY_MAP: Record<string, string> = {
 	'NP': 'Noun Phrase',
 	'VP': 'Verb Phrase',
 	'AdjP': 'Adjective Phrase',
 	'AdvP': 'Adverb Phrase',
 }
 
-/**
- * @param {Token} token 
- * @returns {CategoryName?}
- */
-function get_token_category(token) {
+function get_token_category(token: Token): CategoryName | null {
 	if (token.type === TOKEN_TYPE.CLAUSE) {
 		return 'Clause'
 	} else if (token.type === TOKEN_TYPE.PHRASE && token.token.startsWith('{')) {
 		// A phrase start token is in the format like "{NP" or "{AdjP"
-		return PHRASE_CATEGORY_MAP[token.token.substring(1)]
+		return PHRASE_CATEGORY_MAP[token.token.substring(1)] as CategoryName
 	} else if (token.type === TOKEN_TYPE.PHRASE && token.token === '}') {
-		return 'P_END'
+		return 'P_END' as CategoryName
 	} else if (token.lookup_results.length) {
-		return token.lookup_results[0].part_of_speech
+		return token.lookup_results[0].part_of_speech as CategoryName
 	} else {
 		return null
 	}

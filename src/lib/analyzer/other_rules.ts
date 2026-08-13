@@ -1,8 +1,7 @@
 import { create_token_filter } from '$lib/rules/rules_parser'
 import { create_lookup_result, TOKEN_TYPE } from '$lib/token'
 
-/** @type {[string, TokenFilter][]} */
-const PUNCTUATION_PARTICLES = [
+const PUNCTUATION_PARTICLES: Array<[string, TokenFilter]> = [
 	['exclamation', create_token_filter({ 'token': '!' })],
 	['-QuoteBegin', create_token_filter({ 'token': '"', 'tag': { 'quote': 'begin' } })],
 	['-QuoteEnd', create_token_filter({ 'token': '"' })],
@@ -10,26 +9,14 @@ const PUNCTUATION_PARTICLES = [
 	['-CommentEnd', create_token_filter({ 'token': '(comment-end)|(end-comment)' })],
 ]
 
-/**
- * @param {Sentence[]} sentences 
- * @returns {Sentence[]} 
- */
-export function replace_punctuation(sentences) {
+export function replace_punctuation(sentences: Sentence[]): Sentence[] {
 	return replace_punctuation_tokens(sentences.map(sentence => sentence.clause)).map(clause => ({ clause }))
 
-	/**
-	 * @param {Token[]} tokens 
-	 * @returns {Token[]}
-	 */
-	function replace_punctuation_tokens(tokens) {
+	function replace_punctuation_tokens(tokens: Token[]): Token[] {
 		return tokens.map(replace_punctuation_token)
 	}
 
-	/**
-	 * @param {Token} token 
-	 * @returns {Token}
-	 */
-	function replace_punctuation_token(token) {
+	function replace_punctuation_token(token: Token): Token {
 		if (token.sub_tokens.length) {
 			token.sub_tokens = replace_punctuation_tokens(token.sub_tokens)
 			return token
@@ -49,13 +36,8 @@ export function replace_punctuation(sentences) {
 	}
 }
 
-/**
- * @param {SimpleSourceEntity[]} entities 
- * @returns {NounListEntry[]}
- */
-export function populate_noun_list(entities) {
-	/** @type {NounListEntry[]} */
-	const noun_list = []
+export function populate_noun_list(entities: SimpleSourceEntity[]): NounListEntry[] {
+	const noun_list: NounListEntry[] = []
 
 	entities.forEach(entity => {
 		if (!entity.concept || entity.concept.part_of_speech !== 'Noun') {
@@ -64,17 +46,17 @@ export function populate_noun_list(entities) {
 		const current_noun = `${entity.concept.stem}-${entity.concept.sense}`
 
 		const existing = noun_list.filter(({ noun }) => noun === current_noun)
-		let noun_list_index = ''
+		let noun_list_index: string
 		if (entity.noun_list_index) {
 			const index = parseInt(entity.noun_list_index)
 			if (index > existing.length) {
 				noun_list_index = next_noun_index()
 				noun_list.push({ index: noun_list_index, noun: current_noun })
 			} else {
-				noun_list_index = existing[index-1].index
+				noun_list_index = existing[index - 1].index
 			}
 		} else if (existing.length) {
-			noun_list_index = existing[existing.length-1].index
+			noun_list_index = existing[existing.length - 1].index
 		} else {
 			noun_list_index = next_noun_index()
 			noun_list.push({ index: noun_list_index, noun: current_noun })
@@ -85,10 +67,7 @@ export function populate_noun_list(entities) {
 
 	return noun_list
 
-	/**
-	 * @returns {NounListIndex}
-	 */
-	function next_noun_index() {
+	function next_noun_index(): NounListIndex {
 		const next = noun_list.length + 1
 		if (next >= 10) {
 			// index 10 and up use capital letters starting with A (ascii 65)

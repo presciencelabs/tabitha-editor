@@ -1,12 +1,11 @@
 import { browser } from '$app/environment'
 import SaveButton from './SaveButton.svelte'
-import { writable } from 'svelte/store'
+import { writable, type Writable } from 'svelte/store'
 
 const saved = init()
 
-/** @returns {import('svelte/store').Writable<string>} */
-function init() {
-	const store = writable('', set => {
+function init(): Writable<string> {
+	const store = writable<string>('', set => {
 		const value = browser && localStorage?.getItem('saved') || ''
 		set(value)
 	})
@@ -15,7 +14,7 @@ function init() {
 
 	return {
 		subscribe,
-		set: value => {
+		set: (value: string) => {
 			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 			browser && localStorage.setItem('saved', value)
 			set(value)

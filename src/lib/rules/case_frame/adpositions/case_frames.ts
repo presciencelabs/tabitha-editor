@@ -102,31 +102,17 @@ function create_usage_rules() {
 		.flatMap(([role_tag, rule_json]) => parse_case_frame_rule('adp_default', role_tag, rule_json))
 }
 
-/**
- * @returns {Map<WordStem, ArgumentRulesForSense[]>}
- */
-function create_adposition_argument_rules() {
-	return new Map([...adposition_case_frames.entries()].map(create_rules_for_stem))
-
-	/**
-	 *
-	 * @param {[WordStem, [WordSense, SenseRuleJson<AdpositionRoleTag>][]]} stem_rules
-	 * @returns {[WordStem, ArgumentRulesForSense[]]}
-	 */
-	function create_rules_for_stem([stem, sense_rules_json]) {
-		return [stem, parse_sense_rules(sense_rules_json, DEFAULT_USAGE_RULES)]
-	}
+function create_adposition_argument_rules(): Map<WordStem, ArgumentRulesForSense[]> {
+	return new Map(Array.from(adposition_case_frames.entries()).map(([stem, sense_rules_json]) => {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		return [stem, parse_sense_rules(sense_rules_json as any, DEFAULT_USAGE_RULES)]
+	}))
 }
 
 const DEFAULT_USAGE_RULES = create_usage_rules()
 const ADPOSITION_USAGE_RULES = create_adposition_argument_rules()
 
-/**
- *
- * @param {Token} token
- * @returns {CaseFrameRuleInfo}
- */
-export function get_adposition_case_frame_rules(token) {
+export function get_adposition_case_frame_rules(token: Token): CaseFrameRuleInfo {
 	const stem = token.lookup_results[0].stem
 	return {
 		rules_by_sense: ADPOSITION_USAGE_RULES.get(stem) ?? [],
@@ -136,11 +122,7 @@ export function get_adposition_case_frame_rules(token) {
 	}
 }
 
-/**
- *
- * @param {LookupResult} lookup
- */
-function get_default_usage_rules(lookup) {
+function get_default_usage_rules(lookup: LookupResult) {
 	const roles = convert_usage_info(lookup.categorization)
 
 	// No adposition has more than one usage value
@@ -154,13 +136,7 @@ const ADPOSITION_LETTER_TO_ROLE = new Map([
 	['C', 'opening_subordinate_clause'],
 ])
 
-/**
- *
- * @param {string} categorization
- * @param {ArgumentRulesForSense} role_rules
- * @returns {RoleUsageInfo}
- */
-function get_adposition_usage_info(categorization, role_rules) {
+function get_adposition_usage_info(categorization: string, role_rules: ArgumentRulesForSense): RoleUsageInfo {
 	const usage_roles = convert_usage_info(categorization)
 
 	const all_roles = usage_roles.concat(role_rules.other_optional).concat(role_rules.other_required)
@@ -180,18 +156,10 @@ function get_adposition_usage_info(categorization, role_rules) {
 	}
 }
 
-/**
- *
- * @param {string} categorization
- */
-function convert_usage_info(categorization) {
+function convert_usage_info(categorization: string): string[] {
 	const role_letters = [...categorization].filter(c => c !== '_')
 
-	/** @type {string[]} */
-	// @ts-expect-error this will never be undefined
-	const roles = role_letters
+	return role_letters
 		.map(c => ADPOSITION_LETTER_TO_ROLE.get(c))
-		.filter(role => role)
-
-	return roles
+		.filter((role): role is string => Boolean(role))
 }

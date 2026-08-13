@@ -1115,37 +1115,20 @@ const verb_case_frames = new Map([
 	]],
 ])
 
-/**
- * @returns {ArgumentRoleRule[]}
- */
-function create_default_argument_rules() {
+function create_default_argument_rules(): ArgumentRoleRule[] {
 	return Object.entries(default_verb_case_frame_json)
-		.flatMap(([role_tag, rule_json]) => parse_case_frame_rule('verb_default', role_tag, rule_json))
+		.flatMap(([role_tag, rule_json]) => parse_case_frame_rule('verb_default', role_tag as RoleTag, rule_json as RoleRuleValueJson))
 }
 
-/**
- * @returns {Map<WordStem, ArgumentRulesForSense[]>}
- */
-function create_verb_argument_rules() {
-	return new Map([...verb_case_frames.entries()].map(create_rules_for_stem))
-
-	/**
-	 *
-	 * @param {[WordStem, [WordSense, SenseRuleJson<VerbRoleTag>][]]} stem_rules
-	 * @returns {[WordStem, ArgumentRulesForSense[]]}
-	 */
-	function create_rules_for_stem([stem, sense_rules_json]) {
+function create_verb_argument_rules(): Map<WordStem, ArgumentRulesForSense[]> {
+	return new Map(Array.from(verb_case_frames.entries()).map(([stem, sense_rules_json]) => {
 		const defaults = get_default_rules_for_stem(stem)
-		return [stem, parse_sense_rules(sense_rules_json, defaults)]
-	}
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		return [stem, parse_sense_rules(sense_rules_json as any, defaults)]
+	}))
 }
 
-/**
- *
- * @param {WordStem} stem
- * @returns {ArgumentRoleRule[]}
- */
-function get_default_rules_for_stem(stem) {
+function get_default_rules_for_stem(stem: WordStem): ArgumentRoleRule[] {
 	if (stem === 'call') {
 		// 'call' is the only verb that can have both a patient and a state
 		return DEFAULT_CASE_FRAME_RULES
@@ -1158,11 +1141,7 @@ function get_default_rules_for_stem(stem) {
 const DEFAULT_CASE_FRAME_RULES = create_default_argument_rules()
 const VERB_CASE_FRAME_RULES = create_verb_argument_rules()
 
-/**
- * @param {Token} token
- * @returns {CaseFrameRuleInfo}
- */
-export function get_verb_case_frame_rules(token) {
+export function get_verb_case_frame_rules(token: Token): CaseFrameRuleInfo {
 	const stem = token.lookup_results[0].stem
 	const argument_rules_by_sense = VERB_CASE_FRAME_RULES.get(stem)
 
@@ -1184,33 +1163,24 @@ export function get_verb_case_frame_rules(token) {
 	}
 }
 
-/**
- * @param {Token} token
- * @returns {CaseFrameRuleInfo}
- */
-export function get_passive_verb_case_frame_rules(token) {
+export function get_passive_verb_case_frame_rules(token: Token): CaseFrameRuleInfo {
 	// for a passive, the 'patient' goes right before the verb and the 'agent' is detected by the adposition 'by'
 	const passive_rules_json = {
 		'patient': directly_before_verb(),
 		'agent': by_adposition('by'),
 	}
 	const passive_rules = Object.entries(passive_rules_json)
-		.flatMap(([role_tag, rule_json]) => parse_case_frame_rule('verb_passive', role_tag, rule_json))
+		.flatMap(([role_tag, rule_json]) => parse_case_frame_rule('verb_passive', role_tag as RoleTag, rule_json as RoleRuleValueJson))
 
 	const active_rules = get_verb_case_frame_rules(token)
 	return {
 		...active_rules,
 		rules_by_sense: active_rules.rules_by_sense
 			.map(rules_for_sense => ({ ...rules_for_sense, role_rules: replace_passive_rules(rules_for_sense.role_rules) })),
-		default_rule_getter: lookup => replace_passive_rules(active_rules.default_rule_getter(lookup)),
+		default_rule_getter: (lookup: LookupResult) => replace_passive_rules(active_rules.default_rule_getter(lookup)),
 	}
 
-	/**
-	 *
-	 * @param {ArgumentRoleRule[]} role_rules
-	 * @returns {ArgumentRoleRule[]}
-	 */
-	function replace_passive_rules(role_rules) {
+	function replace_passive_rules(role_rules: ArgumentRoleRule[]): ArgumentRoleRule[] {
 		return role_rules.filter(rule => !['patient', 'agent'].includes(rule.role_tag)).concat(passive_rules)
 	}
 }
@@ -1227,13 +1197,7 @@ const VERB_LETTER_TO_ROLE = new Map([
 	['I', 'agent_clause'],
 ])
 
-/**
- *
- * @param {string} categorization
- * @param {ArgumentRulesForSense} sense_rules
- * @returns {RoleUsageInfo}
- */
-function get_verb_usage_info(categorization, { other_optional, other_required, patient_clause_type }) {
+function get_verb_usage_info(categorization: string, { other_optional, other_required, patient_clause_type }: ArgumentRulesForSense): RoleUsageInfo {
 	const role_letters = [...categorization].filter(c => c !== '_')
 
 	// some categorizations are blank (eg become-J)
@@ -1249,22 +1213,19 @@ function get_verb_usage_info(categorization, { other_optional, other_required, p
 	// Replace 'patient_clause' with the appropriate clause type
 	patient_clause_type = patient_clause_type || 'patient_clause_different_participant'
 
-	/** @type {string[]} */
-	// @ts-expect-error this will never be undefined
 	const possible_roles = role_letters
 		.map(c => VERB_LETTER_TO_ROLE.get(c.toUpperCase()))
 		.map(role => role === 'patient_clause' ? patient_clause_type : role)
 		.concat([...other_optional, ...other_required, 'beneficiary'])	// beneficiaries are always possible
-		.filter(role => role)
+		.filter((role): role is string => Boolean(role))
 
-	/** @type {string[]} */
-	// @ts-expect-error this will never be undefined
 	const required_roles = role_letters
 		.map(c => VERB_LETTER_TO_ROLE.get(c))
+		// Replace 'patient_clause' with the appropriate clause type
 		.map(role => role === 'patient_clause' ? patient_clause_type : role)
 		.filter(role => role !== 'beneficiary')	// beneficiaries are never required
 		.concat(other_required)
-		.filter(role => role)
+		.filter((role): role is string => Boolean(role))
 
 	return { possible_roles, required_roles }
 }

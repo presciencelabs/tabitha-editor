@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import CopyButton from '$lib/CopyButton.svelte'
 	import { SaveButton, saved } from '$lib/save'
 	import { Tokens } from '$lib/tokens'
@@ -6,7 +6,7 @@
 
 	let entered_text = $state($saved)
 	let checking = $state(false)
-	let check_response = $state({ status: 'ok', tokens: [], back_translation: '' })
+	let check_response = $state<{ status: string; tokens: SimpleToken[]; back_translation: string }>({ status: 'ok', tokens: [], back_translation: '' })
 
 	async function check_text() {
 		checking = true
@@ -15,10 +15,7 @@
 		checking = false
 	}
 
-	/**
-	 * @param {string} text
-	 */
-	function sanitize_input(text) {
+	function sanitize_input(text: string): string {
 		return text.replaceAll('\n', ' ')
 	}
 

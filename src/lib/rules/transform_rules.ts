@@ -4,10 +4,8 @@ import { create_context_filter, create_token_filter, create_token_transform, cre
 /**
  * These are words that may change their underlying data based on the context around them.
  * These can look at the lookup results of the surrounding tokens (ie syntactic category).
- * 
- * @type {TransformRuleJson[]}
  */
-const transform_rules_json = [
+const transform_rules_json: TransformRuleJson[] = [
 	// Verb infinitives and forms
 	{
 		'name': '"to" before a verb gets tagged as infinitive',
@@ -679,13 +677,7 @@ const transform_rules_json = [
 	},
 ]
 
-/**
- *
- * @param {TransformRuleJson} rule_json
- * @param {number} index
- * @returns {TokenRule}
- */
-export function parse_transform_rule(rule_json, index) {
+export function parse_transform_rule(rule_json: TransformRuleJson, index: number): TokenRule {
 	const trigger = create_token_filter(rule_json['trigger'])
 	const context = create_context_filter(rule_json['context'])
 	const transform = 'transform' in rule_json ? create_token_transform(rule_json['transform']) : null
@@ -700,12 +692,7 @@ export function parse_transform_rule(rule_json, index) {
 		action: transform_rule_action,
 	}
 
-	/**
-	 * 
-	 * @param {RuleTriggerContext} trigger_context 
-	 * @returns {number}
-	 */
-	function transform_rule_action({ tokens, trigger_index, context_indexes, subtoken_indexes, rule_id }) {
+	function transform_rule_action({ tokens, trigger_index, context_indexes, subtoken_indexes, rule_id }: RuleTriggerContext): number {
 		if (transform) {
 			tokens[trigger_index] = transform(tokens[trigger_index])
 			tokens[trigger_index].applied_rules.push(`transform - ${rule_id}`)
@@ -716,14 +703,7 @@ export function parse_transform_rule(rule_json, index) {
 		return trigger_index + 1
 	}
 
-	/**
-	 *
-	 * @param {Token[]} tokens
-	 * @param {number[]} token_indexes
-	 * @param {TokenTransform[]} transforms
-	 * @param {string} rule_info
-	 */
-	function apply_token_transforms(tokens, token_indexes, transforms, rule_info) {
+	function apply_token_transforms(tokens: Token[], token_indexes: number[], transforms: TokenTransform[], rule_info: string) {
 		for (let i = 0; i < token_indexes.length && i < transforms.length; i++) {
 			const transformed_token = transforms[i](tokens[token_indexes[i]])
 			transformed_token.applied_rules.push(rule_info)
@@ -732,8 +712,7 @@ export function parse_transform_rule(rule_json, index) {
 	}
 }
 
-/** @type {BuiltInRule[]} */
-const builtin_transform_rules = [
+const builtin_transform_rules: BuiltInRule[] = [
 	{
 		name: "All clauses within a relative clause are tagged as 'in_relative_clause'",
 		comment: '',
@@ -758,17 +737,10 @@ const builtin_transform_rules = [
 	},
 ]
 
-/**
- * @param {Token} clause_token 
- * @param {Tag} tag_to_set 
- */
-function tag_nested_clauses(clause_token, tag_to_set) {
+function tag_nested_clauses(clause_token: Token, tag_to_set: Tag) {
 	const quote_begin_filter = create_token_filter({ 'tag': { 'clause_type': 'patient_clause_quote_begin' } })
 
-	/**
-	 * @param {Token[]} clause_tokens 
-	 */
-	function tag_clause_tokens(clause_tokens) {
+	function tag_clause_tokens(clause_tokens: Token[]) {
 		// the first token is always the opening bracket. this is what we want to tag
 		add_tag_to_token(clause_tokens[0], tag_to_set)
 

@@ -424,54 +424,46 @@ const FEATURE_RULES_BY_CATEGORY = parse_all_feature_rules()
  * @returns {FeatureRulesByCategory}
  */
 function parse_all_feature_rules() {
-	return Object.fromEntries(Object.entries(feature_rules_json).map(([pos, pos_feature_rules_json]) => {
+	return Object.fromEntries(Object.entries(feature_rules_json as unknown as Record<string, [string, [string, unknown][]][]>).map(([pos, pos_feature_rules_json]) => {
 		return [
 			pos,
 			pos_feature_rules_json.map(([feature_name, feature_values_json]) => {
 				return [
 					feature_name,
 					feature_values_json.map(([feature_value, rule_json]) => {
-						return [feature_value, parse_feature_rule_json(pos, feature_name, feature_value, rule_json)]
+						return [feature_value, parse_feature_rule_json(pos, feature_name as FeatureName, feature_value as FeatureValue, rule_json)]
 					}),
 				]
 			}),
 		]
 	}))
 
-	/**
-	 * @param {string} part_of_speech 
-	 * @param {FeatureName} feature_name 
-	 * @param {FeatureValue} feature_value 
-	 * @param {FeatureRuleJson} rule_json 
-	 * @returns {TokenRule[]}
-	 */
-	function parse_feature_rule_json(part_of_speech, feature_name, feature_value, rule_json) {
+	function parse_feature_rule_json(
+		part_of_speech: string,
+		feature_name: FeatureName,
+		feature_value: FeatureValue,
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		rule_json: any,
+	): TokenRule[] {
 		if (Array.isArray(rule_json)) {
 			return rule_json.flatMap(json => parse_feature_rule_json(part_of_speech, feature_name, feature_value, json))
 		}
 
 		const trigger = create_token_filter(rule_json['trigger'] || 'all')
 		const context = create_context_filter(rule_json['context'])
-	
+
 		return [{
 			id: `feature:${part_of_speech}:${feature_name}:${feature_value}`,
 			name: '',
 			trigger,
 			context,
-			action: ({ trigger_index }) => trigger_index + 1,	// No actual action is performed at this level
+			action: ({ trigger_index }) => trigger_index + 1,
 		}]
 	}
 }
 
-/**
- * 
- * @param {Token[]} tokens
- * @param {number} token_index
- * @param {CategoryName} category
- * @return {EntityFeature[]}
- */
-export function get_features_for_token(tokens, token_index, category) {
-	const category_feature_rules = FEATURE_RULES_BY_CATEGORY[category] || []
+export function get_features_for_token(tokens: Token[], token_index: number, category: CategoryName): EntityFeature[] {
+	const category_feature_rules = (FEATURE_RULES_BY_CATEGORY as Record<string, [FeatureName, [FeatureValue, TokenRule[]][]][]>)[category] || []
 	return category_feature_rules.map(([feature_name, feature_rules]) => {
 		const selected_value_rules = feature_rules.findLast(([, rules]) => rules.some(rule => test_feature_rule(tokens, token_index, rule)))
 		return {
@@ -481,12 +473,6 @@ export function get_features_for_token(tokens, token_index, category) {
 	})
 }
 
-/**
- * 
- * @param {Token[]} tokens 
- * @param {number} token_index 
- * @param {TokenRule} rule 
- */
-function test_feature_rule(tokens, token_index, rule) {
+function test_feature_rule(tokens: Token[], token_index: number, rule: TokenRule): boolean {
 	return rule.trigger(tokens[token_index]) && rule.context(tokens, token_index).success
 }

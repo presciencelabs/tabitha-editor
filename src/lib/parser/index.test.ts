@@ -137,7 +137,7 @@ describe('parse', () => {
 			const results = parse_for_test('John said, ["What do you(person) want?"] Then that person took the book [that John had].')
 
 			expect(results).length(24)
-			for (let token of results) {
+			for (const token of results) {
 				expect(token.messages.length).toBe(0)
 			}
 		})

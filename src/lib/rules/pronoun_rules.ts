@@ -34,8 +34,7 @@ export const PRONOUN_TAGS = new Map([
 /**
  * These rules are a subset of the syntax rules
  */
-/** @type {BuiltInRule[]} */
-const builtin_pronoun_rules = [
+const builtin_pronoun_rules: BuiltInRule[] = [
 	{
 		'name': 'Check for invalid stand-alone pronouns',
 		'comment': '',
@@ -49,12 +48,10 @@ const builtin_pronoun_rules = [
 		'name': 'Tag valid pronoun referents and check for invalid ones',
 		'comment': '',
 		'rule': {
-			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD && token.pronoun !== null,
+			trigger: (token: Token) => token.type === TOKEN_TYPE.LOOKUP_WORD && token.pronoun !== null,
 			context: create_context_filter({}),
 			action: message_set_action(({ trigger_token, rule_id }) => {
-				/** @type {Token} */
-				// @ts-expect-error -- the trigger filter ensures this is not null
-				const pronoun = trigger_token.pronoun
+				const pronoun = trigger_token.pronoun!
 				const normalized_pronoun = pronoun.token.toLowerCase()
 
 				const tag = PRONOUN_TAGS.get(normalized_pronoun)

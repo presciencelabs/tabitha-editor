@@ -1,7 +1,6 @@
 import { LOOKUP_FILTERS } from '$lib/lookup_filters'
 import { REGEXES } from '$lib/regexes'
 
-/** @type { { [key: string]: TokenType } } */
 export const TOKEN_TYPE = {
 	PUNCTUATION: 'Punctuation',
 	NOTE: 'Note',
@@ -11,33 +10,42 @@ export const TOKEN_TYPE = {
 	ADDED: 'Added',
 	PHRASE: 'Phrase',
 	GAP: 'Gap',
-}
+} as const
 
-/** @type { { [key: string]: MessageType } } */
-export const MESSAGE_TYPE = {
+export const MESSAGE_TYPE: Record<string, MessageType> = {
 	ERROR: { label: 'error', severity: 0 },
 	WARNING: { label: 'warning', severity: 1 },
 	SUGGEST: { label: 'suggest', severity: 2 },
 	INFO: { label: 'info', severity: 3 },
 }
 
-/**
- * @param {string} token
- * @param {TokenType} type
- * @param {Object} [other_data={}]
- * @param {Message?} [other_data.message=null]
- * @param {Tag} [other_data.tag={}]
- * @param {string} [other_data.specified_sense='']
- * @param {string} [other_data.lookup_term='']
- * @param {LookupResult[]} [other_data.lookup_results=[]]
- * @param {Token[]} [other_data.sub_tokens=[]]
- * @param {Token?} [other_data.pairing=null]
- * @param {PairingType} [other_data.pairing_type='none']
- * @param {Token?} [other_data.pronoun=null]
- * @param {string?} [other_data.rule_info=null]
- * @return {Token}
- */
-export function create_token(token, type, { message=null, tag={}, specified_sense='', lookup_term='', lookup_results=[], sub_tokens=[], pairing=null, pairing_type='none', pronoun=null, rule_info=null }={}) {
+export function create_token(
+	token: string,
+	type: TokenType,
+	{
+		message = null,
+		tag = {},
+		specified_sense = '',
+		lookup_term = '',
+		lookup_results = [],
+		sub_tokens = [],
+		pairing = null,
+		pairing_type = 'none',
+		pronoun = null,
+		rule_info = null,
+	}: {
+		message?: Message | null
+		tag?: Tag
+		specified_sense?: string
+		lookup_term?: string
+		lookup_results?: LookupResult[]
+		sub_tokens?: Token[]
+		pairing?: Token | null
+		pairing_type?: PairingType
+		pronoun?: Token | null
+		rule_info?: string | null
+	} = {},
+): Token {
 	return {
 		token,
 		type,
@@ -54,55 +62,31 @@ export function create_token(token, type, { message=null, tag={}, specified_sens
 	}
 }
 
-/**
- * @param {string} token
- * @param {Message} message
- * @param {string?} rule_id
- * @returns {Token}
- */
-export function create_added_token(token, message, rule_id=null) {
+export function create_added_token(token: string, message: Message, rule_id: string | null = null): Token {
 	const rule_info = rule_id ? `add - ${rule_id}` : null
 	return create_token(token, TOKEN_TYPE.ADDED, { message, rule_info })
 }
 
-/**
- * @param {string} rule_id
- * @param {string} label
- * @param {Tag} [tag={}]
- * @returns {Token}
- */
-export function create_gap_token(rule_id, label, tag={}) {
+export function create_gap_token(rule_id: string, label: string, tag: Tag = {}): Token {
 	const token = `GAP_${label}`
 	const gap_result = create_lookup_result({ stem: token, part_of_speech: 'Noun' })
 	const rule_info = `add - ${rule_id}`
 	return create_token(token, TOKEN_TYPE.GAP, { lookup_results: [gap_result], tag, rule_info })
 }
 
-/**
- * @param {Token[]} sub_tokens
- * @param {Tag} tag
- */
-export function create_clause_token(sub_tokens, tag={ 'clause_type': 'subordinate_clause' }) {
+export function create_clause_token(sub_tokens: Token[], tag: Tag = { clause_type: 'subordinate_clause' }): Token {
 	return create_token('', TOKEN_TYPE.CLAUSE, { sub_tokens, tag })
 }
 
-/**
- * @param {MessageLabel} label
- * @returns {MessageType}
- */
-export function get_message_type(label) {
-	// @ts-expect-error label will never be undefined
-	return Object.values(MESSAGE_TYPE).find(message_type => message_type.label === label)
+export function get_message_type(label: MessageLabel): MessageType {
+	return Object.values(MESSAGE_TYPE).find(message_type => message_type.label === label)!
 }
 
 /**
  * Set the message on the given token in the message info, or the trigger token by default.
  * The message will be formatted based on the given token and the token context values within the rule context.
- *
- * @param {RuleTriggerContext} trigger_context
- * @param {MessageInfo} message_info
  */
-export function set_message(trigger_context, message_info) {
+export function set_message(trigger_context: RuleTriggerContext, message_info: MessageInfo) {
 	const token_to_flag = message_info.token_to_flag ?? trigger_context.trigger_token
 
 	const message_type = Object.values(MESSAGE_TYPE).find(message_type => message_type.label in message_info)
@@ -111,7 +95,7 @@ export function set_message(trigger_context, message_info) {
 		return
 	}
 
-	const message = {
+	const message: Message = {
 		...message_type,
 		message: message_info.plain ? message_text : format_token_message(trigger_context, message_text, token_to_flag),
 		rule_id: trigger_context.rule_id,
@@ -121,11 +105,8 @@ export function set_message(trigger_context, message_info) {
 
 /**
  * Set the message on the given token. No formatting is performed.
- *
- * @param {Token} token
- * @param {Message} message
  */
-export function set_message_plain(token, message) {
+export function set_message_plain(token: Token, message: Message) {
 	token.messages.push(message)
 	token.applied_rules.push(`message:${message.label} - ${message.rule_id}`)
 }
@@ -133,30 +114,15 @@ export function set_message_plain(token, message) {
 /**
  * Format the message based on the trigger token or the given token if provided.
  * The message will also be formatted based on the token context values within the rule context.
- * TODO support markers for subtokens?
- *
- * @param {RuleTriggerContext} trigger_context
- * @param {string} message
- * @param {Token} token
  */
-export function format_token_message({ tokens, trigger_token, context_indexes }, message, token=trigger_token) {
+export function format_token_message({ tokens, trigger_token, context_indexes }: RuleTriggerContext, message: string, token: Token = trigger_token): string {
 	return context_indexes.reduce(replace_context_markers, replace_markers(message, token))
 
-	/**
-	 * @param {string} text
-	 * @param {number} token_index
-	 * @param {number} context_number
-	 */
-	function replace_context_markers(text, token_index, context_number) {
+	function replace_context_markers(text: string, token_index: number, context_number: number): string {
 		return replace_markers(text, tokens[token_index], `${context_number}:`)
 	}
 
-	/**
-	 * @param {string} text
-	 * @param {Token} token
-	 * @param {string} context_prefix
-	 */
-	function replace_markers(text, token, context_prefix='') {
+	function replace_markers(text: string, token: Token, context_prefix: string = ''): string {
 		const result = token.lookup_results.at(0)
 		const stem = result?.stem ?? token.token
 		return text
@@ -167,56 +133,27 @@ export function format_token_message({ tokens, trigger_token, context_indexes },
 	}
 }
 
-/**
- *
- * @param {TokenBase} token
- * @returns {boolean}
- */
-export function token_has_error(token) {
+export function token_has_error(token: TokenBase): boolean {
 	return token_has_message(token, 'error')
 }
 
-/**
- *
- * @param {TokenBase} token
- * @param {MessageLabel?} type_to_check
- * @returns {boolean}
- */
-export function token_has_message(token, type_to_check=null) {
+export function token_has_message(token: TokenBase, type_to_check: MessageLabel | null = null): boolean {
 	return type_to_check
 		? token.messages.some(({ label }) => label === type_to_check)
 		: token.messages.length > 0
 }
 
-/**
- *
- * @param {Token} token
- * @returns {boolean}
- */
-export function is_one_part_of_speech(token) {
+export function is_one_part_of_speech(token: Token): boolean {
 	const part_of_speech_0 = token.lookup_results.at(0)?.part_of_speech ?? ''
 	return token.lookup_results.every(LOOKUP_FILTERS.IS_PART_OF_SPEECH(part_of_speech_0))
 }
 
-/**
- *
- * @param {string} term
- * @returns {{stem: string, sense: string}}
- */
-export function split_stem_and_sense(term) {
-	/** @type {RegExpMatchArray} */
-	// @ts-expect-error the match will always succeed
-	const match = term.match(REGEXES.EXTRACT_STEM_AND_SENSE)
+export function split_stem_and_sense(term: string): { stem: string, sense: string } {
+	const match = term.match(REGEXES.EXTRACT_STEM_AND_SENSE)!
 	return { stem: match[1], sense: match[2] ?? '' }
 }
 
-/**
- *
- * @param {Token} token
- * @param {Tag} tag
- * @param {string} [rule_id='Unknown'] 
- */
-export function add_tag_to_token(token, tag, rule_id='Unknown') {
+export function add_tag_to_token(token: Token, tag: Tag, rule_id: string = 'Unknown') {
 	token.tag = { ...token.tag, ...tag }
 	token.applied_rules.push(`tag:${Object.keys(tag).join('|')} - ${rule_id}`)
 }
@@ -224,18 +161,14 @@ export function add_tag_to_token(token, tag, rule_id='Unknown') {
 /**
  * This checks if there is any value for a specific key, or if any of the given values
  * are present for the specified keys.
- *
- * @param {Token} token
- * @param {Tag | string | (Tag | string)[]} tag_to_check
- * @returns {boolean}
  */
-export function token_has_tag(token, tag_to_check) {
+export function token_has_tag(token: Token, tag_to_check: Tag | string | (Tag | string)[]): boolean {
 	if (Array.isArray(tag_to_check)) {
 		return tag_to_check.some(tag => token_has_tag(token, tag))
 	}
 	if (typeof tag_to_check === 'string') {
 		const filter_keys = tag_to_check.split('|')
-		return filter_keys.some(key => token.tag[key]?.length > 0 )
+		return filter_keys.some(key => (token.tag[key]?.length ?? 0) > 0)
 	}
 	return Object.entries(tag_to_check).every(([key, value]) => {
 		const tag_values = token.tag[key]?.split('|') ?? []
@@ -251,53 +184,43 @@ export function token_has_tag(token, tag_to_check) {
 	})
 }
 
-/**
- *
- * @param {Token} token
- * @returns {Token[]}
- */
-export function flatten_token(token) {
+export function flatten_token(token: Token): Token[] {
 	if (token.type === TOKEN_TYPE.CLAUSE) {
 		return token.sub_tokens.flatMap(flatten_token)
 	}
 	return [token]
 }
 
-/**
- *
- * @param {Sentence} sentence
- * @returns {Token[]}
- */
-export function flatten_sentence(sentence) {
+export function flatten_sentence(sentence: Sentence): Token[] {
 	return flatten_token(sentence.clause)
 }
 
-/**
- * @param {{stem: string, sense: string}} result
- * @returns {string}
- */
-export function stem_with_sense(result) {
+export function stem_with_sense(result: { stem: string, sense: string }): string {
 	return result.sense.length ? `${result.stem}-${result.sense}` : result.stem
 }
 
-/**
- *
- * @param {{ stem: string, part_of_speech: string }} lookup
- * @param {Object} [other_data={}]
- * @param {string} [other_data.form='']
- * @param {string} [other_data.sense='']
- * @param {number} [other_data.level=-1]
- * @param {string} [other_data.gloss='']
- * @param {string} [other_data.categorization='']
- * @param {HowToEntry[]} [other_data.how_to=[]]
- * @param {CaseFrameResult?} [other_data.case_frame=null]
- * @param {OntologyStatus} [other_data.ontology_status='unknown']
- * @returns {LookupResult}
- */
 export function create_lookup_result(
-	{ stem, part_of_speech },
-	{ form='stem', sense='', level=-1, gloss='', categorization='', how_to=[], case_frame=null, ontology_status='unknown' }={},
-) {
+	{ stem, part_of_speech }: { stem: string, part_of_speech: string },
+	{
+		form = 'stem',
+		sense = '',
+		level = -1,
+		gloss = '',
+		categorization = '',
+		how_to = [],
+		case_frame = null,
+		ontology_status = 'unknown',
+	}: {
+		form?: string
+		sense?: string
+		level?: number
+		gloss?: string
+		categorization?: string
+		how_to?: HowToEntry[]
+		case_frame?: CaseFrameResult | null
+		ontology_status?: OntologyStatus
+	} = {},
+): LookupResult {
 	return {
 		stem,
 		part_of_speech,
@@ -319,16 +242,19 @@ export function create_lookup_result(
 	}
 }
 
-/**
- *
- * @param {Object} [data={}]
- * @param {CaseFrameStatus} [data.status='unchecked']
- * @param {RoleMatchResult[]} [data.valid_arguments=[]]
- * @param {RoleMatchResult[]} [data.extra_arguments=[]]
- * @param {RoleTag[]} [data.missing_arguments=[]]
- * @returns {CaseFrameResult}
- */
-export function create_case_frame({ status='unchecked', valid_arguments=[], extra_arguments=[], missing_arguments=[] }={}) {
+export function create_case_frame(
+	{
+		status = 'unchecked',
+		valid_arguments = [],
+		extra_arguments = [],
+		missing_arguments = [],
+	}: {
+		status?: CaseFrameStatus
+		valid_arguments?: RoleMatchResult[]
+		extra_arguments?: RoleMatchResult[]
+		missing_arguments?: RoleTag[]
+	} = {},
+): CaseFrameResult {
 	return {
 		status,
 		valid_arguments,

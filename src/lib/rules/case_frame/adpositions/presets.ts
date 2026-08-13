@@ -41,12 +41,7 @@ export function head_noun_post() {
 	}
 }
 
-/**
- * 
- * @param {TokenContextFilterJson} relative_context 
- * @returns {CaseFrameRuleJson}
- */
-export function by_relative_context(relative_context) {
+export function by_relative_context(relative_context: TokenContextFilterJson): CaseFrameRuleJson {
 	return {
 		'trigger': 'all',
 		'context': relative_context,

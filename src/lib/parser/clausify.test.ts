@@ -3,33 +3,16 @@ import { TOKEN_TYPE, create_clause_token, create_added_token, create_token, MESS
 import { ERRORS } from './error_messages'
 import { clausify } from './clausify'
 
-/**
- *
- * @param {string[]} tokens
- * @returns {Token[]}
- */
-function create_tokens(tokens) {
-	/** @type {(token: string) => TokenType} */
-	const type = token => token.length > 1 ? TOKEN_TYPE.LOOKUP_WORD : TOKEN_TYPE.PUNCTUATION
+function create_tokens(tokens: string[]): Token[] {
+	const type = (token: string): TokenType => token.length > 1 ? TOKEN_TYPE.LOOKUP_WORD : TOKEN_TYPE.PUNCTUATION
 	return tokens.map(token => create_token(token, type(token)))
 }
 
-/**
- * 
- * @param {Token[]} tokens 
- * @returns {Sentence}
- */
-function create_sentence(tokens) {
+function create_sentence(tokens: Token[]): Sentence {
 	return { clause: create_clause_token(tokens, { 'clause_type': 'main_clause' }) }
 }
 
-/**
- * 
- * @param {string} token 
- * @param {string} message 
- * @returns {Token}
- */
-function create_error_token(token, message) {
+function create_error_token(token: string, message: string): Token {
 	return create_added_token(token, { ...MESSAGE_TYPE.ERROR, message, rule_id: 'clause:syntax' })
 }
 

@@ -4,11 +4,7 @@ import { perform_form_lookups, perform_ontology_lookups } from '$lib/lookups'
 import { clausify, flatten_sentences } from './clausify'
 import { RULES, rules_applier } from '$lib/rules'
 
-/**
- * @param {string} text
- * @returns {Promise<Sentence[]>}
- */
-export async function parse(text) {
+export async function parse(text: string): Promise<Sentence[]> {
 	return await pipe_async(
 		tokenize_input,
 		clausify,
@@ -24,11 +20,8 @@ export async function parse(text) {
 
 /**
  * TODO: temporary... need to build e2e testing infrastructure
- * 
- * @param {string} text
- * @returns {Token[]}
  */
-export function parse_for_test(text) {
+export function parse_for_test(text: string): Token[] {
 	return pipe(
 		tokenize_input,
 		clausify,
@@ -37,7 +30,7 @@ export function parse_for_test(text) {
 		rules_applier(RULES.PART_OF_SPEECH),
 		rules_applier(RULES.TRANSFORM),
 		rules_applier(RULES.ARGUMENT_AND_SENSE),
-		rules_applier(RULES.CHECKER.slice(0,5)),	// TODO remove slice when e2e testing is set up (skips the 'no lookup' check)
+		rules_applier(RULES.CHECKER.slice(0, 5)),	// TODO remove slice when e2e testing is set up (skips the 'no lookup' check)
 		flatten_sentences,
 	)(text)
 }

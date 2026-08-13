@@ -44,7 +44,7 @@ const builtin_syntax_rules = [
 		name: "Set tag for words with possessive 's as genitive_saxon",
 		comment: '',
 		rule: {
-			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD && REGEXES.HAS_POSSESSIVE.test(token.token),
+			trigger: (token: Token) => token.type === TOKEN_TYPE.LOOKUP_WORD && REGEXES.HAS_POSSESSIVE.test(token.token),
 			context: create_context_filter({}),
 			action: simple_rule_action(({ trigger_token, rule_id }) => {
 				add_tag_to_token(trigger_token, { 'relation': 'genitive_saxon' }, rule_id)
@@ -55,7 +55,7 @@ const builtin_syntax_rules = [
 		name: 'Tag numbers at the start of a verse references',
 		comment: '',
 		rule: {
-			trigger: token => /^\d/.test(token.token),
+			trigger: (token: Token) => /^\d/.test(token.token),
 			context: create_context_filter({
 				'followedby': { 'tag': { 'syntax': 'verse_ref_colon' } },
 			}),
@@ -68,11 +68,11 @@ const builtin_syntax_rules = [
 		name: 'Tag and/or split numbers at the end of a verse references',
 		comment: '',
 		rule: {
-			trigger: token => /^\d/.test(token.token),
+			trigger: (token: Token) => /^\d/.test(token.token),
 			context: create_context_filter({
 				'precededby': { 'tag': { 'syntax': 'verse_ref_colon' } },
 			}),
-			action: ({ tokens, trigger_index, trigger_token, rule_id }) => {
+			action: ({ tokens, trigger_index, trigger_token, rule_id }: RuleTriggerContext) => {
 				if (trigger_token.token.includes('-')) {
 					// this is a verse range (eg. Jeremiah 31:31-34)
 					const verse_numbers = trigger_token.token.split('-')
@@ -106,16 +106,11 @@ const builtin_syntax_rules = [
 
 export const SYNTAX_RULES = builtin_syntax_rules.map(from_built_in_rule('syntax')).concat(PRONOUN_RULES)
 
-/**
- * 
- * @param {Token} token 
- * @returns {Token|undefined}
- */
-export function find_first_word(token) {
+export function find_first_word(token: Token): Token | undefined {
 	if (token_is_word(token)) {
 		return token
 	}
-	for (let sub_token of token.sub_tokens) {
+	for (const sub_token of token.sub_tokens) {
 		const result = find_first_word(sub_token)
 		if (result) {
 			return result
@@ -123,14 +118,8 @@ export function find_first_word(token) {
 	}
 	return undefined
 
-	/**
-	 * 
-	 * @param {Token} token 
-	 * @returns {boolean}
-	 */
-	function token_is_word(token) {
-		/** @type {TokenType[]} */
-		const word_types = [TOKEN_TYPE.LOOKUP_WORD, TOKEN_TYPE.FUNCTION_WORD]
+	function token_is_word(token: Token): boolean {
+		const word_types: TokenType[] = [TOKEN_TYPE.LOOKUP_WORD, TOKEN_TYPE.FUNCTION_WORD]
 
 		return word_types.includes(token.type)
 			|| token.token.length > 0 && REGEXES.WORD_START_CHAR.test(token.token[0])

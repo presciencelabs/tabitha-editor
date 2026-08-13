@@ -4,9 +4,9 @@ import { RULES } from '$lib/rules'
 import { apply_rules } from '$lib/rules/rules_processor'
 import { json } from '@sveltejs/kit'
 
-/** @type {import('./$types').RequestHandler} */
-export async function GET({ url: { searchParams } }) {
-	/** @type {string} */
+import type { RequestEvent } from './$types'
+
+export async function GET({ url: { searchParams } }: RequestEvent) {
 	const text = searchParams.get('text') ?? ''
 
 	const sentences = await parse(text)
@@ -17,18 +17,12 @@ export async function GET({ url: { searchParams } }) {
 
 	return response({ status: get_status(tokens), tokens, back_translation })
 
-	/** @param {CheckResponse} result  */
-	function response(result) {
+	function response(result: CheckResponse) {
 		return json(result)
 	}
 }
 
-/**
- * 
- * @param {SimpleToken[]} tokens 
- * @returns {CheckStatus}
- */
-function get_status(tokens) {
+function get_status(tokens: SimpleToken[]): CheckStatus {
 	const all_messages = tokens.flatMap(expand_token).flatMap(token => token.messages)
 	const has_error = all_messages.some(msg => msg.label === 'error')
 	const has_warning = all_messages.some(msg => msg.label === 'warning')
@@ -42,12 +36,7 @@ function get_status(tokens) {
 	return 'ok'
 }
 
-/**
- * 
- * @param {SimpleToken} token 
- * @returns {SimpleToken[]}
- */
-function expand_token(token) {
+function expand_token(token: SimpleToken): SimpleToken[] {
 	if (token.pairing) {
 		return [token, token.pairing]
 	} else if (token.pronoun) {
@@ -59,25 +48,15 @@ function expand_token(token) {
 	}
 }
 
-/**
- * 
- * @param {Sentence[]} sentences
- * @returns {SimpleToken[]}
- */
-function simplify_tokens(sentences) {
+function simplify_tokens(sentences: Sentence[]): SimpleToken[] {
 	return sentences.map(({ clause }) => simplify_token(clause))
 
-	/**
-	 * 
-	 * @param {Token} token 
-	 * @returns {SimpleToken}
-	 */
-	function simplify_token({ token, type, tag, messages, lookup_results, pairing, pairing_type, pronoun, sub_tokens, applied_rules }) {
+	function simplify_token({ token, type, tag, messages, lookup_results, pairing, pairing_type, pronoun, sub_tokens, applied_rules }: Token): SimpleToken {
 		return {
 			token,
 			type,
 			tag,
-			messages: messages.toSorted((a, b) => a.severity - b.severity),
+			messages: messages.toSorted((a: Message, b: Message) => a.severity - b.severity),
 			lookup_results: lookup_results.map(simplify_lookup),
 			pairing: pairing ? simplify_token(pairing) : null,
 			pairing_type,
@@ -87,12 +66,7 @@ function simplify_tokens(sentences) {
 		}
 	}
 
-	/**
-	 * 
-	 * @param {LookupResult} lookup 
-	 * @returns {SimpleLookupResult}
-	 */
-	function simplify_lookup({ stem, part_of_speech, sense, form, level, gloss, categorization, ontology_status, how_to_entries, case_frame }) {
+	function simplify_lookup({ stem, part_of_speech, sense, form, level, gloss, categorization, ontology_status, how_to_entries, case_frame }: LookupResult): SimpleLookupResult {
 		return {
 			stem,
 			part_of_speech,
@@ -107,27 +81,17 @@ function simplify_tokens(sentences) {
 		}
 	}
 
-	/**
-	 * 
-	 * @param {CaseFrame} case_frame 
-	 * @returns {SimpleCaseFrame}
-	 */
-	function simplify_case_frame({ usage: { possible_roles, required_roles }, result: { status, valid_arguments, extra_arguments, missing_arguments } }) {
+	function simplify_case_frame({ usage: { possible_roles, required_roles }, result: { status, valid_arguments, extra_arguments, missing_arguments } }: CaseFrame): SimpleCaseFrame {
 		return {
 			status,
-			valid_arguments: valid_arguments.reduce(simplify_argument_result, {}),
-			extra_arguments: extra_arguments.reduce(simplify_argument_result, {}),
+			valid_arguments: valid_arguments.reduce(simplify_argument_result, {} as SimpleRoleArgResult),
+			extra_arguments: extra_arguments.reduce(simplify_argument_result, {} as SimpleRoleArgResult),
 			missing_arguments,
 			possible_roles,
 			required_roles,
 		}
 
-		/**
-		 * 
-		 * @param {SimpleRoleArgResult} result 
-		 * @param {RoleMatchResult} match 
-		 */
-		function simplify_argument_result(result, match) {
+		function simplify_argument_result(result: SimpleRoleArgResult, match: RoleMatchResult) {
 			const { trigger_token } = match.trigger_context
 			return {
 				...result,

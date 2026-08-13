@@ -5,10 +5,7 @@ import { REGEXES } from '$lib/regexes'
 import { validate_case_frame } from './case_frame'
 import { create_context_filter, create_token_filter, from_built_in_rule, message_set_action } from './rules_parser'
 
-/**
- * @type {CheckerRuleJson[]}
- */
-const checker_rules_json = [
+const checker_rules_json: CheckerRuleJson[] = [
 	{
 		'name': 'Check for "it" apart from an agent clause',
 		'trigger': { 'tag': { 'syntax': 'agent_proposition_subject' } },
@@ -623,11 +620,7 @@ const builtin_checker_rules = [
 					yield check_for_empty_theta_grid(trigger_token.pairing)
 				}
 
-				/**
-				 * @param {Token} token
-				 * @return {MessageInfo}
-				 */
-				function check_for_empty_theta_grid(token) {
+				function check_for_empty_theta_grid(token: Token): MessageInfo {
 					if (token.lookup_results.length === 0) {
 						return {}
 					}
@@ -654,13 +647,9 @@ const builtin_checker_rules = [
 				// the stack makes it easy to track state as we go up and down clause nesting levels
 				let is_complex_alternate_stack = [false]
 
-				/** @type {MessageInfo[]} */
-				const messages = []
+				const messages: MessageInfo[] = []
 
-				/**
-				 * @param {Token[]} clause_tokens
-				 */
-				function search_clause_tokens(clause_tokens) {
+				function search_clause_tokens(clause_tokens: Token[]) {
 					for (let i = 0; i < clause_tokens.length; i++) {
 						const token = clause_tokens[i]
 						if (complex_alternate_filter(token)) {
@@ -693,7 +682,7 @@ const builtin_checker_rules = [
 		name: 'Check word complexity level of complex pairings',
 		comment: '',
 		rule: {
-			trigger: token => token.pairing_type === 'complex',
+			trigger: (token: Token) => token.pairing_type === 'complex',
 			context: create_context_filter({}),
 			action: message_set_action(function* ({ trigger_token: token }) {
 				// a complex pairing word should never be level 0 or 1
@@ -707,7 +696,7 @@ const builtin_checker_rules = [
 		name: 'Warn user if the word\'s complexity is ambiguous',
 		comment: '',
 		rule: {
-			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD,
+			trigger: (token: Token) => token.type === TOKEN_TYPE.LOOKUP_WORD,
 			context: create_context_filter({}),
 			action: message_set_action(function* ({ trigger_token: token }) {
 				// Alert if the first result is complex and there are also non-complex results (including proper nouns - see 'ark')
@@ -734,7 +723,7 @@ const builtin_checker_rules = [
 		name: 'Check ontology status',
 		comment: '',
 		rule: {
-			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD,
+			trigger: (token: Token) => token.type === TOKEN_TYPE.LOOKUP_WORD,
 			context: create_context_filter({}),
 			action: message_set_action(function* ({ trigger_token: token }) {
 				yield* check_ontology_status(token)
@@ -749,7 +738,7 @@ const builtin_checker_rules = [
 		name: 'Check for words with ambiguous parts of speech',
 		comment: '',
 		rule: {
-			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD && !is_one_part_of_speech(token),
+			trigger: (token: Token) => token.type === TOKEN_TYPE.LOOKUP_WORD && !is_one_part_of_speech(token),
 			context: create_context_filter({}),
 			action: message_set_action(function* () {
 				yield { warning: 'The editor cannot determine which part of speech this word is, so some errors and warnings within the same clause may not be accurate.' }
@@ -833,19 +822,11 @@ const builtin_checker_rules = [
 	},
 ]
 
-/**
- *
- * @param {CheckerRuleJson} rule_json
- * @param {number} index
- * @returns {TokenRule}
- */
-export function parse_checker_rule(rule_json, index) {
+export function parse_checker_rule(rule_json: CheckerRuleJson, index: number): TokenRule {
 	const trigger = create_token_filter(rule_json['trigger'])
 	const context = create_context_filter(rule_json['context'])
 
-	/** @type {MessageType} */
-	// @ts-expect-error there will always be a message
-	const message_type = Object.values(MESSAGE_TYPE).find(({ label }) => label in rule_json)
+	const message_type = Object.values(MESSAGE_TYPE).find(({ label }) => label in rule_json)!
 	const checker_action_json = rule_json[message_type.label] ?? { 'message': 'will never be undefined' }
 	const action = checker_action(checker_action_json, message_type)
 
@@ -857,17 +838,12 @@ export function parse_checker_rule(rule_json, index) {
 		action,
 	}
 
-	/**
-	 * @param {CheckerActionJson} action
-	 * @param {MessageType} message_type
-	 * @returns {RuleAction}
-	 */
-	function checker_action(action, message_type) {
+	function checker_action(action: CheckerActionJson, message_type: MessageType): RuleAction {
 		return trigger_context => {
 			const { tokens, trigger_index, rule_id } = trigger_context
 
 			const formatted_message = format_token_message(trigger_context, action.message)
-			const message = {
+			const message: Message = {
 				...message_type,
 				message: formatted_message,
 				rule_id: trigger_context.rule_id,
@@ -889,12 +865,7 @@ export function parse_checker_rule(rule_json, index) {
 		}
 	}
 
-	/**
-	 *
-	 * @param {CheckerActionJson} action
-	 * @param {RuleTriggerContext} trigger_context
-	 */
-	function get_token_to_flag(action, { tokens, trigger_token, context_indexes, subtoken_indexes }) {
+	function get_token_to_flag(action: CheckerActionJson, { tokens, trigger_token, context_indexes, subtoken_indexes }: RuleTriggerContext): Token {
 		if (!action.on) {
 			return trigger_token
 		}
@@ -907,24 +878,15 @@ export function parse_checker_rule(rule_json, index) {
 
 export const CHECKER_RULES = builtin_checker_rules.map(from_built_in_rule('checker')).concat(checker_rules_json.map(parse_checker_rule))
 
-/**
- *
- * @param {LookupFilter} level_check
- * @returns {TokenFilter}
- */
-function check_token_level(level_check) {
+function check_token_level(level_check: LookupFilter): TokenFilter {
 	return token => {
 		return token.lookup_results.length > 0
-			&& (token.specified_sense && level_check(token.lookup_results[0])
-				|| token.lookup_results.every(result => level_check(result)))
+			&& (token.specified_sense ? level_check(token.lookup_results[0])
+				: token.lookup_results.every(result => level_check(result)))
 	}
 }
-/**
- *
- * @param {LookupFilter} level_check
- * @returns {TokenFilter}
- */
-function check_ambiguous_level(level_check) {
+
+function check_ambiguous_level(level_check: LookupFilter): TokenFilter {
 	return token => {
 		return token.specified_sense.length === 0
 			&& token.lookup_results.length > 0
@@ -933,13 +895,9 @@ function check_ambiguous_level(level_check) {
 	}
 }
 
-/**
- *
- * @param {Token} token
- */
-function* check_ontology_status(token) {
+function* check_ontology_status(token: Token): Generator<MessageInfo, void, unknown> {
 	if (token.lookup_results.some(LOOKUP_FILTERS.IS_IN_ONTOLOGY)) {
-		return {}
+		return
 	}
 
 	const top_result = token.lookup_results.at(0)

@@ -59,12 +59,7 @@ export function with_no_double_patient() {
 	}
 }
 
-/**
- * 
- * @param {string} adposition 
- * @returns {CaseFrameRuleJson}
- */
-export function by_adposition(adposition) {
+export function by_adposition(adposition: string): CaseFrameRuleJson {
 	return {
 		'trigger': { 'tag': { 'syntax': 'head_np' } },
 		'context': { 'precededby': { 'token': adposition, 'skip': 'np_modifiers' } },
@@ -75,10 +70,8 @@ export function by_adposition(adposition) {
 
 /**
  * Different from by_adposition() in that the adposition remains a lexical concept as opposed to becoming a function word.
- * @param {string} adposition
- * @returns {RoleRuleValueJson}
  */
-export function by_adposition_concept(adposition='') {
+export function by_adposition_concept(adposition = ''): RoleRuleValueJson {
 	if (adposition) {
 		// If specific adpositions are provided, filter by those only.
 		return {
@@ -111,23 +104,13 @@ export function by_adposition_concept(adposition='') {
 	}
 }
 
-/**
- * 
- * @param {string} clause_type 
- * @returns {CaseFrameRuleJson}
- */
-export function by_clause_tag(clause_type) {
+export function by_clause_tag(clause_type: string): CaseFrameRuleJson {
 	return {
 		'trigger': { 'type': TOKEN_TYPE.CLAUSE, 'tag': { 'clause_type': clause_type, 'role': 'none' } },
 	}
 }
 
-/**
- * 
- * @param {string} complementizer 
- * @returns {CaseFrameRuleJson}
- */
-export function by_complementizer(complementizer) {
+export function by_complementizer(complementizer: string): CaseFrameRuleJson {
 	return {
 		'trigger': { 'type': TOKEN_TYPE.CLAUSE, 'tag': { 'clause_type': 'adverbial_clause|patient_clause_different_participant' } },
 		'context': {
@@ -139,12 +122,7 @@ export function by_complementizer(complementizer) {
 	}
 }
 
-/**
- * 
- * @param {TokenFilterJsonBase} token_filter 
- * @returns {CaseFrameRuleJson}
- */
-export function directly_before_verb(token_filter={}) {
+export function directly_before_verb(token_filter: TokenFilterJsonBase = {}): CaseFrameRuleJson {
 	return by_relative_context({
 		'precededby': {
 			'tag': { 'syntax': 'head_np' },
@@ -154,12 +132,7 @@ export function directly_before_verb(token_filter={}) {
 	})
 }
 
-/**
- * 
- * @param {TokenFilterJsonBase} token_filter 
- * @returns {CaseFrameRuleJson}
- */
-export function directly_after_verb(token_filter={}) {
+export function directly_after_verb(token_filter: TokenFilterJsonBase = {}): CaseFrameRuleJson {
 	return by_relative_context({
 		'followedby': {
 			'tag': { 'syntax': 'head_np' },
@@ -169,12 +142,7 @@ export function directly_after_verb(token_filter={}) {
 	})
 }
 
-/**
- * 
- * @param {string} adposition 
- * @returns {CaseFrameRuleJson}
- */
-export function directly_after_verb_with_adposition(adposition) {
+export function directly_after_verb_with_adposition(adposition: string): CaseFrameRuleJson {
 	return {
 		...by_relative_context({
 			'followedby': [
@@ -183,16 +151,12 @@ export function directly_after_verb_with_adposition(adposition) {
 			],
 		}),
 		'argument_context_index': 1,
-		'context_transform': { 'function': { 'pre_np_adposition': 'verb_argument' } },	// make the adposition a function word
+		'context_transform': { 'function': { 'pre_np_adposition': 'verb_argument' } }, // make the adposition a function word
 		'missing_message': `'${adposition} X'`,
 	}
 }
 
-/**
- * 
- * @returns {CaseFrameRuleJson}
- */
-export function predicate_adjective() {
+export function predicate_adjective(): CaseFrameRuleJson {
 	return by_relative_context({
 		'followedby': {
 			'category': 'Adjective',
@@ -202,12 +166,7 @@ export function predicate_adjective() {
 	})
 }
 
-/**
- * 
- * @param {TokenContextFilterJson} relative_context 
- * @returns {CaseFrameRuleJson}
- */
-export function by_relative_context(relative_context) {
+export function by_relative_context(relative_context: TokenContextFilterJson): CaseFrameRuleJson {
 	return {
 		'trigger': 'all',
 		'context': relative_context,
