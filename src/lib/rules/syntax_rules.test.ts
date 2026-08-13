@@ -130,4 +130,18 @@ describe('sentence syntax: first_word detection', () => {
 		expect(result_tokens[8].tag).not.toHaveProperty('position', 'first_word')
 		expect(result_tokens[9].tag).not.toHaveProperty('position', 'first_word')
 	})
+
+	test('verse reference syntax rule tags single and ranged verse numbers', () => {
+		const test_tokens = clausify(tokenize_input('Verse 5:10 text.'))
+		const result_tokens = apply_rules(test_tokens, SYNTAX_RULES).flatMap(flatten_sentence)
+
+		const colon_token = result_tokens.find(t => t.token === ':')
+		expect(colon_token?.tag).toHaveProperty('syntax', 'verse_ref_colon')
+
+		const range_tokens = clausify(tokenize_input('Verse 5:10-12 text.'))
+		const range_result = apply_rules(range_tokens, SYNTAX_RULES).flatMap(flatten_sentence)
+
+		const hyphen_token = range_result.find(t => t.token === '-')
+		expect(hyphen_token?.tag).toHaveProperty('syntax', 'verse_ref_hyphen')
+	})
 })

@@ -1,6 +1,6 @@
-import { textify } from '.'
+import { textify, remove_some_gap_tokens, find_replace, backtranslate } from '.'
 import { describe, expect, test } from 'vitest'
-import { MESSAGE_TYPE, create_added_token } from '$lib/token'
+import { MESSAGE_TYPE, TOKEN_TYPE, create_token, create_added_token, create_gap_token, create_clause_token } from '$lib/token'
 import { tokenize_input } from '$lib/parser/tokenize'
 import { clausify } from '$lib/parser/clausify'
 import { RULES, rules_applier } from '$lib/rules'
@@ -45,6 +45,32 @@ describe('textify', () => {
 		expect(result).toBe(expected)
 	})
 
+})
+
+describe('backtranslate integration and helper pipeline functions', () => {
+	test('remove_some_gap_tokens filters out GAP_INTV_V tokens', () => {
+		const gap_token = create_gap_token('rule:1', 'INTV_V')
+		const normal_token = create_token('John', TOKEN_TYPE.LOOKUP_WORD, { lookup_term: 'John' })
+		const sentence: Sentence = { clause: create_clause_token([gap_token, normal_token]) }
+
+		const cleaned = remove_some_gap_tokens([sentence])
+		expect(cleaned[0].clause.sub_tokens).toHaveLength(1)
+		expect(cleaned[0].clause.sub_tokens[0].token).toBe('John')
+	})
+
+	test('find_replace formats verse references, quotes, and punctuation spacing', () => {
+		const text = '1: 10 - 12 , " Hello world " >> <<'
+		const formatted = find_replace(text)
+		expect(formatted).not.toContain(' - ')
+		expect(formatted).not.toContain(', " ')
+	})
+
+	test('backtranslate full end-to-end pipeline', () => {
+		const test_tokens = tokenize_input('Jesus prayed to God.')
+		const result = backtranslate(clausify(test_tokens))
+		expect(typeof result).toBe('string')
+		expect(result).toContain('Jesus')
+	})
 })
 
 // TODO need E2E testing for these
