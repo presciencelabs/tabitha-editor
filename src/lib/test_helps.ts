@@ -1,8 +1,8 @@
 import { expect } from 'vitest'
-import { MESSAGE_TYPE, get_message_type } from './token'
+import { get_message_type } from './token'
 
 export function expect_error(token: Token | null | undefined, message: string) {
-	expect(token?.messages).toContainEqual(expect.objectContaining({ ...MESSAGE_TYPE.ERROR, message }))
+	expect_message(token, 'error', message)
 }
 
 export function expect_message(token: Token | null | undefined, label: MessageLabel, message: string) {
@@ -10,8 +10,7 @@ export function expect_message(token: Token | null | undefined, label: MessageLa
 }
 
 export function expect_error_to_match(token: Token | null | undefined, regex: RegExp) {
-	expect(token?.messages[0].label).toBe('error')
-	expect(token?.messages[0].message).toMatch(regex)
+	expect_message_to_match(token, 'error', regex)
 }
 
 export function expect_message_to_match(token: Token | null | undefined, message_type: MessageLabel, regex: RegExp) {
