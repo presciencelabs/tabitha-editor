@@ -6,8 +6,7 @@ import { create_context_filter, create_token_filter, simple_rule_action, from_bu
 /**
  * These rules are for tagging tokens based on the syntax. These cannot rely on any lookup data.
  */
-/** @type {BuiltInRule[]} */
-const builtin_syntax_rules = [
+const builtin_syntax_rules: BuiltInRule[] = [
 	{
 		name: 'Set tag for quote clauses',
 		comment: '',

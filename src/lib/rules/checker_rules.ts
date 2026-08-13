@@ -572,8 +572,7 @@ const checker_rules_json: CheckerRuleJson[] = [
 	},
 ]
 
-/** @type {BuiltInRule[]} */
-const builtin_checker_rules = [
+const builtin_checker_rules: BuiltInRule[] = [
 	{
 		name: 'Check capitalization for first word in a sentence or quote',
 		comment: '',

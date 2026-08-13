@@ -136,8 +136,7 @@ describe('token filters', () => {
 		expect(results[5]).toBe(true)
 	})
 	test('by anded tag options', () => {
-		/** @type {TokenFilterJson} */
-		const filter_json = { 'tag': [{ 'key1': 'value1&value3' }] }
+		const filter_json: TokenFilterJson = { 'tag': [{ 'key1': 'value1&value3' }] }
 		const filter = create_token_filter(filter_json)
 
 		const tokens = [

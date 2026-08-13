@@ -8,8 +8,7 @@ import { initialize_case_frame_rules, check_case_frames, check_pairing_case_fram
 import { fill_interrogative_gap, fill_relative_clause_gap, fill_same_subject_gap, handle_be_interrogative, restore_ghost_tokens } from './gap_handling'
 
 
-/** @type {BuiltInRule[]} */
-const argument_and_sense_rules = [
+const argument_and_sense_rules: BuiltInRule[] = [
 	{
 		name: 'Fill gap in same-subject clauses',
 		comment: '',

@@ -4,10 +4,8 @@ import { TOKEN_TYPE } from '../token'
 /**
  * These words/phrases (and some others) are accepted by the Analyzer as alternates for
  * certain words in the Ontology.
- * 
- * @type {LookupRuleJson[]}
  */
-const lookup_rules_json = [
+const lookup_rules_json: LookupRuleJson[] = [
 	{
 		'name': 'in-order-to',
 		'trigger': { 'token': 'in' },

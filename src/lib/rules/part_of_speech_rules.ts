@@ -461,8 +461,7 @@ const part_of_speech_rules_json = [
 	},
 ]
 
-/** @type {BuiltInRule[]} */
-const builtin_part_of_speech_rules = [
+const builtin_part_of_speech_rules: BuiltInRule[] = [
 	{
 		name: "Words with possessive 's must be a noun",
 		comment: '',
