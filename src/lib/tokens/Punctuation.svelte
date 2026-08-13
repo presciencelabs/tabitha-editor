@@ -1,5 +1,5 @@
 <script lang="ts">
-	import TokenDisplay from './TokenDisplay.svelte'
+	import TokenWrapper from './TokenWrapper.svelte'
 
 	interface Props {
 		token: SimpleToken
@@ -9,10 +9,4 @@
 	let { token, classes = '' }: Props = $props()
 </script>
 
-{#if classes.includes('join-item')}
-	<TokenDisplay {classes}>{token.token}</TokenDisplay>
-{:else}
-	<span class="pb-3 text-6xl font-thin {classes}">
-		{token.token}
-	</span>
-{/if}
+<TokenWrapper {token} classes="pb-3 text-6xl font-thin {classes}" />
