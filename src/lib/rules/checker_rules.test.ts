@@ -282,4 +282,20 @@ describe('built-in checker rules', () => {
 			expect_message_to_match(checked_tokens[1].pairing, 'warning', /^'second' is not recognized/)
 		})
 	})
+
+	describe('temporal phrase comma suggestion', () => {
+		test('suggests comma after temporal phrase One morning that man', () => {
+			const test_tokens = [create_sentence([
+				create_token('One', TOKEN_TYPE.FUNCTION_WORD),
+				create_lookup_token('morning', { lookup_results: [lookup_result('morning')] }),
+				create_token('that', TOKEN_TYPE.FUNCTION_WORD),
+				create_lookup_token('man', { lookup_results: [lookup_result('man', { part_of_speech: 'Noun' })] }),
+				create_token('.', TOKEN_TYPE.PUNCTUATION),
+			])]
+			const ONE_DAY_RULE = CHECKER_RULES.filter(r => r.name.includes('Suggest a comma after'))
+			const checked_tokens = apply_rules(test_tokens, ONE_DAY_RULE).flatMap(flatten_sentence)
+			const comma_token = checked_tokens.find(t => t.token === ',')
+			expect(comma_token?.messages.some(m => m.message.includes("Add a comma after 'One morning'"))).toBe(true)
+		})
+	})
 })

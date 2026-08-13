@@ -183,17 +183,17 @@ const checker_rules_json: CheckerRuleJson[] = [
 	// 	},
 	// },
 	{
-		'name': 'Suggest a comma after "One day..."',
-		'trigger': { 'stem': 'day' },
+		'name': 'Suggest a comma after temporal phrase "One day/morning/evening..."',
+		'trigger': { 'token': 'day|morning|afternoon|evening|night|week|month|year' },
 		'context': {
 			'precededby': { 'token': 'One' },
 			'followedby': [{ 'token': 'that' }, { 'category': 'Noun' }],
 		},
 		'suggest': {
 			'followedby': ',',
-			'message': "Add a comma after 'One day' so the 'that' doesn't confuse the Analyzer.",
+			'message': "Add a comma after 'One {token}' so the 'that' doesn't confuse the Analyzer.",
 		},
-		'comment': 'The Analyzer messes up "One day that man...", but it works fine with a comma. TODO handle other phrases too?',
+		'comment': 'The Analyzer messes up "One day that man...", but it works fine with a comma.',
 	},
 	{
 		'name': 'Expect a [ before a relative clause',
