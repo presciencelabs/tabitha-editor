@@ -1,14 +1,6 @@
 import { create_context_filter, create_token_filter } from '$lib/rules/rules_parser'
 
-/**
- * @typedef {TokenRuleJsonBase | TokenRuleJsonBase[]} FeatureRuleJson
- * @typedef {[FeatureValue, TokenRule[]]} FeatureValueRules
- * @typedef {[FeatureName, FeatureValueRules[]]} FeatureRules
- * @typedef {Record<CategoryName, FeatureRules[]>} FeatureRulesByCategory
- */
-
-/** @type {Record<CategoryName, [FeatureName, [FeatureValue, FeatureRuleJson][]][]>} */
-const feature_rules_json = {
+const feature_rules_json: FeatureRulesByCategoryJson = {
 	'Noun': [
 		['Number', [
 			['Singular', { }],
@@ -417,33 +409,30 @@ const feature_rules_json = {
 	],
 }
 
-/** @type {FeatureRulesByCategory} */
-const FEATURE_RULES_BY_CATEGORY = parse_all_feature_rules()
+const FEATURE_RULES_BY_CATEGORY: FeatureRulesByCategory = parse_all_feature_rules()
 
-/**
- * @returns {FeatureRulesByCategory}
- */
-function parse_all_feature_rules() {
-	return Object.fromEntries(Object.entries(feature_rules_json as unknown as Record<string, [string, [string, unknown][]][]>).map(([pos, pos_feature_rules_json]) => {
-		return [
-			pos,
-			pos_feature_rules_json.map(([feature_name, feature_values_json]) => {
-				return [
-					feature_name,
-					feature_values_json.map(([feature_value, rule_json]) => {
-						return [feature_value, parse_feature_rule_json(pos, feature_name as FeatureName, feature_value as FeatureValue, rule_json)]
-					}),
-				]
-			}),
-		]
-	}))
+function parse_all_feature_rules(): FeatureRulesByCategory {
+	return Object.fromEntries(
+		Object.entries(feature_rules_json).map(([pos, pos_feature_rules_json]) => {
+			return [
+				pos,
+				pos_feature_rules_json.map(([feature_name, feature_values_json]) => {
+					return [
+						feature_name,
+						feature_values_json.map(([feature_value, rule_json]) => {
+							return [feature_value, parse_feature_rule_json(pos, feature_name, feature_value, rule_json)]
+						}),
+					]
+				}),
+			]
+		}),
+	)
 
 	function parse_feature_rule_json(
 		part_of_speech: string,
 		feature_name: FeatureName,
 		feature_value: FeatureValue,
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		rule_json: any,
+		rule_json: FeatureRuleJson,
 	): TokenRule[] {
 		if (Array.isArray(rule_json)) {
 			return rule_json.flatMap(json => parse_feature_rule_json(part_of_speech, feature_name, feature_value, json))
@@ -463,7 +452,7 @@ function parse_all_feature_rules() {
 }
 
 export function get_features_for_token(tokens: Token[], token_index: number, category: CategoryName): EntityFeature[] {
-	const category_feature_rules = (FEATURE_RULES_BY_CATEGORY as Record<string, [FeatureName, [FeatureValue, TokenRule[]][]][]>)[category] || []
+	const category_feature_rules = FEATURE_RULES_BY_CATEGORY[category] || []
 	return category_feature_rules.map(([feature_name, feature_rules]) => {
 		const selected_value_rules = feature_rules.findLast(([, rules]) => rules.some(rule => test_feature_rule(tokens, token_index, rule)))
 		return {
