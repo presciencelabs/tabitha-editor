@@ -229,10 +229,12 @@ export function tokenize_input(text: string = ''): Token[] {
 		return text[i]
 	}
 
+	// peek_match() checks if the current character matches the given regex without advancing
 	function peek_match(regex: RegExp): boolean {
 		return !is_at_end() && Boolean(peek().match(regex))
 	}
 
+	// match() advances if the current character matches the given regex
 	function match(regex: RegExp): boolean {
 		if (peek_match(regex)) {
 			advance()
@@ -241,6 +243,7 @@ export function tokenize_input(text: string = ''): Token[] {
 		return false
 	}
 
+	// match_two() advances if the next two characters match the given regex
 	function match_two(regex: RegExp): boolean {
 		if (i < text.length - 1 && (text[i] + text[i + 1]).match(regex)) {
 			i += 2
@@ -250,12 +253,14 @@ export function tokenize_input(text: string = ''): Token[] {
 		return false
 	}
 
+	// eat() advances greedily until a character does not match the given regex
 	function eat(regex: RegExp) {
 		while (peek_match(regex)) {
 			advance()
 		}
 	}
 
+	// eat_until() advances greedily until a character matches the given regex
 	function eat_until(regex: RegExp) {
 		while (!is_at_end() && !peek().match(regex)) {
 			advance()
