@@ -491,8 +491,4 @@ function select_word_sense(token: Token, trigger_context: RuleTriggerContext) {
 		token.lookup_results = [selected_result, ...token.lookup_results]
 	}
 
-	const result = token.lookup_results[0]
-	if (result?.part_of_speech === 'Verb') {
-		add_tag_to_token(token, { 'stem': result.stem }, trigger_context.rule_id)
-	}
 }
