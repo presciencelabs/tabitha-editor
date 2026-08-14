@@ -61,7 +61,7 @@ function phrasify_tokens(tokens: Token[]): Token[] {
 			// find all tokens AFTER the current phrase that should be included
 			const post_token_filters = ORDERED_PHRASE_POST_FILTERS.find(([phrase_filter]) => phrase_filter(token))?.[1] ?? []
 			// underscore notes always directly follow the word they're associated with
-			post_token_filters.splice(0, 0, (token: Token) => token.token.startsWith('_'))
+			post_token_filters.splice(0, 0, token => token.token.startsWith('_'))
 			let post_index = i + 1
 			for (const token_filter of post_token_filters) {
 				// keep matching the filter until it no longer matches. then move on to the next filter and repeat

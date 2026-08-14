@@ -1173,7 +1173,7 @@ export function get_passive_verb_case_frame_rules(token: Token): CaseFrameRuleIn
 		...active_rules,
 		rules_by_sense: active_rules.rules_by_sense
 			.map(rules_for_sense => ({ ...rules_for_sense, role_rules: replace_passive_rules(rules_for_sense.role_rules) })),
-		default_rule_getter: (lookup: LookupResult) => replace_passive_rules(active_rules.default_rule_getter(lookup)),
+		default_rule_getter: lookup => replace_passive_rules(active_rules.default_rule_getter(lookup)),
 	}
 
 	function replace_passive_rules(role_rules: ArgumentRoleRule[]): ArgumentRoleRule[] {

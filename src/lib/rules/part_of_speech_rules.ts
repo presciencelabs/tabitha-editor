@@ -475,7 +475,7 @@ const builtin_part_of_speech_rules: BuiltInRule[] = [
 		name: 'Words with a pronoun must be a noun.',
 		comment: '',
 		rule: {
-			trigger: (token: Token) => token.pronoun !== null,
+			trigger: token => token.pronoun !== null,
 			context: create_context_filter({}),
 			action: simple_rule_action(({ trigger_token }) => keep_parts_of_speech(new Set(['Noun']))(trigger_token)),
 		},
@@ -484,7 +484,7 @@ const builtin_part_of_speech_rules: BuiltInRule[] = [
 		name: 'Filter lookup results for pairings based on part of speech',
 		comment: '',
 		rule: {
-			trigger: (token: Token) => !!(token.lookup_results.length && token.pairing?.lookup_results.length),
+			trigger: token => !!(token.lookup_results.length && token.pairing?.lookup_results.length),
 			context: create_context_filter({}),
 			action: message_set_action(({ trigger_token: token }) => {
 				const left = token
@@ -508,7 +508,7 @@ const builtin_part_of_speech_rules: BuiltInRule[] = [
 		name: 'Select part-of-speech based on a note',
 		comment: '',
 		rule: {
-			trigger: (token: Token) => token.type === TOKEN_TYPE.LOOKUP_WORD,
+			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD,
 			context: create_context_filter({ 'followedby': { 'token': '_noun|_verb|_adj|_adv|_adp|_conj' } }),
 			action: simple_rule_action(({ trigger_token, tokens, context_indexes }) => {
 				const part_of_speech_note = tokens[context_indexes[0]].token
@@ -534,7 +534,7 @@ const builtin_part_of_speech_rules: BuiltInRule[] = [
 		name: 'Disambiguate part-of-speech based on the selected sense',
 		comment: '',
 		rule: {
-			trigger: (token: Token) => token.type === TOKEN_TYPE.LOOKUP_WORD && token.specified_sense.length > 0,
+			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD && token.specified_sense.length > 0,
 			context: create_context_filter({}),
 			action: message_set_action(({ trigger_token: token }) => {
 				if (is_one_part_of_speech(token)) {
@@ -558,7 +558,7 @@ const builtin_part_of_speech_rules: BuiltInRule[] = [
 		name: 'Disambiguate "is Xing"',
 		comment: 'When a verb like "saying" or "teaching" is preceded by "be", another rule wrongly selects the Noun. In these cases, a Noun like this would never immediately follow "be", so we can select the Verb instead.',
 		rule: {
-			trigger: (token: Token) => has_part_of_speech(token, 'Verb') && has_part_of_speech(token, 'Noun'),
+			trigger: token => has_part_of_speech(token, 'Verb') && has_part_of_speech(token, 'Noun'),
 			context: create_context_filter({ 'precededby': { 'stem': 'be' } }),
 			action: simple_rule_action(({ trigger_token }) => {
 				if (trigger_token.lookup_results
@@ -574,7 +574,7 @@ const builtin_part_of_speech_rules: BuiltInRule[] = [
 		name: 'If an ambiguous word could be a Verb, and there are no other Verbs in the clause, select the Verb',
 		comment: 'this is an implicit rule in the Analyzer',
 		rule: {
-			trigger: (token: Token) => has_part_of_speech(token, 'Verb') && !is_one_part_of_speech(token),
+			trigger: token => has_part_of_speech(token, 'Verb') && !is_one_part_of_speech(token),
 			context: create_context_filter({}),
 			action: simple_rule_action(({ tokens, trigger_token, trigger_index }) => {
 				// Can't use the context filter, because there may be another ambiguous word somewhere.
@@ -597,7 +597,7 @@ export function parse_part_of_speech_rule(rule_json: PartOfSpeechRuleJson, index
 	return {
 		id: `part_of_speech:${index}`,
 		name: rule_json['name'] ?? '',
-		trigger: (token: Token) => category(token) && trigger(token),
+		trigger: token => category(token) && trigger(token),
 		context,
 		action,
 	}

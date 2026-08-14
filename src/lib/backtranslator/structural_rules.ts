@@ -426,7 +426,7 @@ const structural_rules_json: BuiltInRule[] = [
 		name: 'Simple text mappings',
 		comment: '',
 		rule: {
-			trigger: (token: Token) => TOKEN_TEXT_MAP.has(token.token),
+			trigger: token => TOKEN_TEXT_MAP.has(token.token),
 			context: create_context_filter({ }),
 			action: simple_rule_action(({ trigger_token }) => {
 				trigger_token.token = TOKEN_TEXT_MAP.get(trigger_token.token) ?? trigger_token.token
@@ -437,7 +437,7 @@ const structural_rules_json: BuiltInRule[] = [
 		name: 'Simple number text mappings',
 		comment: 'Change some numbers to text (eg. 2 -> two), unless they are part of a verse reference (eg. Habakkuk 2:3)',
 		rule: {
-			trigger: (token: Token) => NUMBER_TOKEN_TEXT_MAP.has(token.token) && !token_has_tag(token, { 'role': 'verse_ref' }),
+			trigger: token => NUMBER_TOKEN_TEXT_MAP.has(token.token) && !token_has_tag(token, { 'role': 'verse_ref' }),
 			context: create_context_filter({ }),
 			action: simple_rule_action(({ trigger_token }) => {
 				trigger_token.token = NUMBER_TOKEN_TEXT_MAP.get(trigger_token.token) ?? trigger_token.token

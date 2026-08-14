@@ -43,7 +43,7 @@ const builtin_syntax_rules: BuiltInRule[] = [
 		name: "Set tag for words with possessive 's as genitive_saxon",
 		comment: '',
 		rule: {
-			trigger: (token: Token) => token.type === TOKEN_TYPE.LOOKUP_WORD && REGEXES.HAS_POSSESSIVE.test(token.token),
+			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD && REGEXES.HAS_POSSESSIVE.test(token.token),
 			context: create_context_filter({}),
 			action: simple_rule_action(({ trigger_token, rule_id }) => {
 				add_tag_to_token(trigger_token, { 'relation': 'genitive_saxon' }, rule_id)
@@ -54,7 +54,7 @@ const builtin_syntax_rules: BuiltInRule[] = [
 		name: 'Tag numbers at the start of a verse references',
 		comment: '',
 		rule: {
-			trigger: (token: Token) => /^\d/.test(token.token),
+			trigger: token => /^\d/.test(token.token),
 			context: create_context_filter({
 				'followedby': { 'tag': { 'syntax': 'verse_ref_colon' } },
 			}),
@@ -67,11 +67,11 @@ const builtin_syntax_rules: BuiltInRule[] = [
 		name: 'Tag and/or split numbers at the end of a verse references',
 		comment: '',
 		rule: {
-			trigger: (token: Token) => /^\d/.test(token.token),
+			trigger: token => /^\d/.test(token.token),
 			context: create_context_filter({
 				'precededby': { 'tag': { 'syntax': 'verse_ref_colon' } },
 			}),
-			action: ({ tokens, trigger_index, trigger_token, rule_id }: RuleTriggerContext) => {
+			action: ({ tokens, trigger_index, trigger_token, rule_id }) => {
 				if (trigger_token.token.includes('-')) {
 					// this is a verse range (eg. Jeremiah 31:31-34)
 					const verse_numbers = trigger_token.token.split('-')

@@ -261,11 +261,11 @@ function check_usage(lookup: LookupResult, role_matches: RoleMatchResult[]): Cas
 	// Sometimes the same token matches multiple roles, especially with clauses. So if an 'extra' argument
 	// also matched a valid argument, remove it from the extras.
 
-	const valid_arguments = role_matches.filter(({ role_tag }: RoleMatchResult) => possible_roles.includes(role_tag))
-	const extra_arguments = role_matches.filter(({ role_tag, trigger_context }: RoleMatchResult) => 
+	const valid_arguments = role_matches.filter(({ role_tag }) => possible_roles.includes(role_tag))
+	const extra_arguments = role_matches.filter(({ role_tag, trigger_context }) => 
 		!possible_roles.includes(role_tag)
-		&& !valid_arguments.some(({ trigger_context: { trigger_index } }: RoleMatchResult) => trigger_context.trigger_index === trigger_index))
-	const missing_arguments = required_roles.filter((role: string) => !role_matches.some(({ role_tag }: RoleMatchResult) => role_tag === role))
+		&& !valid_arguments.some(({ trigger_context: { trigger_index } }) => trigger_context.trigger_index === trigger_index))
+	const missing_arguments = required_roles.filter(role => !role_matches.some(({ role_tag }) => role_tag === role))
 
 	const is_valid = extra_arguments.length === 0 && missing_arguments.length === 0
 
@@ -296,7 +296,7 @@ export function* validate_case_frame(trigger_context: RuleTriggerContext): Gener
 		yield { [severity]: "This use of '{stem}' does not match any sense in the Ontology. Check other errors and warnings for more information." }
 
 		// flag any extra roles common to all lookup results
-		const extra_roles_for_all = selected_result.case_frame.result.extra_arguments.filter(({ role_tag }: RoleMatchResult) => role_is_extra_for_all(role_tag, token))
+		const extra_roles_for_all = selected_result.case_frame.result.extra_arguments.filter(({ role_tag }) => role_is_extra_for_all(role_tag, token))
 		for (const extra_argument of extra_roles_for_all) {
 			const extra_message = ALL_HAVE_EXTRA_ARGUMENT_MESSAGES.get(extra_argument.role_tag)
 				|| extra_argument.rule.extra_message.replaceAll('{sense}', "'{stem}'")
@@ -327,7 +327,7 @@ export function* validate_case_frame(trigger_context: RuleTriggerContext): Gener
 		['beneficiary', 'G'],
 	]
 	for (const [role_tag, categorization_letter] of roles_to_check) {
-		const role_argument = case_frame.valid_arguments.find(({ role_tag: tag }: RoleMatchResult) => tag === role_tag)
+		const role_argument = case_frame.valid_arguments.find(({ role_tag: tag }) => tag === role_tag)
 		if (role_argument && !selected_result.categorization.toUpperCase().includes(categorization_letter)) {
 			yield {
 				token_to_flag: role_argument.trigger_context.trigger_token,
@@ -339,7 +339,7 @@ export function* validate_case_frame(trigger_context: RuleTriggerContext): Gener
 	// Flag a pairing that is invalid
 	// If the base word is invalid, there's no point checking the pairing
 	const pairing_token = token.pairing
-	if (case_frame.status === 'valid' && pairing_token && pairing_token.lookup_results.some(({ case_frame }: LookupResult) => case_frame.result.status === 'invalid')) {
+	if (case_frame.status === 'valid' && pairing_token && pairing_token.lookup_results.some(({ case_frame }) => case_frame.result.status === 'invalid')) {
 		const selected_pairing_result = pairing_token.lookup_results[0]
 		const simple_sense = stem_with_sense(selected_result)
 		if (no_matches_and_ambiguous_sense(pairing_token)) {
@@ -374,7 +374,7 @@ function show_invalid_roles(lookup: LookupResult): MessageInfo {
 	const missing_roles = lookup.case_frame.result.missing_arguments.map(get_missing_messages)
 	const missing_message = missing_roles.length ? `missing ${missing_roles.join(', ')}` : ''
 
-	const extra_roles = lookup.case_frame.result.extra_arguments.map(({ role_tag }: RoleMatchResult) => readable_role_tag(role_tag))
+	const extra_roles = lookup.case_frame.result.extra_arguments.map(({ role_tag }) => readable_role_tag(role_tag))
 	const extra_message = extra_roles.length ? `unexpected ${extra_roles.join(', ')}` : ''
 
 	const joiner = missing_message.length && extra_message.length ? '; ' : ''
@@ -383,7 +383,7 @@ function show_invalid_roles(lookup: LookupResult): MessageInfo {
 }
 
 function no_matches_and_ambiguous_sense(token: Token): boolean {
-	return token.lookup_results.every(({ case_frame }: LookupResult) => case_frame.result.status === 'invalid') && token.lookup_results.length > 1 && !token.specified_sense
+	return token.lookup_results.every(({ case_frame }) => case_frame.result.status === 'invalid') && token.lookup_results.length > 1 && !token.specified_sense
 }
 
 function role_is_extra_for_all(role_tag: RoleTag, token: Token): boolean {

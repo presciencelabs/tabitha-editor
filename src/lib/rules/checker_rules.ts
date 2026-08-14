@@ -681,7 +681,7 @@ const builtin_checker_rules: BuiltInRule[] = [
 		name: 'Check word complexity level of complex pairings',
 		comment: '',
 		rule: {
-			trigger: (token: Token) => token.pairing_type === 'complex',
+			trigger: token => token.pairing_type === 'complex',
 			context: create_context_filter({}),
 			action: message_set_action(function* ({ trigger_token: token }) {
 				// a complex pairing word should never be level 0 or 1
@@ -695,7 +695,7 @@ const builtin_checker_rules: BuiltInRule[] = [
 		name: 'Warn user if the word\'s complexity is ambiguous',
 		comment: '',
 		rule: {
-			trigger: (token: Token) => token.type === TOKEN_TYPE.LOOKUP_WORD,
+			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD,
 			context: create_context_filter({}),
 			action: message_set_action(function* ({ trigger_token: token }) {
 				// Alert if the first result is complex and there are also non-complex results (including proper nouns - see 'ark')
@@ -722,7 +722,7 @@ const builtin_checker_rules: BuiltInRule[] = [
 		name: 'Check ontology status',
 		comment: '',
 		rule: {
-			trigger: (token: Token) => token.type === TOKEN_TYPE.LOOKUP_WORD,
+			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD,
 			context: create_context_filter({}),
 			action: message_set_action(function* ({ trigger_token: token }) {
 				yield* check_ontology_status(token)
@@ -737,7 +737,7 @@ const builtin_checker_rules: BuiltInRule[] = [
 		name: 'Check for words with ambiguous parts of speech',
 		comment: '',
 		rule: {
-			trigger: (token: Token) => token.type === TOKEN_TYPE.LOOKUP_WORD && !is_one_part_of_speech(token),
+			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD && !is_one_part_of_speech(token),
 			context: create_context_filter({}),
 			action: message_set_action(function* () {
 				yield { warning: 'The editor cannot determine which part of speech this word is, so some errors and warnings within the same clause may not be accurate.' }

@@ -48,7 +48,7 @@ const builtin_pronoun_rules: BuiltInRule[] = [
 		'name': 'Tag valid pronoun referents and check for invalid ones',
 		'comment': '',
 		'rule': {
-			trigger: (token: Token) => token.type === TOKEN_TYPE.LOOKUP_WORD && token.pronoun !== null,
+			trigger: token => token.type === TOKEN_TYPE.LOOKUP_WORD && token.pronoun !== null,
 			context: create_context_filter({}),
 			action: message_set_action(({ trigger_token, rule_id }) => {
 				const pronoun = trigger_token.pronoun!
