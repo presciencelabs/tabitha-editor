@@ -1,6 +1,6 @@
 import { REGEXES } from '$lib/regexes'
 import { ERRORS } from './error_messages'
-import { TOKEN_TYPE, create_clause_token, create_added_token, flatten_sentence, MESSAGE_TYPE } from '../token'
+import { TOKEN_TYPE, create_clause_token, create_added_token, flatten_sentence, MESSAGE_TYPE, set_message_plain } from '../token'
 
 export function clausify(tokens: Token[]): Sentence[] {
 	if (tokens.length === 0) {
@@ -21,6 +21,14 @@ export function clausify(tokens: Token[]): Sentence[] {
 
 		if (token.token.includes('[')) {
 			start_clause()
+
+			if (clause_tokens.length > 4) {
+				set_message_plain(token, {
+					...MESSAGE_TYPE.WARNING,
+					message: 'Clause nesting depth exceeds 3 levels. Consider reworking the sentence for clarity.',
+					rule_id: 'clause:nesting_depth',
+				})
+			}
 		}
 
 		add_token_to_clause(token)
@@ -63,13 +71,6 @@ export function clausify(tokens: Token[]): Sentence[] {
 
 	function start_clause() {
 		clause_tokens.push([])
-		if (clause_tokens.length > 4) {
-			add_token_to_clause(create_added_token('[', {
-				...MESSAGE_TYPE.WARNING,
-				message: 'Clause nesting depth exceeds 3 levels. Consider reworking the sentence for clarity.',
-				rule_id: 'clause:nesting_depth',
-			}))
-		}
 	}
 
 	function end_clause() {
