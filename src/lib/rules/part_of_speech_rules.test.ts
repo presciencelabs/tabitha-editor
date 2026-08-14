@@ -11,8 +11,8 @@ function create_pairing_token(left: Token, right: Token, pairing_type: PairingTy
 	return left
 }
 
-function create_lookup_token(token: string, { lookup_results = [] }: { lookup_results?: LookupResult[] } = {}): Token {
-	return create_token(token, TOKEN_TYPE.LOOKUP_WORD, { lookup_term: token, lookup_results })
+function create_lookup_token(token: string, { lookup_results = [], tag = {} }: { lookup_results?: LookupResult[]; tag?: Tag } = {}): Token {
+	return create_token(token, TOKEN_TYPE.LOOKUP_WORD, { tag, lookup_term: token, lookup_results })
 }
 
 function create_sentence(tokens: Token[]): Sentence {
@@ -114,6 +114,7 @@ describe('possessive and pronoun POS rules', () => {
 	test('possessive noun rule selects noun part of speech', () => {
 		const test_tokens = [create_sentence([
 			create_lookup_token("king's", {
+				tag: { relation: 'genitive_saxon' },
 				lookup_results: [
 					lookup_result('king', { part_of_speech: 'Noun' }),
 					lookup_result('king', { part_of_speech: 'Verb' }),
@@ -124,6 +125,7 @@ describe('possessive and pronoun POS rules', () => {
 		])]
 
 		const checked_tokens = apply_rules(test_tokens, PART_OF_SPEECH_RULES).flatMap(flatten_sentence)
-		expect(checked_tokens[0].lookup_results.length).toBeGreaterThan(0)
+		expect(checked_tokens[0].lookup_results.length).toBe(1)
+		expect(checked_tokens[0].lookup_results[0].part_of_speech).toBe('Noun')
 	})
 })
